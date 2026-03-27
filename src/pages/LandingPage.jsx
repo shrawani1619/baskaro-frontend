@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { catalog } from '../../mock/catalog.js'
+import { catalog } from '../mock/catalog.js'
 
 const TOP_NAV = [
   'All',
@@ -576,7 +576,7 @@ function ServiceThumb({ label }) {
       alt=""
       aria-hidden="true"
       loading="lazy"
-      className="mx-auto h-20 w-20 object-contain"
+      className="mx-auto h-12 w-12 object-contain"
     />
   )
 }
@@ -2835,21 +2835,22 @@ export default function LandingPage() {
 
       {/* Services */}
       <section className="w-full px-4 pt-10 pb-10 sm:px-6">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl rounded-3xl bg-slate-50 px-4 py-6 sm:px-6 sm:py-7">
           <h2 className="mb-5 text-xl font-extrabold text-slate-900">
             Our Services
           </h2>
 
-          {/* ~2 rows like the screenshot */}
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-7 xl:grid-cols-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
             {SERVICES.map((label) => (
               <button
                 key={label}
                 type="button"
-                className="group flex min-h-[128px] flex-col items-center justify-start rounded-2xl p-2 text-left transition hover:-translate-y-0.5 hover:bg-white hover:shadow-sm"
+                className="group flex flex-col items-center justify-start rounded-xl p-1 text-left transition-transform duration-200 hover:-translate-y-0.5"
               >
-                <ServiceThumb label={label} />
-                <span className="mt-3 text-center text-sm font-bold text-slate-800 group-hover:text-red-700">
+                <div className="flex h-24 w-full max-w-[118px] items-center justify-center rounded-2xl bg-[#eaf3f2] transition-colors duration-200 group-hover:bg-[#dff0ee]">
+                  <ServiceThumb label={label} />
+                </div>
+                <span className="mt-2 text-center text-xs font-bold text-slate-800 group-hover:text-red-700">
                   {label}
                 </span>
               </button>
