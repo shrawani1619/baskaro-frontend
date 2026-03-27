@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { catalog } from '../../mock/catalog.js'
-import { estimateSellingPrice } from '../../lib/pricing/estimatePrice.js'
+import { catalog } from '../mock/catalog.js'
+import { estimateSellingPrice } from '../lib/pricing/estimatePrice.js'
 
 const SCREEN_OPTIONS = ['Excellent', 'Good', 'Fair', 'Bad / Cracked']
 const BODY_OPTIONS = ['Excellent', 'Good', 'Fair', 'Bad / Scratched']
@@ -20,7 +20,7 @@ function formatMoney(n) {
   return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(n)
 }
 
-export function HomePageReal() {
+export default function HomePage() {
   const brands = useMemo(() => Object.keys(catalog), [])
   const [step, setStep] = useState('select') // select -> estimate -> pickup -> confirm
   const [selectedBrand, setSelectedBrand] = useState(brands[0] ?? 'Apple')
