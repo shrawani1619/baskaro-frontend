@@ -12,6 +12,7 @@ import {
   Store,
   PlusCircle,
   ChevronRight,
+  ChevronLeft,
   TrendingUp,
   MapPin,
   ArrowRight
@@ -19,6 +20,7 @@ import {
 import { catalog } from '../mock/catalog.js'
 import { gPhoto, gBrandLogo } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
+import { ProductCard } from '../components/ProductCard'
 
 const TOP_NAV = [
   'All',
@@ -459,57 +461,6 @@ function IconBox({ idx }) {
   )
 }
 
-function ProductCard({ product }) {
-  return (
-    <div className="w-[220px] shrink-0 rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-50">
-        <img
-          src={product.imageUrl}
-          alt={product.title}
-          className="absolute left-1/2 top-1/2 h-5/6 w-auto -translate-x-1/2 -translate-y-1/2 object-contain"
-          loading="lazy"
-        />
-        {product.topBadge ? (
-          <div className="absolute right-2 top-2 rounded-md bg-white/90 px-2 py-1 text-[10px] font-extrabold text-red-700">
-            {product.topBadge}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="mt-2 line-clamp-2 text-sm font-extrabold text-slate-900">
-        {product.title}
-      </div>
-
-      <div className="mt-2 flex items-center gap-2">
-        {product.oldPrice ? (
-          <div className="text-xs font-extrabold text-rose-600 line-through">
-            {product.oldPrice}
-          </div>
-        ) : null}
-        <div className="text-base font-extrabold text-slate-900">
-          {product.price}
-        </div>
-      </div>
-
-      {product.saleLabel ? (
-        <div className="mt-2 inline-flex items-center gap-2 rounded-md bg-red-50 px-2 py-1 text-[11px] font-extrabold text-red-700">
-          {product.saleLabel}
-        </div>
-      ) : null}
-
-      {product.rating ? (
-        <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-slate-600">
-          <div className="flex items-center gap-1">
-            <span className="inline-block h-3 w-3 rounded-full bg-amber-200" />
-            {product.rating}
-          </div>
-          <div className="text-red-700">{product.flashLabel}</div>
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
 const SERVICE_THUMBS = {
   'Sell Phone': gPhoto(0),
   'Buy Gadgets': gPhoto(1),
@@ -538,7 +489,83 @@ function ServiceThumb({ label }) {
   )
 }
 
+const REFURBISHED_DEVICES_CAROUSEL = [
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+    title: 'Samsung Galaxy S25 Edge - Refurbished',
+    price: '₹57,599',
+    originalPrice: '₹75,900',
+    discount: 57,
+    rating: 4.8,
+    tag: ['Flash Sale', 'Month End Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+    title: 'OnePlus Nord CE 5G - Refurbished',
+    price: '₹11,699',
+    rating: 4.0,
+    tag: ['Flash Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+    title: 'Samsung Galaxy S20 FE 5G - Refurbished',
+    price: '₹14,699',
+    originalPrice: '₹18,500',
+    discount: 21,
+    rating: 4.4,
+    tag: ['Month End Sale', 'Flash Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+    title: 'Xiaomi Redmi Note 10 Pro - Refurbished',
+    price: '₹8,525',
+    originalPrice: '₹9,800',
+    discount: 13,
+    rating: 4.2,
+    tag: ['Month End Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+    title: 'Apple iPhone 14 - Refurbished',
+    price: '₹29,999',
+    originalPrice: '₹42,900',
+    discount: 30,
+    rating: 4.8,
+    tag: ['Flash Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    image:
+      'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+    title: 'Realme Phone - Refurbished',
+    price: '₹12,999',
+    originalPrice: '₹14,999',
+    discount: 13,
+    rating: 4.3,
+    tag: ['Flash Sale', 'Month End Sale'],
+    brand: 'BASKARO',
+  },
+]
+
 function CarouselSection({ title, viewAllText, products }) {
+  const scrollerRef = useRef(null)
+
+  const scrollCarousel = (direction) => {
+    const el = scrollerRef.current
+    if (!el) return
+    const delta = Math.min(el.clientWidth * 0.85, 520) * direction
+    el.scrollBy({ left: delta, behavior: 'smooth' })
+  }
+
   return (
     <section className="w-full px-4 py-10 sm:px-6">
       <div className="mx-auto max-w-6xl">
@@ -552,10 +579,32 @@ function CarouselSection({ title, viewAllText, products }) {
           </a>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
-          {products.map((p) => (
-            <ProductCard key={p.title} product={p} />
-          ))}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => scrollCarousel(-1)}
+            aria-label="Scroll products left"
+            className="absolute left-0 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:text-red-700 sm:flex"
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollCarousel(1)}
+            aria-label="Scroll products right"
+            className="absolute right-0 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:text-red-700 sm:flex"
+          >
+            <ChevronRight className="h-5 w-5" aria-hidden />
+          </button>
+
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto pb-2 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-12"
+          >
+            {products.map((p) => (
+              <ProductCard key={p.title} {...p} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -2818,74 +2867,7 @@ export default function LandingPage() {
       <CarouselSection
         title="Buy Refurbished Devices"
         viewAllText="View All"
-        products={[
-          {
-            title: 'Samsung Galaxy S25 Edge - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹75,900',
-            price: '₹57,599',
-            saleLabel: '-57%',
-            rating: '4.8',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'OnePlus Nord CE 5G - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹11,699',
-            price: '₹11,699',
-            saleLabel: 'Flash Sale',
-            rating: '4.0',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Samsung Galaxy S20 FE 5G - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹18,500',
-            price: '₹14,699',
-            saleLabel: 'Month End Sale',
-            rating: '4.4',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Xiaomi Redmi Note 10 Pro - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹9,800',
-            price: '₹8,525',
-            saleLabel: 'Month End Sale',
-            rating: '4.2',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Apple iPhone 14 - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹29,900',
-            price: '₹29,999',
-            saleLabel: 'Flash Sale',
-            rating: '4.8',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Realme Phone - Refurbished',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹14,999',
-            price: '₹12,999',
-            saleLabel: 'Deal',
-            rating: '4.3',
-            flashLabel: 'Flash Sale',
-          },
-        ]}
+        products={REFURBISHED_DEVICES_CAROUSEL}
       />
 
       {/* Our Exclusive Stores */}
