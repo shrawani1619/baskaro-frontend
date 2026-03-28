@@ -1,4 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { cloneElement, useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Smartphone,
+  Laptop,
+  Watch,
+  Tablet,
+  Wrench,
+  Recycle,
+  Search,
+  Store,
+  PlusCircle,
+  ChevronRight,
+  TrendingUp,
+  MapPin,
+  ArrowRight
+} from 'lucide-react'
 import { catalog } from '../mock/catalog.js'
 
 const TOP_NAV = [
@@ -9,6 +26,34 @@ const TOP_NAV = [
   'BASKARO Store',
   'More',
 ]
+
+const CATEGORY_DATA = {
+  Phone: {
+    icon: <Smartphone size={18} />,
+    description: 'Sell phones, brands & models'
+  },
+  More: {
+    icon: <PlusCircle size={18} />,
+    description: 'Laptops, tablets & more'
+  },
+  Repair: {
+    icon: <Wrench size={18} />,
+    description: 'Screen, battery repair'
+  },
+  Recycle: {
+    icon: <Recycle size={18} />,
+    description: 'Eco-friendly disposal'
+  },
+  'Find New Phone': {
+    icon: <Search size={18} />,
+    description: 'New arrivals & comparison'
+  },
+  'Cashify Store': {
+    icon: <Store size={18} />,
+    description: 'Locate nearby store'
+  }
+}
+
 
 const SERVICES = [
   'Sell Phone',
@@ -1308,6 +1353,7 @@ function DownloadAppSection() {
 }
 
 export default function LandingPage() {
+  const navigate = useNavigate()
   const [location, setLocation] = useState('Gurgaon')
   const locationOptions = useMemo(() => ['Gurgaon', 'Delhi', 'Noida'], [])
   const [moreOpen, setMoreOpen] = useState(false)
@@ -1581,7 +1627,11 @@ export default function LandingPage() {
                             <button
                               key={b}
                               type="button"
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
+                              onClick={() => {
+                                setSellDesktopOpen(false)
+                                navigate(`/brand/${b}`)
+                              }}
+                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-rose-600"
                             >
                               {b}
                             </button>
@@ -1598,7 +1648,7 @@ export default function LandingPage() {
                             <button
                               key={p}
                               type="button"
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
+                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-rose-600"
                             >
                               {p}
                             </button>
@@ -1628,9 +1678,9 @@ export default function LandingPage() {
               ))}
             </select>
 
-            <button className="rounded-md bg-red-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700">
+            <Link to="/login" className="rounded-xl bg-rose-600 px-6 py-2 text-sm font-black text-white shadow-lg shadow-rose-600/20 hover:bg-rose-700 transition-all hover:scale-105 active:scale-95">
               Login
-            </button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -1651,21 +1701,19 @@ export default function LandingPage() {
             <div
               className="relative"
               data-topnav-dropdown="true"
-              onMouseEnter={() => {
-                setAllDropdownOpen(true)
-                setAllSellSubOpen(true)
-                setMoreDropdownOpen(false)
-                setSellDesktopOpen(false)
-                setRefurbishedDropdownOpen(false)
-              }}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
+                className={[
+                  "flex items-center gap-2 whitespace-nowrap px-4 py-2 rounded-xl text-sm font-black transition-all duration-300",
+                  allDropdownOpen
+                    ? "bg-rose-50 text-rose-600 shadow-sm"
+                    : "text-slate-900 hover:bg-slate-100/80 hover:text-rose-600"
+                ].join(' ')}
                 aria-haspopup="menu"
                 aria-expanded={allDropdownOpen}
                 onClick={() => {
-                  setAllDropdownOpen(true)
+                  setAllDropdownOpen(!allDropdownOpen)
                   setAllSellSubOpen(true)
                   setMoreDropdownOpen(false)
                   setSellDesktopOpen(false)
@@ -1674,157 +1722,134 @@ export default function LandingPage() {
               >
                 <span>All</span>
                 <svg
-                  width="14"
-                  height="14"
+                  width="12"
+                  height="12"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                   aria-hidden="true"
+                  className={["transition-transform duration-300", allDropdownOpen ? "rotate-180" : ""].join(' ')}
                 >
                   <path
                     d="M6 9L12 15L18 9"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="3"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
               </button>
 
-              {allDropdownOpen && (
-                <div className="absolute left-0 top-full z-[120] mt-3 w-[680px] max-h-[calc(100vh-140px)] overflow-y-auto rounded-2xl border border-slate-100 bg-white shadow-lg">
-                  <div className="grid grid-cols-[260px_1fr]">
-                    <div className="border-r border-slate-100 p-4">
-                      <div className="text-3xl font-extrabold text-slate-900">Sell</div>
-                      <div className="mt-4 space-y-2">
-                        {[
-                          'Phone',
-                          'Laptop',
-                          'Smartwatch',
-                          'Tablet',
-                          'More',
-                          'Repair',
-                          'Sell Gadgets',
-                          'Buy Gadgets',
-                          'Recycle',
-                          'Find New Phone',
-                          'Cashify Store',
-                        ].map((label) => {
+              <AnimatePresence mode="wait">
+                {allDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute left-0 top-full z-[120] mt-3 w-[620px] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)]"
+                  >
+                    <div className="flex h-[440px]">
+                      {/* Text-Only Switcher (Left) */}
+                      <div className="w-[180px] bg-slate-50/50 border-r border-slate-100 flex flex-col py-8 px-8 gap-4">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Categories</h4>
+                        {Object.entries(CATEGORY_DATA).map(([label, data]) => {
                           const active = allSellCategory === label
                           return (
                             <button
                               key={label}
-                              type="button"
-                              onMouseEnter={() => setAllSellCategory(label)}
                               onClick={() => setAllSellCategory(label)}
                               className={[
-                                'flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors',
-                                active
-                                  ? 'bg-red-50 text-red-700'
-                                  : 'text-slate-700 hover:bg-red-50 hover:text-red-700',
+                                'text-left transition-all duration-200 text-sm font-bold uppercase tracking-tight',
+                                active ? 'text-rose-600' : 'text-slate-600 hover:text-slate-900'
                               ].join(' ')}
                             >
-                              <span>{label}</span>
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                                className="text-current opacity-70"
-                              >
-                                <path
-                                  d="M9 18l6-6-6-6"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
+                               {label}
                             </button>
                           )
                         })}
                       </div>
-                    </div>
 
-                    {allSellCategory === 'Phone' ? (
-                      <div className="p-5">
-                        <div className="text-sm font-semibold text-slate-500">More in Sell</div>
-
-                        <div className="mt-2 text-3xl font-extrabold text-slate-900">
-                          Top Brands
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          {['Apple', 'Xiaomi', 'Samsung', 'Oneplus', 'Nokia', 'Poco'].map((b) => (
-                            <button
-                              key={b}
-                              type="button"
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                            >
-                              {b}
-                            </button>
-                          ))}
-                          <button
-                            type="button"
-                            className="mt-1 text-left text-sm font-extrabold text-red-700 hover:text-red-800"
+                      {/* Text-Only Content (Right) */}
+                      <div className="flex-1 bg-white py-8 px-10 overflow-y-auto custom-scrollbar">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={allSellCategory}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.1 }}
+                            className="h-full"
                           >
-                            More Phone Brands
-                          </button>
-                        </div>
+                            {allSellCategory === 'Phone' ? (
+                              <div className="space-y-10">
+                                <div>
+                                  <h4 className="text-base font-black text-slate-900 mb-6">Top Brands</h4>
+                                  <div className="flex flex-col gap-4">
+                                    {[
+                                      'Apple', 'Samsung', 'Xiaomi', 'OnePlus', 'Vivo', 'Oppo'
+                                    ].map((brand) => (
+                                      <button
+                                        key={brand}
+                                        onClick={() => {
+                                          setAllDropdownOpen(false)
+                                          navigate(`/brand/${brand}`)
+                                        }}
+                                        className="text-left text-[15px] font-bold text-slate-600 hover:text-rose-600 transition-colors tracking-tight"
+                                      >
+                                        {brand}
+                                      </button>
+                                    ))}
+                                    <button className="text-left text-[14px] font-black text-rose-600 hover:underline mt-2">More Phone Brands</button>
+                                  </div>
+                                </div>
 
-                        <div className="mt-5 text-3xl font-extrabold text-slate-900">
-                          Top Selling Phones
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          {[
-                            'Apple iPhone 12',
-                            'Apple iPhone 11',
-                            'Samsung Galaxy Note 20',
-                            'One Plus 9 Pro',
-                            'Xiaomi Redmi Note 4',
-                            'Apple iPhone 6',
-                          ].map((p) => (
-                            <button
-                              key={p}
-                              type="button"
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                            >
-                              {p}
-                            </button>
-                          ))}
-                        </div>
+                                <div>
+                                  <h4 className="text-base font-black text-slate-900 mb-6 border-t border-slate-50 pt-8">Top Selling Phones</h4>
+                                  <div className="flex flex-col gap-4 pb-4">
+                                    {[
+                                      'iPhone 16 Pro Max', 'iPhone 15', 'Galaxy S24 Ultra', 'OnePlus 12', 'Pixel 9 Pro'
+                                    ].map(phone => (
+                                      <button key={phone} className="text-left text-[15px] font-bold text-slate-600 hover:text-rose-600 transition-colors tracking-tight">
+                                        {phone}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col justify-center h-full">
+                                <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">Expert {allSellCategory} Portal</h4>
+                                <p className="text-[12px] font-medium text-slate-400 mt-2 leading-relaxed italic opacity-80">Our premium {allSellCategory.toLowerCase()} services are launching soon. Check back for high-end valuations.</p>
+                                <button className="mt-8 text-left text-[11px] font-black text-rose-600 uppercase tracking-widest hover:underline">Notify Me</button>
+                              </div>
+                            )}
+                          </motion.div>
+                        </AnimatePresence>
                       </div>
-                    ) : (
-                      <div className="p-5">
-                        <div className="text-sm font-semibold text-slate-500">More in Sell</div>
-                        <div className="mt-3 text-sm font-semibold text-slate-600">
-                          Hover on <span className="font-extrabold text-slate-900">Phone</span> to open top brands and top selling phones.
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Sell Phone mega dropdown (hover) */}
             <div
               className="relative"
               data-topnav-dropdown="true"
-              onMouseEnter={() => {
-                setSellDesktopOpen(true)
-                setAllDropdownOpen(false)
-                setAllSellSubOpen(false)
-                setMoreDropdownOpen(false)
-                setRefurbishedDropdownOpen(false)
-              }}
             >
               <button
                 type="button"
-                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
+                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-rose-600"
                 aria-haspopup="menu"
                 aria-expanded={sellDesktopOpen}
+                onClick={() => {
+                  setSellDesktopOpen(!sellDesktopOpen)
+                  setAllDropdownOpen(false)
+                  setAllSellSubOpen(false)
+                  setMoreDropdownOpen(false)
+                  setRefurbishedDropdownOpen(false)
+                }}
               >
                 Sell Phone
                 <svg
@@ -1898,13 +1923,6 @@ export default function LandingPage() {
             <div
               className="relative"
               data-topnav-dropdown="true"
-              onMouseEnter={() => {
-                setRefurbishedDropdownOpen(true)
-                setAllDropdownOpen(false)
-                setAllSellSubOpen(false)
-                setSellDesktopOpen(false)
-                setMoreDropdownOpen(false)
-              }}
             >
               <button
                 type="button"
@@ -2558,9 +2576,6 @@ export default function LandingPage() {
                         <div className="mt-3 space-y-2">
                           {[
                             { label: 'Phone' },
-                            { label: 'Laptop' },
-                            { label: 'Smartwatch' },
-                            { label: 'Tablet' },
                             { label: 'More' },
                           ].map((row) => {
                             const active = allSellCategory === row.label
@@ -2603,8 +2618,6 @@ export default function LandingPage() {
                         <div className="mt-5 space-y-2">
                           {[
                             'Repair',
-                            'Sell Gadgets',
-                            'Buy Gadgets',
                             'Recycle',
                             'Find New Phone',
                             'Cashify Store',
@@ -2836,21 +2849,29 @@ export default function LandingPage() {
       {/* Services */}
       <section className="w-full px-4 pt-10 pb-10 sm:px-6">
         <div className="mx-auto max-w-6xl rounded-3xl bg-slate-50 px-4 py-6 sm:px-6 sm:py-7">
-          <h2 className="mb-5 text-xl font-extrabold text-slate-900">
-            Our Services
-          </h2>
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-xl font-extrabold text-slate-900">Our Services</h2>
+            <span className="text-xs font-semibold text-slate-400">Tap to explore →</span>
+          </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
             {SERVICES.map((label) => (
               <button
                 key={label}
                 type="button"
-                className="group flex flex-col items-center justify-start rounded-xl p-1 text-left transition-transform duration-200 hover:-translate-y-0.5"
+                onClick={() => navigate(`/services/${encodeURIComponent(label)}`)}
+                className="group flex flex-col items-center justify-start rounded-xl p-1 text-left transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02]"
               >
-                <div className="flex h-24 w-full max-w-[118px] items-center justify-center rounded-2xl bg-[#eaf3f2] transition-colors duration-200 group-hover:bg-[#dff0ee]">
+                <div className="relative flex h-24 w-full max-w-[118px] items-center justify-center rounded-2xl bg-[#eaf3f2] ring-2 ring-transparent transition-all duration-200 group-hover:bg-[#dff0ee] group-hover:ring-red-200 group-hover:shadow-md">
                   <ServiceThumb label={label} />
+                  {/* Hover arrow badge */}
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 scale-75">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
                 </div>
-                <span className="mt-2 text-center text-xs font-bold text-slate-800 group-hover:text-red-700">
+                <span className="mt-2 text-center text-xs font-bold text-slate-800 transition-colors duration-150 group-hover:text-red-700">
                   {label}
                 </span>
               </button>

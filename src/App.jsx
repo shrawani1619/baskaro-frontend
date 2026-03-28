@@ -3,6 +3,10 @@ import { MainLayout } from './components/MainLayout'
 import { Button } from './components/Button'
 import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
+import BrandPage from './pages/BrandPage'
+import ServiceExplorer from './pages/ServiceExplorer'
+import LoginPage from './pages/LoginPage'
+import UserDashboard from './pages/UserDashboard'
 
 function NotFoundPage() {
   return (
@@ -19,6 +23,8 @@ function NotFoundPage() {
   )
 }
 
+
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -26,6 +32,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/brand/:brandName" element={<BrandPage />} />
+          <Route path="/services/:serviceType" element={<ServiceExplorer />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
           <Route path="/landing" element={<Navigate to="/" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
