@@ -200,33 +200,6 @@ const TRUST_TESTIMONIALS = [
   },
 ]
 
-const HOT_DEALS = [
-  {
-    id: 'buyback',
-    title: 'Buyback Offers',
-    bgClass: 'bg-rose-100',
-    imageUrl: gPhoto(0),
-  },
-  {
-    id: 'exchange',
-    title: 'Exchange Offers',
-    bgClass: 'bg-teal-100',
-    imageUrl: gPhoto(1),
-  },
-  {
-    id: 'refurbished',
-    title: 'Refurbished Device Offers',
-    bgClass: 'bg-indigo-100',
-    imageUrl: gPhoto(2),
-  },
-  {
-    id: 'repair',
-    title: 'Repair Offers',
-    bgClass: 'bg-amber-100',
-    imageUrl: gPhoto(3),
-  },
-]
-
 /** Partner strip — infinite horizontal marquee (placed before “Top Brands We Buy”) */
 const MAJOR_BRANDS_STRIP = [
   { id: 'realme', label: 'realme', className: 'text-lg font-semibold lowercase tracking-tight' },
@@ -665,65 +638,6 @@ function PromoSliderRow({ title, cards, viewAllText = 'See all' }) {
               />
             </svg>
           </button>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function HotDealsSection() {
-  return (
-    <section className="w-full px-4 pb-10 sm:px-6">
-      <div className="mx-auto max-w-7xl rounded-2xl bg-slate-50 p-4 sm:p-6">
-        <h2 className="text-3xl font-extrabold text-slate-900">Hot Deals</h2>
-        <p className="mt-1 text-sm font-semibold text-slate-500">
-          Exciting offers for more value
-        </p>
-
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {HOT_DEALS.map((deal) => (
-            <article
-              key={deal.id}
-              className={`relative overflow-hidden rounded-2xl ${deal.bgClass} p-4`}
-            >
-              <div className="relative z-10 max-w-[55%]">
-                <h3 className="text-[34px] leading-9 font-extrabold text-slate-900">
-                  {deal.title}
-                </h3>
-                <button
-                  type="button"
-                  aria-label={`Open ${deal.title}`}
-                  className="mt-7 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-slate-500 shadow-sm hover:bg-white"
-                >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M9 18l6-6-6-6"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-
-              <img
-                src={deal.imageUrl}
-                alt=""
-                aria-hidden="true"
-                className="pointer-events-none absolute bottom-0 right-0 h-28 w-auto object-contain"
-                loading="lazy"
-              />
-              <div className="pointer-events-none absolute -right-3 -bottom-3 h-28 w-28 rounded-full bg-white/20" />
-            </article>
-          ))}
         </div>
       </div>
     </section>
@@ -3330,8 +3244,6 @@ export default function LandingPage() {
           },
         ]}
       />
-
-      <HotDealsSection />
 
       <FaqsSection />
 

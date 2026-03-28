@@ -7,16 +7,12 @@ import BrandPage from './pages/BrandPage'
 import LoginPage from './pages/LoginPage'
 import UserDashboard from './pages/UserDashboard'
 import SellPhonePage from './pages/SellPhonePage'
-<<<<<<< Updated upstream
 import AdminDashboard from './pages/AdminDashboard'
 import AdminLoginPage from './pages/AdminLoginPage'
-
-=======
 import BuyAccessoriesPage from './pages/BuyAccessoriesPage'
 import RepairPhonePage from './pages/RepairPhonePage'
 import FindNewPhonePage from './pages/FindNewPhonePage'
 import NearbyStoresPage from './pages/NearbyStoresPage'
->>>>>>> Stashed changes
 
 function NotFoundPage() {
   return (
@@ -33,49 +29,34 @@ function NotFoundPage() {
   )
 }
 
-
-
 export default function App() {
   return (
     <BrowserRouter>
-<<<<<<< Updated upstream
       <Routes>
-        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/*" element={
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/home" element={<HomePage />} />
-              <Route path="/brand/:brandName" element={<BrandPage />} />
-              <Route path="/services/:serviceType" element={<ServiceExplorer />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/dashboard" element={<UserDashboard />} />
-              <Route path="/sell-phone" element={<SellPhonePage />} />
-              <Route path="/landing" element={<Navigate to="/" replace />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </MainLayout>
-        } />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route
+          path="/*"
+          element={
+            <MainLayout>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/brand/:brandName" element={<BrandPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/dashboard" element={<UserDashboard />} />
+                <Route path="/sell-phone" element={<SellPhonePage />} />
+                <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
+                <Route path="/repair-phone" element={<RepairPhonePage />} />
+                <Route path="/find-new-phone" element={<FindNewPhonePage />} />
+                <Route path="/nearby-stores" element={<NearbyStoresPage />} />
+                <Route path="/landing" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </MainLayout>
+          }
+        />
       </Routes>
-=======
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/home" element={<HomePage />} />
-          <Route path="/brand/:brandName" element={<BrandPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/sell-phone" element={<SellPhonePage />} />
-          <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
-          <Route path="/repair-phone" element={<RepairPhonePage />} />
-          <Route path="/find-new-phone" element={<FindNewPhonePage />} />
-          <Route path="/nearby-stores" element={<NearbyStoresPage />} />
-          <Route path="/landing" element={<Navigate to="/" replace />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </MainLayout>
->>>>>>> Stashed changes
     </BrowserRouter>
   )
 }
