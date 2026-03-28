@@ -15,7 +15,7 @@ export function MainLayout({ children }) {
                 className="ml-2 h-10 w-auto max-w-[180px] object-contain object-left"
               />
               <p className="mt-2 text-sm font-semibold text-slate-600">
-                Buy and sell refurbished mobiles with confidence.
+                Buy and sell pre-owned mobiles with confidence.
               </p>
             </div>
 
@@ -72,6 +72,15 @@ export function MainLayout({ children }) {
                 </a>
                 <a className="block hover:text-red-700" href="#">
                   Refund Policy
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900">Portal</h3>
+              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600">
+                <a className="block hover:text-red-700" href="/admin/login">
+                  Admin Login
                 </a>
               </div>
             </div>

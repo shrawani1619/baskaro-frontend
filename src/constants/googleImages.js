@@ -1,21 +1,21 @@
 /**
- * Images served from Google:
- * - Sample photos: gstatic WebP gallery (Google demo assets)
- * - Brand marks: Google favicon cache (site icons by domain)
+ * High-quality, reliable smartphone product images from Unsplash.
+ * These URLs are stable and provide excellent visual quality.
  */
 
-const GSTATIC_WEBP = [
-  'https://www.gstatic.com/webp/gallery/1.webp',
-  'https://www.gstatic.com/webp/gallery/2.webp',
-  'https://www.gstatic.com/webp/gallery/3.webp',
-  'https://www.gstatic.com/webp/gallery/4.webp',
-  'https://www.gstatic.com/webp/gallery/5.webp',
+const PHONE_IMAGES = [
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=640&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=640&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=640&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1567581935884-3349723552ca?q=80&w=640&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=640&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1601784551446-20c9e07cdbab?q=80&w=640&auto=format&fit=crop',
 ]
 
-/** Rotates through Google's sample WebP photos (0-based index). */
+/** Rotates through specific mobile phone product shots. */
 export function gPhoto(i = 0) {
   const n = Number(i) || 0
-  return GSTATIC_WEBP[((n % 5) + 5) % 5]
+  return PHONE_IMAGES[((n % PHONE_IMAGES.length) + PHONE_IMAGES.length) % PHONE_IMAGES.length]
 }
 
 /** Site icon from Google's favicon cache (registrable domain, e.g. apple.com). */

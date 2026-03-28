@@ -13,6 +13,8 @@ import BuyAccessoriesPage from './pages/BuyAccessoriesPage'
 import RepairPhonePage from './pages/RepairPhonePage'
 import FindNewPhonePage from './pages/FindNewPhonePage'
 import NearbyStoresPage from './pages/NearbyStoresPage'
+import { CartProvider } from './context/CartContext'
+import CartPage from './pages/CartPage'
 
 function NotFoundPage() {
   return (
@@ -31,32 +33,35 @@ function NotFoundPage() {
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route
-          path="/*"
-          element={
-            <MainLayout>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/brand/:brandName" element={<BrandPage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/dashboard" element={<UserDashboard />} />
-                <Route path="/sell-phone" element={<SellPhonePage />} />
-                <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
-                <Route path="/repair-phone" element={<RepairPhonePage />} />
-                <Route path="/find-new-phone" element={<FindNewPhonePage />} />
-                <Route path="/nearby-stores" element={<NearbyStoresPage />} />
-                <Route path="/landing" element={<Navigate to="/" replace />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Routes>
-            </MainLayout>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+    <CartProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route
+            path="/*"
+            element={
+              <MainLayout>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/home" element={<HomePage />} />
+                  <Route path="/brand/:brandName" element={<BrandPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/dashboard" element={<UserDashboard />} />
+                  <Route path="/sell-phone" element={<SellPhonePage />} />
+                  <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
+                  <Route path="/repair-phone" element={<RepairPhonePage />} />
+                  <Route path="/find-new-phone" element={<FindNewPhonePage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/nearby-stores" element={<NearbyStoresPage />} />
+                  <Route path="/landing" element={<Navigate to="/" replace />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </MainLayout>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </CartProvider>
   )
 }

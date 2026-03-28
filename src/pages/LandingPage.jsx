@@ -25,7 +25,7 @@ import { ProductCard } from '../components/ProductCard'
 const TOP_NAV = [
   'All',
   'Sell Phone',
-  'Buy Refurbished Devices',
+  'Buy Pre-Owned Devices',
   'Find New Phone',
   'BASKARO Store',
   'More',
@@ -111,7 +111,7 @@ const HERO_CAROUSEL_SLIDES = [
   },
   {
     id: 'buy',
-    heading: 'Certified refurbished phones',
+    heading: 'Certified pre-owned phones',
     subtext: 'Warranty included · Save big on Apple, Samsung & more',
     cta: 'Shop deals',
     ctaTo: '/find-new-phone',
@@ -285,18 +285,18 @@ const SELL_TOP_PHONES = [
   'Redmi Note Series',
 ]
 
-const REFURBISHED_CATEGORIES = [
-  'Refurbished Phones',
-  'Refurbished Laptops',
-  'Refurbished Smart Watches',
-  'Refurbished Tablets',
-  'Refurbished Gaming Consoles',
-  'Refurbished Cameras',
+const PRE_OWNED_CATEGORIES = [
+  'Pre-Owned Phones',
+  'Pre-Owned Laptops',
+  'Pre-Owned Smart Watches',
+  'Pre-Owned Tablets',
+  'Pre-Owned Gaming Consoles',
+  'Pre-Owned Cameras',
   'Speakers',
   'Amazon Devices',
 ]
 
-const REFURBISHED_TOP_BRANDS = [
+const PRE_OWNED_TOP_BRANDS = [
   'Apple',
   'Xiaomi',
   'Samsung',
@@ -313,7 +313,7 @@ const MORE_CATEGORIES = [
   { title: 'Sell Smartwatch', img: gPhoto(2) },
   { title: 'Sell Earbuds', img: gPhoto(3) },
   { title: 'Repair Phone', img: gPhoto(4) },
-  { title: 'Buy Refurbished Phones', img: gPhoto(5) },
+  { title: 'Buy Pre-Owned Phones', img: gPhoto(5) },
   { title: 'Find New Phone', img: gPhoto(0) },
 ]
 
@@ -701,8 +701,8 @@ const FAQS = [
   },
   {
     id: 'faq-2',
-    q: 'Do you provide warranty on refurbished devices?',
-    a: 'Yes. Refurbished devices come with warranty to ensure a safe purchase and peace of mind.',
+    q: 'Do you provide warranty on pre-owned devices?',
+    a: 'Yes. Pre-Owned devices come with warranty to ensure a safe purchase and peace of mind.',
   },
   {
     id: 'faq-3',
@@ -737,7 +737,7 @@ function FaqsSection() {
             FAQs
           </h2>
           <p className="mt-2 text-sm font-semibold text-slate-500">
-            Quick answers about buying and selling refurbished devices.
+            Quick answers about buying and selling pre-owned devices.
           </p>
         </div>
 
@@ -881,7 +881,7 @@ const TRENDING_ARTICLES = [
     category: 'Tips',
     title: 'How to Verify Used Phone Condition Before Buying',
     excerpt:
-      'Use this quick checklist to spot hidden issues and avoid overpaying when purchasing a refurbished smartphone.',
+      'Use this quick checklist to spot hidden issues and avoid overpaying when purchasing a pre-owned smartphone.',
     readTime: '3 min read',
     date: '11th Mar 2026',
     imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
@@ -1172,7 +1172,7 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [mobileSellOpen, setMobileSellOpen] = useState(false)
   const [sellDesktopOpen, setSellDesktopOpen] = useState(false)
-  const [refurbishedDropdownOpen, setRefurbishedDropdownOpen] = useState(false)
+  const [preOwnedDropdownOpen, setPreOwnedDropdownOpen] = useState(false)
   const [allDropdownOpen, setAllDropdownOpen] = useState(false)
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false)
   const [mobileAllOpen, setMobileAllOpen] = useState(false)
@@ -1291,7 +1291,7 @@ export default function LandingPage() {
         setMobileSellOpen(false)
         setMobileMoreOpen(false)
         setSellDesktopOpen(false)
-        setRefurbishedDropdownOpen(false)
+        setPreOwnedDropdownOpen(false)
       }
     }
 
@@ -1303,7 +1303,7 @@ export default function LandingPage() {
       setAllSellSubOpen(false)
       setMobileAllSellSubOpen(false)
       setSellDesktopOpen(false)
-      setRefurbishedDropdownOpen(false)
+      setPreOwnedDropdownOpen(false)
     }
 
     window.addEventListener('keydown', onKeyDown)
@@ -1319,7 +1319,7 @@ export default function LandingPage() {
     allDropdownOpen,
     moreDropdownOpen,
     sellDesktopOpen,
-    refurbishedDropdownOpen,
+    preOwnedDropdownOpen,
     mobileMenuOpen,
     mobileAllOpen,
     mobileSellOpen,
@@ -1528,7 +1528,7 @@ export default function LandingPage() {
                   setAllSellSubOpen(true)
                   setMoreDropdownOpen(false)
                   setSellDesktopOpen(false)
-                  setRefurbishedDropdownOpen(false)
+                  setPreOwnedDropdownOpen(false)
                 }}
               >
                 <span>All</span>
@@ -1659,7 +1659,7 @@ export default function LandingPage() {
                   setAllDropdownOpen(false)
                   setAllSellSubOpen(false)
                   setMoreDropdownOpen(false)
-                  setRefurbishedDropdownOpen(false)
+                  setPreOwnedDropdownOpen(false)
                 }}
               >
                 Sell Phone
@@ -1750,9 +1750,9 @@ export default function LandingPage() {
                 type="button"
                 className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
                 aria-haspopup="menu"
-                aria-expanded={refurbishedDropdownOpen}
+                aria-expanded={preOwnedDropdownOpen}
                 onClick={() =>
-                  setRefurbishedDropdownOpen((v) => {
+                  setPreOwnedDropdownOpen((v) => {
                     const next = !v
                     if (next) {
                       setAllDropdownOpen(false)
@@ -1764,7 +1764,7 @@ export default function LandingPage() {
                   })
                 }
               >
-                <span>Buy Refurbished Devices</span>
+                <span>Buy Pre-Owned Devices</span>
                 <svg
                   width="14"
                   height="14"
@@ -1783,16 +1783,16 @@ export default function LandingPage() {
                 </svg>
               </button>
 
-              {refurbishedDropdownOpen && (
+              {preOwnedDropdownOpen && (
                 <div className="absolute left-0 top-full z-[120] mt-3 w-72 max-h-[calc(100vh-140px)] overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-lg">
                   <div className="p-3">
                     <div className="space-y-1">
-                      {REFURBISHED_CATEGORIES.map((label) => (
+                      {PRE_OWNED_CATEGORIES.map((label) => (
                         <button
                           key={label}
                           type="button"
                           className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                          onClick={() => setRefurbishedDropdownOpen(false)}
+                          onClick={() => setPreOwnedDropdownOpen(false)}
                         >
                           {label}
                         </button>
@@ -1805,12 +1805,12 @@ export default function LandingPage() {
                       Top Brands
                     </div>
                     <div className="mt-2 space-y-1">
-                      {REFURBISHED_TOP_BRANDS.map((label) => (
+                      {PRE_OWNED_TOP_BRANDS.map((label) => (
                         <button
                           key={label}
                           type="button"
                           className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                          onClick={() => setRefurbishedDropdownOpen(false)}
+                          onClick={() => setPreOwnedDropdownOpen(false)}
                         >
                           {label}
                         </button>
@@ -1847,7 +1847,7 @@ export default function LandingPage() {
                       setAllDropdownOpen(false)
                       setAllSellSubOpen(false)
                       setSellDesktopOpen(false)
-                      setRefurbishedDropdownOpen(false)
+                      setPreOwnedDropdownOpen(false)
                     }
                     return next
                   })
@@ -2083,7 +2083,7 @@ export default function LandingPage() {
                         setMobileAllOpen(false)
                       }}
                     >
-                      Buy Refurbished Phones
+                      Buy Pre-Owned Phones
                     </button>
                     <button
                       type="button"
@@ -2206,7 +2206,7 @@ export default function LandingPage() {
                   type="button"
                   className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
                 >
-                  Buy Refurbished Devices
+                  Buy Pre-Owned Devices
                 </button>
                 <button
                   type="button"
@@ -2863,11 +2863,82 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Buy Refurbished Devices */}
+      {/* Buy Pre-Owned Devices */}
       <CarouselSection
-        title="Buy Refurbished Devices"
+        title="Buy Pre-Owned Devices"
         viewAllText="View All"
+<<<<<<< Updated upstream
         products={REFURBISHED_DEVICES_CAROUSEL}
+=======
+        products={[
+          {
+            title: 'Samsung Galaxy S25 Edge - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+            topBadge: 'BASKARO',
+            oldPrice: '₹75,900',
+            price: '₹57,599',
+            saleLabel: '-57%',
+            rating: '4.8',
+            flashLabel: 'Flash Sale',
+          },
+          {
+            title: 'OnePlus Nord CE 5G - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+            topBadge: 'BASKARO',
+            oldPrice: '₹11,699',
+            price: '₹11,699',
+            saleLabel: 'Flash Sale',
+            rating: '4.0',
+            flashLabel: 'Flash Sale',
+          },
+          {
+            title: 'Samsung Galaxy S20 FE 5G - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+            topBadge: 'BASKARO',
+            oldPrice: '₹18,500',
+            price: '₹14,699',
+            saleLabel: 'Month End Sale',
+            rating: '4.4',
+            flashLabel: 'Flash Sale',
+          },
+          {
+            title: 'Xiaomi Redmi Note 10 Pro - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+            topBadge: 'BASKARO',
+            oldPrice: '₹9,800',
+            price: '₹8,525',
+            saleLabel: 'Month End Sale',
+            rating: '4.2',
+            flashLabel: 'Flash Sale',
+          },
+          {
+            title: 'Apple iPhone 14 - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+            topBadge: 'BASKARO',
+            oldPrice: '₹29,900',
+            price: '₹29,999',
+            saleLabel: 'Flash Sale',
+            rating: '4.8',
+            flashLabel: 'Flash Sale',
+          },
+          {
+            title: 'Realme Phone - Pre-Owned',
+            imageUrl:
+              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+            topBadge: 'BASKARO',
+            oldPrice: '₹14,999',
+            price: '₹12,999',
+            saleLabel: 'Deal',
+            rating: '4.3',
+            flashLabel: 'Flash Sale',
+          },
+        ]}
+>>>>>>> Stashed changes
       />
 
       {/* Our Exclusive Stores */}
@@ -3174,26 +3245,26 @@ export default function LandingPage() {
 
       {/* Image promo sliders */}
       <PromoSliderRow
-        title="Better For Pocket. Buy Refurbished"
+        title="Better For Pocket. Buy Pre-Owned"
         viewAllText="See all"
         cards={[
           {
-            title: 'Apple iPhone 13 Mini Refurbished Deal...',
+            title: 'Apple iPhone 13 Mini Pre-Owned Deal...',
             imageUrl:
               'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
           },
           {
-            title: 'Get Refurbished Bose Portable Smart Speaker with...',
+            title: 'Get Pre-Owned Bose Portable Smart Speaker with...',
             imageUrl:
               'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
           },
           {
-            title: 'Best Deal On Refurbished Xiaomi Redmi Note 11...',
+            title: 'Best Deal On Pre-Owned Xiaomi Redmi Note 11...',
             imageUrl:
               'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
           },
           {
-            title: 'Get Refurbished Samsung Galaxy S20 FE under...',
+            title: 'Get Pre-Owned Samsung Galaxy S20 FE under...',
             imageUrl:
               'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
           },

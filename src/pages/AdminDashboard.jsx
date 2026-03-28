@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  LayoutDashboard, ShoppingCart, Smartphone, Users, Settings, Tag,
+  LayoutDashboard, ShoppingCart, ShoppingBag, Smartphone, Users, Settings, Tag,
   BarChart3, TrendingUp, Package, Truck, CheckCircle, Clock,
   Edit2, Trash2, Plus, ArrowLeft, ArrowRight, AlertCircle, MoreVertical, Search, Bell, Menu, LogOut, DollarSign, ListOrdered, ShieldCheck
 } from 'lucide-react'
@@ -27,7 +27,8 @@ export default function AdminDashboard() {
   // Top-level navigation
   const navItems = [
     { id: 'overview', label: 'Dashboard', Icon: LayoutDashboard },
-    { id: 'orders', label: 'Orders Management', Icon: ShoppingCart },
+    { id: 'orders', label: 'Buyback Orders', Icon: ShoppingCart },
+    { id: 'sales', label: 'Sales Management', Icon: ShoppingBag },
     { id: 'catalog', label: 'Device Catalog', Icon: Smartphone },
     { id: 'customers', label: 'Customers', Icon: Users },
     { id: 'promotions', label: 'Coupons & Referrals', Icon: Tag },
@@ -115,6 +116,7 @@ export default function AdminDashboard() {
             <motion.div key={tab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
               {tab === 'overview' && <OverviewTab />}
               {tab === 'orders' && <OrdersTab />}
+              {tab === 'sales' && <SalesTab />}
               {tab === 'catalog' && <CatalogTab />}
               {tab === 'customers' && <CustomersTab />}
               {tab === 'promotions' && <PromotionsTab />}
@@ -681,6 +683,65 @@ function SettingsTab() {
         <div className="pt-4">
            <button className="bg-red-600 text-white px-6 py-3 rounded-xl font-black text-sm hover:bg-red-700 transition">Save All Settings</button>
         </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TAB 2.5: SALES MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+function SalesTab() {
+  const [sales, setSales] = useState(() => JSON.parse(localStorage.getItem('baskaro_sales') || '[]'))
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-black text-slate-900">Sales Management</h2>
+        <div className="flex bg-slate-100 p-1 rounded-xl">
+           <button className="px-4 py-1.5 text-xs font-bold rounded-lg bg-white shadow text-slate-900">All Sales</button>
+           <button className="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700">Pending</button>
+           <button className="px-4 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-700">Shipped</button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        {sales.length === 0 ? (
+          <div className="p-20 text-center">
+             <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+               <ShoppingBag size={32} />
+             </div>
+             <p className="text-slate-500 font-bold">No sales orders received yet.</p>
+             <p className="text-xs text-slate-400 mt-1">Orders will appear here when customers buy pre-owned phones.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+             <table className="w-full text-left text-sm">
+               <thead className="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-widest">
+                 <tr>
+                   <th className="px-6 py-4">Order ID</th>
+                   <th className="px-6 py-4">Customer</th>
+                   <th className="px-6 py-4">Items</th>
+                   <th className="px-6 py-4">Total Amount</th>
+                   <th className="px-6 py-4 text-right">Status</th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100">
+                 {sales.map(s => (
+                   <tr key={s.id} className="hover:bg-slate-50">
+                     <td className="px-6 py-4 font-black">{s.id}</td>
+                     <td className="px-6 py-4 font-bold">{s.customerName}</td>
+                     <td className="px-6 py-4 text-slate-500">{s.itemCount} items</td>
+                     <td className="px-6 py-4 font-black text-red-600">Rs {s.total}</td>
+                     <td className="px-6 py-4 text-right">
+                       <span className="bg-blue-100 text-blue-800 text-[10px] font-black uppercase px-2 py-1 rounded-full">Paid</span>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -2,7 +2,7 @@
  * Full-width teal “Download the App” strip (matches home page CTA).
  */
 export function DownloadAppBanner({
-  subtitle = 'Sell your old phone | Buy top-quality refurbished phones | Get your phone repaired',
+  subtitle = 'Sell your old phone | Buy top-quality pre-owned phones | Get your phone repaired',
 }) {
   return (
     <section className="w-full pb-10">

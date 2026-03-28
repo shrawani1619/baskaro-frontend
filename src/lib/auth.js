@@ -17,7 +17,7 @@ export function setUser(user) {
   localStorage.setItem(AUTH_KEY, JSON.stringify(user))
 }
 
-export function clearUser() {
+export function logout() {
   localStorage.removeItem(AUTH_KEY)
 }
 

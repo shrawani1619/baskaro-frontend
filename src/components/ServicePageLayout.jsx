@@ -26,6 +26,7 @@ export function ServicePageLayout({
   faqs,
   downloadBannerSubtitle,
   productButtonLabel = 'Sell Now',
+  onProductClick,
 }) {
   const [openFaq, setOpenFaq] = useState(0)
 
@@ -204,7 +205,11 @@ export function ServicePageLayout({
                   <p className="text-2xl font-extrabold text-blue-700">
                     {productsSection.omitCurrency ? phone.price : `Rs ${phone.price}`}
                   </p>
-                  <Button variant="danger" className="mt-3">
+                  <Button 
+                    variant="danger" 
+                    className="mt-3 active:scale-95 transition-transform"
+                    onClick={() => onProductClick?.(phone)}
+                  >
                     {productButtonLabel}
                   </Button>
                 </article>

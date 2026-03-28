@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { catalog } from '../mock/catalog.js'
 import { estimateSellingPrice } from '../lib/pricing/estimatePrice.js'
-import { getUser, clearUser, setUser } from '../lib/auth.js'
+import { getUser, logout as performLogout, setUser } from '../lib/auth.js'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const SCREEN_OPTIONS  = ['Excellent', 'Good', 'Fair', 'Bad / Cracked']
@@ -68,7 +68,7 @@ export default function UserDashboard() {
 function DashboardShell({ user, navigate }) {
   const [tab, setTab] = useState('sell')
 
-  function logout() { clearUser(); navigate('/') }
+  function logout() { performLogout(); navigate('/') }
 
   const tabs = [
     { id: 'sell',    Icon: Smartphone, label: 'Sell Phone' },
