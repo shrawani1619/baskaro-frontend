@@ -621,7 +621,7 @@ function ServiceThumb({ label }) {
       alt=""
       aria-hidden="true"
       loading="lazy"
-      className="mx-auto h-12 w-12 object-contain"
+      className="mx-auto h-20 w-20 object-contain"
     />
   )
 }
@@ -2882,7 +2882,7 @@ export default function LandingPage() {
 
       {/* Sell Your Old Device Now */}
       <section className="w-full px-4 pb-16 sm:px-6">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-7xl">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="mb-2 text-xl font-extrabold text-slate-900">
@@ -2895,7 +2895,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-8">
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-4 lg:grid-cols-7 xl:grid-cols-8">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
               {[
                 {
                   title: 'Sell Phone',
@@ -2930,13 +2930,14 @@ export default function LandingPage() {
                 <button
                   key={`${card.title}-${idx}`}
                   type="button"
-                  className="group flex min-h-[126px] flex-col items-center justify-start rounded-2xl border border-slate-100 bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="group flex min-h-[140px] flex-col items-center justify-start rounded-2xl border border-slate-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
                   onClick={() => {
                     if (card.dots) setMoreOpen(true)
+                    if (card.title === 'Sell Phone') navigate('/sell-phone')
                   }}
                 >
                   {card.dots ? (
-                    <span className="mt-3 flex items-center gap-1 text-xl text-slate-500">
+                    <span className="mt-4 flex items-center gap-1 text-xl text-slate-500">
                       <span>•</span>
                       <span>•</span>
                       <span>•</span>
@@ -2945,11 +2946,11 @@ export default function LandingPage() {
                     <img
                       src={card.img}
                       alt={card.title}
-                      className="h-16 w-16 object-contain"
+                      className="h-20 w-20 object-contain"
                       loading="lazy"
                     />
                   )}
-                  <span className="mt-3 text-center text-sm font-bold text-slate-700">
+                  <span className="mt-4 text-center text-sm font-bold leading-tight text-slate-700">
                     {card.title}
                   </span>
                 </button>
@@ -3472,82 +3473,6 @@ export default function LandingPage() {
       <TrendingArticlesSection />
       <RecentNewsSection />
       <DownloadAppSection />
-
-      {/* Footer */}
-      <footer className="border-t bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
-              <img
-                src="/logo.png"
-                alt="BAS karo"
-                className="ml-2 h-10 w-auto max-w-[180px] object-contain object-left"
-              />
-              <div className="mt-2 text-sm font-semibold text-slate-600">
-                Buy and sell refurbished mobiles with confidence.
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-extrabold text-slate-900">Services</div>
-              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600">
-                <a className="block hover:text-red-700" href="#">
-                  Sell Phone
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Buy Refurbished Devices
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Pickup Scheduling
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Secure Payment
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-extrabold text-slate-900">Company</div>
-              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600">
-                <a className="block hover:text-red-700" href="#">
-                  About Us
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Careers
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Privacy Policy
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Terms of Use
-                </a>
-              </div>
-            </div>
-
-            <div>
-              <div className="text-sm font-extrabold text-slate-900">Help & Support</div>
-              <div className="mt-3 space-y-2 text-sm font-semibold text-slate-600">
-                <a className="block hover:text-red-700" href="#">
-                  FAQ
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Contact Us
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Warranty
-                </a>
-                <a className="block hover:text-red-700" href="#">
-                  Refund Policy
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-10 border-t pt-6 text-center text-xs font-semibold text-slate-500 sm:text-left">
-            Copyright &copy; {new Date().getFullYear()} BAS karo. All rights reserved.
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
