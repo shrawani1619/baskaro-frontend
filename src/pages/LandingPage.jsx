@@ -17,6 +17,8 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { catalog } from '../mock/catalog.js'
+import { gPhoto, gBrandLogo } from '../constants/googleImages'
+import { DownloadAppBanner } from '../components/DownloadAppBanner'
 
 const TOP_NAV = [
   'All',
@@ -56,74 +58,41 @@ const CATEGORY_DATA = {
 
 
 const SERVICES = [
-  'Sell Phone',
-  'Buy Phone',
-  'Repair Phone',
-  'Find New Phone',
-  'Nearby Stores',
-  'New Accessories',
-  'Buy Smartwatches',
+  { label: 'Sell Phone', path: '/sell-phone' },
+  { label: 'Buy Phone', path: '/find-new-phone' },
+  { label: 'Repair Phone', path: '/repair-phone' },
+  { label: 'Find New Phone', path: '/find-new-phone' },
+  { label: 'Nearby Stores', path: '/nearby-stores' },
+  { label: 'New Accessories', path: '/buy-accessories' },
+  { label: 'Buy Smartwatches', path: '/buy-accessories' },
 ]
 
 const TOP_BRANDS = [
-  {
-    name: 'Apple',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_logo_black.svg',
-  },
-  {
-    name: 'Samsung',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Samsung_Global_Logo_Lettermark.svg',
-  },
-  {
-    name: 'Xiaomi',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Xiaomi_logo.svg',
-  },
-  {
-    name: 'OnePlus',
-    logoUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/OnePlus_logo.png',
-  },
-  {
-    name: 'Vivo',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Vivo_logo_2019.svg',
-  },
-  {
-    name: 'OPPO',
-    logoUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/OPPO_Logo.svg',
-  },
-  {
-    name: 'Realme',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Realme_logo.svg',
-  },
-  {
-    name: 'Google Pixel',
-    logoUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Pixel_wordmark.svg',
-  },
+  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
+  { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
+  { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
+  { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
+  { name: 'Vivo', logoUrl: gBrandLogo('vivo.com') },
+  { name: 'OPPO', logoUrl: gBrandLogo('oppo.com') },
+  { name: 'Realme', logoUrl: gBrandLogo('realme.com') },
+  { name: 'Google Pixel', logoUrl: gBrandLogo('google.com') },
 ]
 
 const OFFERS = [
   {
     title: 'Get Instant Price Estimation',
     description: 'Select brand, model, and condition. Get an estimated payout in seconds.',
-    imageUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+    imageUrl: gPhoto(0),
   },
   {
     title: 'Free Pickup Scheduling',
     description: 'Choose pickup date & time. We coordinate the pickup and verification steps.',
-    imageUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+    imageUrl: gPhoto(1),
   },
   {
     title: 'Secure Payment After Verification',
     description: 'Pay via UPI or bank transfer once the device is received and verified.',
-    imageUrl:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
+    imageUrl: gPhoto(2),
   },
 ]
 
@@ -134,24 +103,27 @@ const HERO_CAROUSEL_SLIDES = [
     heading: 'Sell your smartphone',
     subtext: 'Best price guaranteed — free pickup at your doorstep',
     cta: 'Sell now',
+    ctaTo: '/sell-phone',
     bgClass: 'bg-red-50',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
+    img: gPhoto(3),
   },
   {
     id: 'buy',
     heading: 'Certified refurbished phones',
     subtext: 'Warranty included · Save big on Apple, Samsung & more',
     cta: 'Shop deals',
+    ctaTo: '/find-new-phone',
     bgClass: 'bg-blue-50',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+    img: gPhoto(4),
   },
   {
     id: 'exchange',
     heading: 'Swap & upgrade',
     subtext: 'Trade in your old phone for instant credit on your next buy',
     cta: 'Start exchange',
+    ctaTo: '/sell-phone',
     bgClass: 'bg-slate-100',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Watches.png',
+    img: gPhoto(5),
   },
 ]
 
@@ -233,25 +205,25 @@ const HOT_DEALS = [
     id: 'buyback',
     title: 'Buyback Offers',
     bgClass: 'bg-rose-100',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+    imageUrl: gPhoto(0),
   },
   {
     id: 'exchange',
     title: 'Exchange Offers',
     bgClass: 'bg-teal-100',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+    imageUrl: gPhoto(1),
   },
   {
     id: 'refurbished',
     title: 'Refurbished Device Offers',
     bgClass: 'bg-indigo-100',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+    imageUrl: gPhoto(2),
   },
   {
     id: 'repair',
     title: 'Repair Offers',
     bgClass: 'bg-amber-100',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
+    imageUrl: gPhoto(3),
   },
 ]
 
@@ -361,34 +333,13 @@ const REFURBISHED_TOP_BRANDS = [
 ]
 
 const MORE_CATEGORIES = [
-  {
-    title: 'Sell Phone',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-  },
-  {
-    title: 'Sell Tablet',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-  },
-  {
-    title: 'Sell Smartwatch',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Watches.png',
-  },
-  {
-    title: 'Sell Earbuds',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
-  },
-  {
-    title: 'Repair Phone',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-  },
-  {
-    title: 'Buy Refurbished Phones',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-  },
-  {
-    title: 'Find New Phone',
-    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-  },
+  { title: 'Sell Phone', img: gPhoto(0) },
+  { title: 'Sell Tablet', img: gPhoto(1) },
+  { title: 'Sell Smartwatch', img: gPhoto(2) },
+  { title: 'Sell Earbuds', img: gPhoto(3) },
+  { title: 'Repair Phone', img: gPhoto(4) },
+  { title: 'Buy Refurbished Phones', img: gPhoto(5) },
+  { title: 'Find New Phone', img: gPhoto(0) },
 ]
 
 function IconBox({ idx }) {
@@ -587,30 +538,18 @@ function ProductCard({ product }) {
 }
 
 const SERVICE_THUMBS = {
-  'Sell Phone':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-  'Buy Gadgets':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-  'Buy Phone':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-  'Buy Laptops':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_picture.jpg',
-  'Buy Accessories':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
-  'Repair Phone':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
-  'Repair Laptop':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_on_a_desk.jpg',
-  Recycle:
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
-  'Find New Phone':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-  'Nearby Stores':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_on_a_desk.jpg',
-  'New Accessories':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-  'Buy Smartwatches':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Watches.png',
+  'Sell Phone': gPhoto(0),
+  'Buy Gadgets': gPhoto(1),
+  'Buy Phone': gPhoto(2),
+  'Buy Laptops': gPhoto(3),
+  'Buy Accessories': gPhoto(4),
+  'Repair Phone': gPhoto(5),
+  'Repair Laptop': gPhoto(0),
+  Recycle: gPhoto(1),
+  'Find New Phone': gPhoto(2),
+  'Nearby Stores': gPhoto(3),
+  'New Accessories': gPhoto(4),
+  'Buy Smartwatches': gPhoto(5),
 }
 
 function ServiceThumb({ label }) {
@@ -1258,98 +1197,7 @@ function RecentNewsSection() {
 }
 
 function DownloadAppSection() {
-  return (
-    <section className="w-full px-4 pb-10 sm:px-6">
-      <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl bg-[#43c3bb] p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-              Download the App
-            </h2>
-            <p className="mt-3 text-base font-semibold text-white/90 sm:text-lg">
-              Sell your old phone | Buy top-quality refurbished phones | Get your phone repaired
-            </p>
-
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className="inline-flex items-center gap-3 rounded-lg bg-black px-4 py-2 text-left text-white shadow-sm hover:bg-slate-900"
-              >
-                <svg
-                  width="18"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path d="M3 2v20l11-10L3 2Z" fill="#34A853" />
-                  <path d="M14 12 20.5 8.3 17 6.3 10.5 10 14 12Z" fill="#FBBC05" />
-                  <path d="M14 12 10.5 14 17 17.7l3.5-2-6.5-3.7Z" fill="#EA4335" />
-                  <path d="M3 2 10.5 10 14 12 10.5 14 3 22" stroke="#4285F4" strokeWidth="1.5" />
-                </svg>
-                <span className="leading-tight">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-white/70">
-                    Get it on
-                  </span>
-                  <span className="block text-xl font-bold">Google Play</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center gap-3 rounded-lg bg-black px-4 py-2 text-left text-white shadow-sm hover:bg-slate-900"
-              >
-                <svg
-                  width="18"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M16.5 12.5c0-2 1.7-3 1.8-3.1-1-1.5-2.6-1.7-3.2-1.8-1.4-.1-2.7.8-3.4.8-.7 0-1.8-.8-3-.8-1.6 0-3 .9-3.8 2.3-1.6 2.8-.4 6.9 1.1 9.1.7 1.1 1.6 2.4 2.8 2.4 1.1 0 1.5-.7 2.8-.7 1.3 0 1.7.7 2.8.7 1.2 0 2-1.1 2.7-2.2.8-1.2 1.1-2.4 1.1-2.5 0 0-2.1-.8-2.1-4.2Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M14.4 5.8c.6-.7 1-1.6.9-2.6-.9 0-2 .6-2.7 1.3-.6.6-1.1 1.6-1 2.5 1 .1 2-.5 2.8-1.2Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <span className="leading-tight">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-white/70">
-                    Download on the
-                  </span>
-                  <span className="block text-xl font-bold">App Store</span>
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div className="relative h-[220px] w-full max-w-[420px] shrink-0 self-end sm:h-[260px]">
-            <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png"
-              alt="App preview phone"
-              className="absolute bottom-0 right-6 h-[220px] w-auto rounded-2xl object-contain drop-shadow-2xl sm:h-[260px]"
-              loading="lazy"
-            />
-            <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png"
-              alt="App preview phone"
-              className="absolute bottom-2 right-40 h-[190px] w-auto rounded-2xl object-contain drop-shadow-2xl sm:bottom-3 sm:h-[225px]"
-              loading="lazy"
-            />
-            <img
-              src="https://ui-avatars.com/api/?name=Brand+Expert&background=ffffff&color=0f172a&size=256"
-              alt="App ambassador"
-              className="absolute bottom-0 left-3 h-[170px] w-[140px] rounded-2xl object-cover shadow-lg sm:h-[200px] sm:w-[160px]"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+  return <DownloadAppBanner />
 }
 
 export default function LandingPage() {
@@ -1880,7 +1728,14 @@ export default function LandingPage() {
                 ].join(' ')}
               >
                 <div className="p-4">
-                  <div className="text-sm font-extrabold text-slate-900">
+                  <Link
+                    to="/sell-phone"
+                    className="block rounded-lg bg-red-50 px-3 py-2.5 text-center text-sm font-extrabold text-red-700 ring-1 ring-red-100 hover:bg-red-100"
+                    onClick={() => setSellDesktopOpen(false)}
+                  >
+                    Sell your phone — get price
+                  </Link>
+                  <div className="mt-4 text-sm font-extrabold text-slate-900">
                     Top Brands
                   </div>
                   <div className="mt-3 space-y-2">
@@ -1888,6 +1743,10 @@ export default function LandingPage() {
                       <button
                         key={b}
                         type="button"
+                        onClick={() => {
+                          setSellDesktopOpen(false)
+                          navigate(`/brand/${b}`)
+                        }}
                         className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
                       >
                         {b}
@@ -2715,9 +2574,9 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero carousel — Cashify-style: split layout, light backgrounds */}
-      <section className="w-full px-4 pt-6 pb-2 sm:px-6">
-        <div className="mx-auto w-full max-w-7xl">
+      {/* Hero carousel — full width (inset matches Our Services) */}
+      <section className="w-full pt-6 pb-2">
+        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div
             className="relative"
             role="region"
@@ -2746,12 +2605,12 @@ export default function LandingPage() {
                         <p className="mt-3 text-base text-slate-600 sm:text-lg">
                           {slide.subtext}
                         </p>
-                        <button
-                          type="button"
-                          className="mt-6 rounded-full bg-red-600 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                        <Link
+                          to={slide.ctaTo}
+                          className="mt-6 inline-flex rounded-full bg-red-600 px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
                         >
                           {slide.cta}
-                        </button>
+                        </Link>
                       </div>
                       <div className="flex flex-1 justify-center md:max-w-md lg:max-w-lg">
                         <img
@@ -2846,24 +2705,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Services */}
-      <section className="w-full px-4 pt-10 pb-10 sm:px-6">
-        <div className="mx-auto max-w-6xl rounded-3xl bg-slate-50 px-4 py-6 sm:px-6 sm:py-7">
+      {/* Services — full-width band */}
+      <section className="w-full border-y border-slate-100 bg-slate-50 pt-10 pb-10">
+        <div className="w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-10 xl:px-16">
           <div className="mb-5 flex items-center justify-between">
             <h2 className="text-xl font-extrabold text-slate-900">Our Services</h2>
-            <span className="text-xs font-semibold text-slate-400">Tap to explore →</span>
+            <span className="text-xs font-semibold text-slate-400">Tap to open →</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8">
-            {SERVICES.map((label) => (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+            {SERVICES.map((service) => (
               <button
-                key={label}
+                key={service.label}
                 type="button"
-                onClick={() => navigate(`/services/${encodeURIComponent(label)}`)}
+                onClick={() => navigate(service.path)}
                 className="group flex flex-col items-center justify-start rounded-xl p-1 text-left transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02]"
               >
                 <div className="relative flex h-24 w-full max-w-[118px] items-center justify-center rounded-2xl bg-[#eaf3f2] ring-2 ring-transparent transition-all duration-200 group-hover:bg-[#dff0ee] group-hover:ring-red-200 group-hover:shadow-md">
-                  <ServiceThumb label={label} />
+                  <ServiceThumb label={service.label} />
                   {/* Hover arrow badge */}
                   <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 scale-75">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -2872,7 +2731,7 @@ export default function LandingPage() {
                   </span>
                 </div>
                 <span className="mt-2 text-center text-xs font-bold text-slate-800 transition-colors duration-150 group-hover:text-red-700">
-                  {label}
+                  {service.label}
                 </span>
               </button>
             ))}
@@ -2881,7 +2740,7 @@ export default function LandingPage() {
       </section>
 
       {/* Sell Your Old Device Now */}
-      <section className="w-full px-4 pb-16 sm:px-6">
+      <section id="sell-your-device" className="w-full scroll-mt-20 px-4 pb-16 sm:px-6">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -2900,26 +2759,32 @@ export default function LandingPage() {
                 {
                   title: 'Sell Phone',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+                  path: '/sell-phone',
                 },
                 {
-                  title: 'Sell Phone',
+                  title: 'Get estimate',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+                  path: '/sell-phone',
                 },
                 {
                   title: 'Buy Accessories',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
+                  path: '/buy-accessories',
                 },
                 {
                   title: 'Repair Phone',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
+                  path: '/repair-phone',
                 },
                 {
                   title: 'Find New Phone',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
+                  path: '/find-new-phone',
                 },
                 {
                   title: 'Nearby Stores',
                   img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
+                  path: '/nearby-stores',
                 },
                 {
                   title: 'More',
@@ -2933,7 +2798,7 @@ export default function LandingPage() {
                   className="group flex min-h-[140px] flex-col items-center justify-start rounded-2xl border border-slate-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
                   onClick={() => {
                     if (card.dots) setMoreOpen(true)
-                    if (card.title === 'Sell Phone') navigate('/sell-phone')
+                    else if (card.path) navigate(card.path)
                   }}
                 >
                   {card.dots ? (

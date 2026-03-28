@@ -25,14 +25,17 @@ export function MainLayout({ children }) {
                 <a className="block hover:text-red-700" href="/sell-phone">
                   Sell Phone
                 </a>
-                <a className="block hover:text-red-700" href="/">
-                  Buy Refurbished Devices
+                <a className="block hover:text-red-700" href="/find-new-phone">
+                  Find New Phone
                 </a>
-                <a className="block hover:text-red-700" href="#">
-                  Pickup Scheduling
+                <a className="block hover:text-red-700" href="/buy-accessories">
+                  Buy Accessories
                 </a>
-                <a className="block hover:text-red-700" href="#">
-                  Secure Payment
+                <a className="block hover:text-red-700" href="/repair-phone">
+                  Repair Phone
+                </a>
+                <a className="block hover:text-red-700" href="/nearby-stores">
+                  Nearby Stores
                 </a>
               </div>
             </div>
