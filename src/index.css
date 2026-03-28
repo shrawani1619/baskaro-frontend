@@ -24,7 +24,7 @@
 .major-brands-marquee-track {
   display: flex;
   width: max-content;
-  animation: major-brands-marquee 42s linear infinite;
+  animation: major-brands-marquee 15s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
