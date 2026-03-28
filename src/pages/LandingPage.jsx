@@ -489,11 +489,10 @@ function ServiceThumb({ label }) {
   )
 }
 
-const REFURBISHED_DEVICES_CAROUSEL = [
+const PRE_OWNED_DEVICES_CAROUSEL = [
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-    title: 'Samsung Galaxy S25 Edge - Refurbished',
+    image: gPhoto(0),
+    title: 'Samsung Galaxy S25 Edge - Pre-Owned',
     price: '₹57,599',
     originalPrice: '₹75,900',
     discount: 57,
@@ -502,18 +501,16 @@ const REFURBISHED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-    title: 'OnePlus Nord CE 5G - Refurbished',
+    image: gPhoto(1),
+    title: 'OnePlus Nord CE 5G - Pre-Owned',
     price: '₹11,699',
     rating: 4.0,
     tag: ['Flash Sale'],
     brand: 'BASKARO',
   },
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-    title: 'Samsung Galaxy S20 FE 5G - Refurbished',
+    image: gPhoto(2),
+    title: 'Samsung Galaxy S20 FE 5G - Pre-Owned',
     price: '₹14,699',
     originalPrice: '₹18,500',
     discount: 21,
@@ -522,9 +519,8 @@ const REFURBISHED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-    title: 'Xiaomi Redmi Note 10 Pro - Refurbished',
+    image: gPhoto(3),
+    title: 'Xiaomi Redmi Note 10 Pro - Pre-Owned',
     price: '₹8,525',
     originalPrice: '₹9,800',
     discount: 13,
@@ -533,9 +529,8 @@ const REFURBISHED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
-    title: 'Apple iPhone 14 - Refurbished',
+    image: gPhoto(4),
+    title: 'Apple iPhone 14 - Pre-Owned',
     price: '₹29,999',
     originalPrice: '₹42,900',
     discount: 30,
@@ -544,9 +539,8 @@ const REFURBISHED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
-    image:
-      'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-    title: 'Realme Phone - Refurbished',
+    image: gPhoto(5),
+    title: 'Realme Phone - Pre-Owned',
     price: '₹12,999',
     originalPrice: '₹14,999',
     discount: 13,
@@ -2867,78 +2861,7 @@ export default function LandingPage() {
       <CarouselSection
         title="Buy Pre-Owned Devices"
         viewAllText="View All"
-<<<<<<< Updated upstream
-        products={REFURBISHED_DEVICES_CAROUSEL}
-=======
-        products={[
-          {
-            title: 'Samsung Galaxy S25 Edge - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹75,900',
-            price: '₹57,599',
-            saleLabel: '-57%',
-            rating: '4.8',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'OnePlus Nord CE 5G - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹11,699',
-            price: '₹11,699',
-            saleLabel: 'Flash Sale',
-            rating: '4.0',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Samsung Galaxy S20 FE 5G - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹18,500',
-            price: '₹14,699',
-            saleLabel: 'Month End Sale',
-            rating: '4.4',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Xiaomi Redmi Note 10 Pro - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹9,800',
-            price: '₹8,525',
-            saleLabel: 'Month End Sale',
-            rating: '4.2',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Apple iPhone 14 - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
-            topBadge: 'BASKARO',
-            oldPrice: '₹29,900',
-            price: '₹29,999',
-            saleLabel: 'Flash Sale',
-            rating: '4.8',
-            flashLabel: 'Flash Sale',
-          },
-          {
-            title: 'Realme Phone - Pre-Owned',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-            topBadge: 'BASKARO',
-            oldPrice: '₹14,999',
-            price: '₹12,999',
-            saleLabel: 'Deal',
-            rating: '4.3',
-            flashLabel: 'Flash Sale',
-          },
-        ]}
->>>>>>> Stashed changes
+        products={PRE_OWNED_DEVICES_CAROUSEL}
       />
 
       {/* Our Exclusive Stores */}
