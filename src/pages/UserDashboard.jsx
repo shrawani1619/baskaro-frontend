@@ -19,7 +19,7 @@ const ACC_OPTIONS     = ['Original box + all accessories', 'Original charger onl
 
 const ORDER_STATUSES = [
   { key: 'Request Submitted', Icon: AlertCircle,  color: 'text-slate-500',  bg: 'bg-slate-100',   fill: 'bg-slate-500'   },
-  { key: 'Pickup Scheduled',  Icon: Truck,        color: 'text-blue-600',   bg: 'bg-blue-100',    fill: 'bg-blue-600'    },
+  { key: 'Pickup Scheduled',  Icon: Truck,        color: 'text-rose-600',   bg: 'bg-rose-100',    fill: 'bg-rose-600'    },
   { key: 'Device Received',   Icon: ShieldCheck,  color: 'text-orange-600', bg: 'bg-orange-100',  fill: 'bg-orange-500'  },
   { key: 'Payment Completed', Icon: BadgeCheck,   color: 'text-green-600',  bg: 'bg-green-100',   fill: 'bg-green-500'   },
 ]
@@ -39,7 +39,7 @@ function Label({ children }) {
 function DSelect({ value, onChange, options, placeholder }) {
   return (
     <select value={value} onChange={e => onChange(e.target.value)}
-      className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none transition focus:border-rose-500 focus:ring-2 focus:ring-rose-100"
     >
       {placeholder && <option value="">{placeholder}</option>}
       {options.map(o => <option key={o} value={o}>{o}</option>)}
@@ -49,7 +49,7 @@ function DSelect({ value, onChange, options, placeholder }) {
 function DInput({ value, onChange, placeholder, type = 'text', ...rest }) {
   return (
     <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-      className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-100"
       {...rest}
     />
   )
@@ -66,11 +66,12 @@ export default function UserDashboard() {
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
 function DashboardShell({ user, navigate }) {
-  const [tab, setTab] = useState('sell')
+  const [tab, setTab] = useState('overview')
 
   function logout() { performLogout(); navigate('/') }
 
   const tabs = [
+    { id: 'overview', Icon: Home,       label: 'Overview'   },
     { id: 'sell',    Icon: Smartphone, label: 'Sell Phone' },
     { id: 'orders',  Icon: Package,    label: 'My Orders'  },
     { id: 'profile', Icon: User,       label: 'Profile'    },
@@ -88,9 +89,9 @@ function DashboardShell({ user, navigate }) {
             <span style={{display:'none'}} className="text-xl font-black text-slate-900">BAS<span className="text-red-600">karo</span></span>
           </Link>
         </div>
-        <div className="mx-4 mt-5 rounded-2xl bg-blue-50 px-4 py-3">
+        <div className="mx-4 mt-5 rounded-2xl bg-rose-50 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600 text-sm font-black text-white">
               {(user.name || user.phone || 'U')[0].toUpperCase()}
             </div>
             <div className="min-w-0">
@@ -122,6 +123,7 @@ function DashboardShell({ user, navigate }) {
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+              {tab === 'overview' && <OverviewTab user={user} setTab={setTab} />}
               {tab === 'sell'    && <SellTab onViewOrders={() => setTab('orders')} />}
               {tab === 'orders'  && <OrdersTab />}
               {tab === 'profile' && <ProfileTab user={user} />}
@@ -141,6 +143,123 @@ function DashboardShell({ user, navigate }) {
           ))}
         </nav>
       </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OVERVIEW TAB
+// ─────────────────────────────────────────────────────────────────────────────
+function OverviewTab({ user, setTab }) {
+  const navigate = useNavigate();
+  const orders = useMemo(() => JSON.parse(localStorage.getItem('baskaro_orders') || '[]'), []);
+  const activeOrders = orders.filter(o => o.status !== 'Payment Completed');
+  
+  // Calculate total earnings across all completed orders
+  const totalEarned = orders
+    .filter(o => o.status === 'Payment Completed')
+    .reduce((sum, o) => sum + (o.estimate || 0), 0);
+    
+  return (
+    <div className="max-w-5xl space-y-6">
+      {/* Welcome Banner */}
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-900 via-rose-950 to-red-900 p-8 sm:p-10 shadow-xl shadow-rose-900/20 text-white">
+        <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-rose-500/20 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-red-600/20 blur-3xl" />
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight mb-2">
+              Welcome back, {user?.name?.split(' ')[0] || 'User'}!
+            </h1>
+            <p className="text-rose-200 font-medium text-sm sm:text-base max-w-md">
+              Your hyper-premium portal for managing device valuations, tracking pickups, and exploring exclusive pre-owned deals.
+            </p>
+          </div>
+          {totalEarned > 0 && (
+            <div className="shrink-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5">
+              <p className="text-xs font-black uppercase tracking-widest text-rose-200 mb-1">Total Earned</p>
+              <p className="text-3xl font-black text-white">₹{fmt(totalEarned)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-lg font-black text-slate-900 mb-4 px-1">Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <button onClick={() => setTab('sell')} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-rose-400 hover:shadow-lg hover:-translate-y-1 text-left">
+            <div className="absolute right-0 top-0 opacity-5 group-hover:scale-110 transition-transform duration-500">
+              <Smartphone size={100} className="translate-x-4 -translate-y-4" />
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 mb-4 group-hover:scale-110 transition-transform">
+              <Smartphone size={24} />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-1">Sell a Device</h3>
+            <p className="text-xs font-semibold text-slate-500">Get an instant, AI-driven valuation for your old phone.</p>
+          </button>
+          
+          <button onClick={() => navigate('/marketplace')} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-slate-800 hover:shadow-lg hover:-translate-y-1 text-left">
+            <div className="absolute right-0 top-0 opacity-5 group-hover:scale-110 transition-transform duration-500">
+              <BadgeCheck size={100} className="translate-x-4 -translate-y-4" />
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700 mb-4 group-hover:scale-110 transition-transform">
+              <BadgeCheck size={24} />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-1">Buy Pre-Owned</h3>
+            <p className="text-xs font-semibold text-slate-500">Explore our certified, high-fidelity marketplace.</p>
+          </button>
+          
+          <button onClick={() => setTab('orders')} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-orange-400 hover:shadow-lg hover:-translate-y-1 text-left">
+            <div className="absolute right-0 top-0 opacity-5 group-hover:scale-110 transition-transform duration-500">
+              <Package size={100} className="translate-x-4 -translate-y-4" />
+            </div>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-50 text-orange-600 mb-4 group-hover:scale-110 transition-transform">
+              <Package size={24} />
+            </div>
+            <h3 className="text-lg font-black text-slate-900 mb-1">Track Orders</h3>
+            <p className="text-xs font-semibold text-slate-500">Monitor pickup schedules and payment statuses.</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Active Sell Request Preview */}
+      {activeOrders.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-lg font-black text-slate-900 mb-4 px-1">Active Sell Requests</h2>
+          <div className="space-y-4">
+            {activeOrders.slice(0, 3).map(o => {
+              const statusCfg = ORDER_STATUSES.find(s => s.key === o.status) || ORDER_STATUSES[0]
+              return (
+                <button key={o.id} onClick={() => setTab('orders')} className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm transition hover:shadow-md hover:border-rose-300 group">
+                  <div className="flex items-center gap-4 text-left">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 font-black text-slate-700 text-2xl group-hover:bg-rose-50 transition-colors">
+                      {o.brand?.[0]}
+                    </div>
+                    <div>
+                      <p className="font-black text-slate-900 text-lg group-hover:text-rose-600 transition-colors">{o.brand} {o.model}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ID: {o.id}</span>
+                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-black ${statusCfg.bg} ${statusCfg.color}`}>
+                          <span className={`h-1 w-1 rounded-full ${statusCfg.fill}`} />
+                          {o.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right flex items-center gap-4">
+                    <div>
+                      <p className="text-xl font-black text-slate-900">₹{fmt(o.estimate)}</p>
+                      {o.pickupDate && <p className="text-xs font-bold text-slate-500 mt-1 flex items-center justify-end gap-1"><Calendar size={12}/> {o.pickupDate}</p>}
+                    </div>
+                    <ChevronRight size={18} className="text-slate-300 group-hover:text-rose-600 transition-colors" />
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -220,7 +339,7 @@ function SellTab({ onViewOrders }) {
       <div className="mb-6 flex items-center gap-4">
         {step > 1 && step < 7 && (
           <button onClick={() => setStep(s => Math.max(1, s - 1))}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-slate-200 text-slate-500 hover:border-blue-400 hover:text-blue-600 transition-all"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-slate-200 text-slate-500 hover:border-rose-400 hover:text-rose-600 transition-all"
           ><ArrowLeft size={16} /></button>
         )}
         <div>
@@ -231,7 +350,7 @@ function SellTab({ onViewOrders }) {
 
       {step < 7 && (
         <div className="mb-6 h-1.5 w-full overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-red-500 transition-all duration-500"
+          <div className="h-full rounded-full bg-gradient-to-r from-rose-500 to-red-500 transition-all duration-500"
             style={{ width: `${Math.round(((step - 1) / 6) * 100)}%` }} />
         </div>
       )}
@@ -274,7 +393,7 @@ function SellTab({ onViewOrders }) {
             <div><Label>Storage</Label><DSelect value={storage} onChange={setStorage} options={storageOptions} placeholder="Select Storage" /></div>
           </div>
           <button disabled={!ram || !storage} onClick={() => setStep(4)}
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-md shadow-blue-200 transition-all hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 py-3 text-sm font-black text-white shadow-md shadow-rose-200 transition-all hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed"
           >Continue <ArrowRight size={15} /></button>
         </div>
       )}
@@ -289,10 +408,10 @@ function SellTab({ onViewOrders }) {
             <div><Label>Battery Health</Label><DSelect value={battery} onChange={setBattery} options={BATTERY_OPTIONS} /></div>
             <div><Label>Accessories</Label><DSelect value={accessories} onChange={setAccessories} options={ACC_OPTIONS} /></div>
           </div>
-          <div className="mt-5 rounded-xl bg-blue-50 px-4 py-3 text-xs font-semibold text-blue-700">
+          <div className="mt-5 rounded-xl bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
             💡 Be honest — our agent verifies condition at pickup. Better condition = higher payout.
           </div>
-          <button onClick={() => setStep(5)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-md shadow-blue-200 hover:bg-blue-700 transition-all">
+          <button onClick={() => setStep(5)} className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 py-3 text-sm font-black text-white shadow-md shadow-rose-200 hover:bg-rose-700 transition-all">
             Get Price Estimate <ArrowRight size={15} />
           </button>
         </div>
@@ -300,17 +419,27 @@ function SellTab({ onViewOrders }) {
 
       {/* Step 5: Estimate */}
       {step === 5 && (
-        <div className="space-y-4">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 to-blue-800 p-6 text-white shadow-xl shadow-blue-200">
-            <div className="absolute -top-10 -right-10 h-48 w-48 rounded-full bg-white/5" />
-            <div className="absolute -bottom-8 -left-8 h-36 w-36 rounded-full bg-white/5" />
-            <div className="relative">
-              <p className="text-sm font-semibold text-blue-200">Estimated Offer Price</p>
-              <p className="mt-2 text-5xl font-black tracking-tight">₹{estimate ? fmt(estimate.finalPrice) : '—'}</p>
-              <p className="mt-1 text-xs text-blue-300">Base ₹{estimate ? fmt(estimate.breakdown.basePrice) : 0} · {estimate ? Math.round(estimate.breakdown.totalDeductionPct * 100) : 0}% deducted</p>
-              <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-bold">
-                <CheckCircle size={12} /> Instant payout after device check
-              </div>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.4 }} className="space-y-4">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-rose-900 to-rose-600 p-8 sm:p-10 text-white shadow-2xl shadow-rose-900/40 border border-rose-500/30">
+            <motion.div initial={{ opacity: 0, rotate: -45 }} animate={{ opacity: 1, rotate: 0 }} transition={{ delay: 0.3, duration: 1 }} className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-rose-500/20 blur-3xl" />
+            <motion.div initial={{ opacity: 0, rotate: 45 }} animate={{ opacity: 1, rotate: 0 }} transition={{ delay: 0.4, duration: 1 }} className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-red-600/20 blur-3xl" />
+            <div className="relative z-10 flex flex-col items-center text-center">
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-500/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-rose-200 border border-rose-500/30 mb-4 shadow-inner shadow-rose-500/20">
+                  <BadgeCheck size={12} className="text-rose-300" /> Awesome Value Unlocked!
+                </span>
+                <p className="text-sm font-semibold text-rose-200">Estimated Offer Price</p>
+              </motion.div>
+              
+              <motion.div initial={{ scale: 0.5, opacity: 0, filter: "blur(10px)" }} animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }} transition={{ delay: 0.4, type: "spring", stiffness: 200, damping: 15 }} className="mt-3 text-6xl sm:text-7xl font-black tracking-tight text-white drop-shadow-[0_0_25px_rgba(225,29,72,0.5)]">
+                 ₹<AnimatedCounter value={estimate ? estimate.finalPrice : 0} />
+              </motion.div>
+              
+              <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }} className="w-full">
+                <p className="mt-4 text-[11px] font-semibold text-rose-200/80 uppercase tracking-widest">
+                  Base: ₹{estimate ? fmt(estimate.breakdown.basePrice) : 0} <span className="mx-2 opacity-30">|</span> -{estimate ? Math.round(estimate.breakdown.totalDeductionPct * 100) : 0}% deduction
+                </p>
+              </motion.div>
             </div>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -330,7 +459,7 @@ function SellTab({ onViewOrders }) {
               Schedule Pickup <ArrowRight size={15} />
             </button>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Step 6: Pickup & Payment */}
@@ -344,7 +473,7 @@ function SellTab({ onViewOrders }) {
             <div>
               <Label>Pickup Date</Label>
               <input type="date" value={pickupDate} onChange={e => setPickupDate(e.target.value)} min={new Date().toISOString().split('T')[0]}
-                className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                className="h-11 w-full rounded-xl border-2 border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100 transition"
               />
             </div>
             <div>
@@ -353,7 +482,7 @@ function SellTab({ onViewOrders }) {
                 {timeSlots.map(t => (
                   <button key={t} onClick={() => setPickupTime(t)}
                     className={['flex items-center justify-center gap-2 rounded-xl border-2 px-3 py-2.5 text-xs font-bold transition-all',
-                      pickupTime === t ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-300 hover:bg-blue-50'].join(' ')}
+                      pickupTime === t ? 'border-rose-500 bg-rose-50 text-rose-700' : 'border-slate-200 text-slate-600 hover:border-rose-300 hover:bg-rose-50'].join(' ')}
                   ><Clock size={13} /> {t}</button>
                 ))}
               </div>
@@ -368,7 +497,7 @@ function SellTab({ onViewOrders }) {
                   {addresses.map((a, i) => (
                     <button key={i} onClick={() => setSelectedAddr(a)}
                       className={['w-full rounded-xl border-2 px-4 py-3 text-left text-sm transition-all',
-                        selectedAddr === a ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-blue-300'].join(' ')}
+                        selectedAddr === a ? 'border-rose-500 bg-rose-50' : 'border-slate-200 hover:border-rose-300'].join(' ')}
                     >
                       <div className="font-black text-slate-900">{a.label}</div>
                       <div className="mt-0.5 font-semibold text-slate-500">{a.line1}, {a.city} – {a.pincode}</div>
@@ -436,13 +565,13 @@ function InlineAddressForm({ onSaved }) {
   }
 
   return (
-    <div className="mt-1 rounded-xl border-2 border-blue-200 bg-blue-50 p-4 space-y-3">
-      <p className="text-xs font-black uppercase tracking-wider text-blue-700">Add Pickup Address</p>
+    <div className="mt-1 rounded-xl border-2 border-rose-200 bg-rose-50 p-4 space-y-3">
+      <p className="text-xs font-black uppercase tracking-wider text-rose-700">Add Pickup Address</p>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Label>Label</Label>
           <select value={label} onChange={e => setLabel(e.target.value)}
-            className="h-11 w-full rounded-xl border-2 border-blue-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-blue-500"
+            className="h-11 w-full rounded-xl border-2 border-rose-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none focus:border-rose-500"
           >
             {['Home', 'Work', 'Other'].map(o => <option key={o} value={o}>{o}</option>)}
           </select>
@@ -450,24 +579,24 @@ function InlineAddressForm({ onSaved }) {
         <div className="sm:col-span-2">
           <Label>Street / House No.</Label>
           <input value={line1} onChange={e => setLine1(e.target.value)} placeholder="123, Main Street"
-            className="h-11 w-full rounded-xl border-2 border-blue-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-blue-500"
+            className="h-11 w-full rounded-xl border-2 border-rose-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-rose-500"
           />
         </div>
         <div>
           <Label>City</Label>
           <input value={city} onChange={e => setCity(e.target.value)} placeholder="Delhi"
-            className="h-11 w-full rounded-xl border-2 border-blue-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-blue-500"
+            className="h-11 w-full rounded-xl border-2 border-rose-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-rose-500"
           />
         </div>
         <div>
           <Label>Pincode</Label>
           <input value={pincode} onChange={e => setPincode(e.target.value.replace(/\D/g,'').slice(0,6))} placeholder="110001" inputMode="numeric" maxLength={6}
-            className="h-11 w-full rounded-xl border-2 border-blue-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-blue-500"
+            className="h-11 w-full rounded-xl border-2 border-rose-200 bg-white px-3 text-sm font-semibold text-slate-800 outline-none placeholder:text-slate-300 focus:border-rose-500"
           />
         </div>
       </div>
       <button onClick={save} disabled={!line1 || !city || !pincode}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-2.5 text-sm font-black text-white shadow-md hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 py-2.5 text-sm font-black text-white shadow-md hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
         <CheckCircle size={14} /> Save &amp; Use This Address
       </button>
@@ -500,10 +629,10 @@ function OrderConfirmation({ order, onSellAnother, onViewOrders }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-slate-400">Order ID</p>
-            <p className="mt-1 text-xl font-black text-blue-600">{order.id}</p>
+            <p className="mt-1 text-xl font-black text-rose-600">{order.id}</p>
           </div>
           <button onClick={copyId}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-all"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-500 hover:border-rose-300 hover:text-rose-600 transition-all"
           ><Copy size={13} />{copied ? 'Copied!' : 'Copy'}</button>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -524,7 +653,7 @@ function OrderConfirmation({ order, onSellAnother, onViewOrders }) {
 
       <div className="grid grid-cols-2 gap-3">
         <button onClick={onSellAnother} className="rounded-xl border-2 border-slate-200 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50">Sell Another</button>
-        <button onClick={onViewOrders} className="rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-md hover:bg-blue-700">View My Orders</button>
+        <button onClick={onViewOrders} className="rounded-xl bg-rose-600 py-3 text-sm font-black text-white shadow-md hover:bg-rose-700">View My Orders</button>
       </div>
     </motion.div>
   )
@@ -556,7 +685,7 @@ function StatusTimeline({ currentStatus, history = [] }) {
             <div className="pb-5 pt-1">
               <p className={['text-sm font-black transition-colors', done ? 'text-slate-900' : 'text-slate-400'].join(' ')}>{s.key}</p>
               {histEntry && <p className="text-[11px] font-semibold text-slate-400">{fmtDate(histEntry.at)}</p>}
-              {active && <span className="mt-1 inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-black text-blue-700">Current</span>}
+              {active && <span className="mt-1 inline-block rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-700">Current</span>}
             </div>
           </div>
         )
@@ -601,7 +730,7 @@ function OrdersTab() {
     <div className="max-w-3xl">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-900">My Sell Orders</h1>
-        <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-black text-blue-700">{orders.length} order{orders.length !== 1 ? 's' : ''}</span>
+        <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-700">{orders.length} order{orders.length !== 1 ? 's' : ''}</span>
       </div>
       <div className="space-y-4">
         {orders.map(o => (
@@ -673,7 +802,7 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
 
         {/* Mini progress bar */}
         <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-700"
+          <div className="h-full rounded-full bg-gradient-to-r from-rose-500 to-green-500 transition-all duration-700"
             style={{ width: `${((currentIdx) / (ORDER_STATUSES.length - 1)) * 100}%` }} />
         </div>
         <div className="mt-1.5 flex justify-between text-[9px] font-bold uppercase tracking-wider text-slate-300">
@@ -791,7 +920,7 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
               {/* Demo: advance status button (hidden in production) */}
               {order.status !== 'Payment Completed' && (
                 <button onClick={advanceStatus}
-                  className="w-full rounded-xl border-2 border-dashed border-slate-200 py-2 text-xs font-bold text-slate-400 hover:border-blue-300 hover:text-blue-500 transition-all"
+                  className="w-full rounded-xl border-2 border-dashed border-slate-200 py-2 text-xs font-bold text-slate-400 hover:border-rose-300 hover:text-rose-500 transition-all"
                 >
                   🔧 Demo: Advance to next status
                 </button>
@@ -820,7 +949,7 @@ function ProfileTab({ user }) {
     <div className="max-w-lg">
       <h1 className="mb-6 text-2xl font-black text-slate-900">My Profile</h1>
       <div className="mb-6 flex items-center gap-4">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-black text-white">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-rose-600 text-2xl font-black text-white">
           {(name || phone || 'U')[0].toUpperCase()}
         </div>
         <div>
@@ -833,7 +962,7 @@ function ProfileTab({ user }) {
         <div><Label>Email Address</Label><DInput value={email} onChange={setEmail} placeholder="you@email.com" type="email" /></div>
         <div>
           <Label>Mobile Number</Label>
-          <div className="flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-3 focus-within:border-blue-500 transition">
+          <div className="flex items-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-3 focus-within:border-rose-500 transition">
             <span className="text-sm font-black text-slate-400">+91</span>
             <div className="h-5 w-px bg-slate-200" />
             <input type="tel" inputMode="numeric" maxLength={10}
@@ -843,7 +972,7 @@ function ProfileTab({ user }) {
             />
           </div>
         </div>
-        <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-sm font-black text-white shadow-md shadow-blue-200 hover:bg-blue-700 transition-all">
+        <button type="submit" className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 py-3 text-sm font-black text-white shadow-md shadow-rose-200 hover:bg-rose-700 transition-all">
           {saved ? <><CheckCircle size={15} /> Saved!</> : 'Save Changes'}
         </button>
       </form>
@@ -872,16 +1001,16 @@ function AddressTab() {
     <div className="max-w-lg">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-black text-slate-900">Pickup Addresses</h1>
-        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-md shadow-blue-200 hover:bg-blue-700 transition-all">
+        <button onClick={() => setAdding(true)} className="flex items-center gap-1.5 rounded-xl bg-rose-600 px-4 py-2 text-sm font-black text-white shadow-md shadow-rose-200 hover:bg-rose-700 transition-all">
           <Plus size={15} /> Add New
         </button>
       </div>
       <AnimatePresence>
         {adding && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="mb-4 rounded-2xl border-2 border-blue-200 bg-blue-50 p-5 space-y-3"
+            className="mb-4 rounded-2xl border-2 border-rose-200 bg-rose-50 p-5 space-y-3"
           >
-            <h3 className="text-sm font-black text-blue-800">New Address</h3>
+            <h3 className="text-sm font-black text-rose-800">New Address</h3>
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="sm:col-span-2"><Label>Label</Label><DSelect value={form.label} onChange={v => setForm(f => ({ ...f, label: v }))} options={['Home', 'Work', 'Other']} /></div>
               <div className="sm:col-span-2"><Label>Street / House No.</Label><DInput value={form.line1} onChange={v => setForm(f => ({ ...f, line1: v }))} placeholder="123, Main Street" /></div>
@@ -891,7 +1020,7 @@ function AddressTab() {
             </div>
             <div className="flex gap-3 pt-1">
               <button onClick={() => setAdding(false)} className="flex-1 rounded-xl border-2 border-slate-200 py-2 text-sm font-bold text-slate-600 hover:bg-white">Cancel</button>
-              <button onClick={save} className="flex-1 rounded-xl bg-blue-600 py-2 text-sm font-black text-white shadow-md hover:bg-blue-700">Save Address</button>
+              <button onClick={save} className="flex-1 rounded-xl bg-rose-600 py-2 text-sm font-black text-white shadow-md hover:bg-rose-700">Save Address</button>
             </div>
           </motion.div>
         )}
@@ -906,7 +1035,7 @@ function AddressTab() {
         <div className="space-y-3">
           {addresses.map((a, i) => (
             <div key={i} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><Home size={18} /></div>
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><Home size={18} /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-black text-slate-900">{a.label}</p>
                 <p className="text-xs font-semibold text-slate-500 mt-0.5">{a.line1}, {a.city} {a.state && `(${a.state})`} – {a.pincode}</p>
@@ -918,4 +1047,32 @@ function AddressTab() {
       )}
     </div>
   )
+}
+
+// ─── Utilities ─────────────────────────────────────────────────────────────
+function AnimatedCounter({ value }) {
+  const [displayValue, setDisplayValue] = useState(0);
+  useEffect(() => {
+    if (!value) return;
+    let start = 0;
+    const duration = 1800; // 1.8 seconds for drama
+    const startTime = performance.now();
+    
+    function update(currentTime) {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo for that satisfying snap at the end
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setDisplayValue(Math.floor(easeProgress * value));
+      
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        setDisplayValue(value);
+      }
+    }
+    requestAnimationFrame(update);
+  }, [value]);
+  
+  return <>{Number(displayValue).toLocaleString('en-IN')}</>;
 }
