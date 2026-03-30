@@ -1,5 +1,6 @@
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { gPhoto, gBrandLogo } from '../constants/googleImages'
+import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
+import { gPhoto } from '../constants/googleImages'
 
 const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'OPPO', 'Realme', 'Motorola']
 
@@ -28,14 +29,6 @@ const WHY_US = [
   'Pickup available',
   'Same-day on select jobs',
   'Data-safe handling',
-]
-
-const TOP_BRANDS = [
-  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
-  { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
-  { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
-  { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
-  { name: 'Vivo', logoUrl: gBrandLogo('vivo.com') },
 ]
 
 const REPAIR_ITEMS = [
@@ -74,7 +67,7 @@ export default function RepairPhonePage() {
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
       hotDealsTitle="Repair offers"
-      topBrands={TOP_BRANDS}
+      topBrands={PHONE_BRAND_PORTALS}
       productsSection={{
         title: 'Common services',
         priceLabel: 'Starts at',

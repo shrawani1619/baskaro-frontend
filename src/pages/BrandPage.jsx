@@ -1,7 +1,7 @@
 import React from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Smartphone, ArrowLeft, Star, ShieldCheck, Zap, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 
 const BRAND_SERIES = {
   Apple: [
@@ -46,37 +46,17 @@ const BrandPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 font-['Outfit'] pb-20">
-      {/* Header Section */}
-      <div className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 h-20 flex items-center justify-between">
-          <Link to="/" className="group flex items-center gap-3 text-slate-500 hover:text-rose-600 transition-colors">
-            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-rose-50 transition-colors">
-              <ArrowLeft size={20} />
-            </div>
-            <span className="text-sm font-black uppercase tracking-widest hidden md:inline">Back</span>
-          </Link>
-          
-          <div className="flex-1 max-w-md mx-8 relative">
-             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-             <input 
-                type="text" 
-                placeholder={`Search model...`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-11 bg-slate-50 border border-slate-100 rounded-2xl pl-12 pr-4 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
-             />
-          </div>
-
-          <div className="flex items-center gap-4">
-             <div className="text-right hidden sm:block">
-                <div className="text-[10px] font-black uppercase tracking-tighter text-rose-600">Region</div>
-                <div className="text-sm font-bold text-slate-900">New Delhi, IN</div>
-             </div>
-          </div>
-        </div>
-      </div>
-
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-12">
+        <div className="relative mb-10 max-w-xl">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <input
+            type="text"
+            placeholder="Search model..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-11 bg-white border border-slate-200 rounded-2xl pl-12 pr-4 text-sm font-bold shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
+          />
+        </div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

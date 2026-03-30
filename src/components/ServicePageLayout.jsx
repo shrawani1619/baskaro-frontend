@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from './Button'
 import { DownloadAppBanner } from './DownloadAppBanner'
-import { Navbar } from './Navbar'
+import { TopSellingBrands } from './TopBrandPortals'
 
 /**
  * Shared marketing/service page shell — same structure as the original Sell Phone page.
@@ -21,6 +21,7 @@ export function ServicePageLayout({
   showHotDeals = true,
   hotDealsTitle = 'Hot Deals',
   topBrands,
+  topBrandsTitle = 'Top Selling Brands',
   productsSection,
   stories,
   faqs,
@@ -32,7 +33,6 @@ export function ServicePageLayout({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50 to-white">
-      <Navbar />
       <section className="w-full border-b border-blue-100 bg-gradient-to-r from-red-50 via-white to-blue-50">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-12">
           <p className="text-sm font-semibold text-slate-500">{breadcrumb}</p>
@@ -141,36 +141,7 @@ export function ServicePageLayout({
       {topBrands && topBrands.length > 0 && (
         <section className="w-full px-4 pb-12 sm:px-6">
           <div className="mx-auto max-w-7xl">
-            <h2 className="text-2xl font-extrabold text-slate-900">Top Selling Brands</h2>
-            <div className="mt-4 flex items-center gap-4">
-              <div className="flex flex-1 gap-4 overflow-x-auto pb-2">
-                {topBrands.map((brand) => (
-                  <article
-                    key={brand.name}
-                    className="min-w-[138px] rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
-                  >
-                    <div className="flex h-16 items-center justify-center rounded-lg bg-gradient-to-r from-slate-50 to-blue-50 px-2">
-                      <img
-                        src={brand.logoUrl}
-                        alt={brand.name}
-                        loading="lazy"
-                        className="h-8 w-full object-contain"
-                      />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold text-slate-800">{brand.name}</p>
-                  </article>
-                ))}
-              </div>
-              <button
-                type="button"
-                aria-label="Next brands"
-                className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:border-slate-400 md:inline-flex"
-              >
-                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
+            <TopSellingBrands brands={topBrands} title={topBrandsTitle} />
           </div>
         </section>
       )}

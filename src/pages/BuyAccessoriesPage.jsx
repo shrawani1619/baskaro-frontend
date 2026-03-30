@@ -1,5 +1,6 @@
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { gPhoto, gBrandLogo } from '../constants/googleImages'
+import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
+import { gPhoto } from '../constants/googleImages'
 
 const BRANDS = ['Apple', 'Samsung', 'Anker', 'Boat', 'JBL', 'OnePlus', 'Realme', 'Noise']
 
@@ -28,14 +29,6 @@ const WHY_US = [
   'Best offers',
   'Warranty support',
   'Secure checkout',
-]
-
-const TOP_BRANDS = [
-  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
-  { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
-  { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
-  { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
-  { name: 'Realme', logoUrl: gBrandLogo('realme.com') },
 ]
 
 const PICKS = [
@@ -74,7 +67,7 @@ export default function BuyAccessoriesPage() {
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
       hotDealsTitle="Accessory bundles"
-      topBrands={TOP_BRANDS}
+      topBrands={PHONE_BRAND_PORTALS}
       productsSection={{
         title: 'Popular picks',
         priceLabel: 'From',

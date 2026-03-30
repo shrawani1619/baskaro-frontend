@@ -119,12 +119,6 @@ function DashboardShell({ user, navigate }) {
 
       {/* Main */}
       <div className="flex flex-1 flex-col min-w-0">
-        <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-4 md:hidden">
-          <Link to="/" className="flex items-center gap-1.5 text-sm font-bold text-slate-500"><ArrowLeft size={15} /> Home</Link>
-          <span className="text-base font-black text-slate-900">BAS<span className="text-red-600">karo</span></span>
-          <button onClick={logout} className="rounded-full p-1.5 text-slate-400 hover:text-red-600"><LogOut size={17} /></button>
-        </header>
-
         <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>

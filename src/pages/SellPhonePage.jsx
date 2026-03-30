@@ -1,5 +1,6 @@
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { gPhoto, gBrandLogo } from '../constants/googleImages'
+import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
+import { gPhoto } from '../constants/googleImages'
 
 const BRAND_LIST = ['Apple', 'Xiaomi', 'Samsung', 'Vivo', 'OnePlus', 'OPPO', 'Realme', 'Motorola']
 
@@ -63,16 +64,6 @@ const TOP_PHONES = [
   },
 ]
 
-const TOP_BRANDS = [
-  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
-  { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
-  { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
-  { name: 'Vivo', logoUrl: gBrandLogo('vivo.com') },
-  { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
-  { name: 'OPPO', logoUrl: gBrandLogo('oppo.com') },
-  { name: 'Realme', logoUrl: gBrandLogo('realme.com') },
-]
-
 const STORIES = [
   'I loved that pickup was from my home and payment was instant. Super convenient.',
   'Local buyers were low-balling. Here I got a fair value in minutes.',
@@ -99,7 +90,7 @@ export default function SellPhonePage() {
       howItWorksTitle="How Cashify Works"
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
-      topBrands={TOP_BRANDS}
+      topBrands={PHONE_BRAND_PORTALS}
       productsSection={{
         title: 'Top Selling Mobile Phones',
         items: TOP_PHONES,

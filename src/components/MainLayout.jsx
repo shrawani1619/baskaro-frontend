@@ -1,9 +1,12 @@
+import { LandingNavbar } from './LandingNavbar'
+
 /**
  * Wraps page content; add header/footer/sidebar here as the app grows.
  */
 export function MainLayout({ children }) {
   return (
     <>
+      <LandingNavbar />
       {children}
       <footer className="border-t bg-white">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">

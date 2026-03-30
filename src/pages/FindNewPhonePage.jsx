@@ -1,5 +1,6 @@
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { gPhoto, gBrandLogo } from '../constants/googleImages'
+import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
+import { gPhoto } from '../constants/googleImages'
 import { useCart } from '../context/CartContext'
 
 const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Vivo', 'Xiaomi', 'OPPO', 'Realme', 'Motorola']
@@ -29,15 +30,6 @@ const WHY_US = [
   'EMI available',
   'Easy exchange',
   'Verified sellers',
-]
-
-const TOP_BRANDS = [
-  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
-  { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
-  { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
-  { name: 'Vivo', logoUrl: gBrandLogo('vivo.com') },
-  { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
-  { name: 'OPPO', logoUrl: gBrandLogo('oppo.com') },
 ]
 
 const PHONES = [
@@ -78,7 +70,7 @@ export default function FindNewPhonePage() {
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
       hotDealsTitle="Phone deals"
-      topBrands={TOP_BRANDS}
+      topBrands={PHONE_BRAND_PORTALS}
       productsSection={{
         title: 'Trending phones',
         priceLabel: 'From',

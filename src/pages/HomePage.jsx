@@ -29,7 +29,6 @@ export default function HomePage() {
     [selectedBrand],
   )
 
-  const [siteQuery, setSiteQuery] = useState('')
   const [modelQuery, setModelQuery] = useState('')
   const filteredModels = useMemo(() => {
     const q = modelQuery.trim().toLowerCase()
@@ -136,27 +135,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header className="border-b bg-white">
-        <div className="mx-auto flex h-14 w-full max-w-6xl items-center gap-4 px-4">
-          <a href="/" className="ml-2 flex shrink-0 items-center" aria-label="BAS karo home">
-            <img
-              src="/logo.png"
-              alt="BAS karo"
-              className="h-9 w-auto max-w-[160px] object-contain object-left"
-            />
-          </a>
-          <input
-            className={`${inputClass} max-w-xl pl-3`}
-            placeholder="Search for mobiles"
-            value={siteQuery}
-            onChange={(e) => setSiteQuery(e.target.value)}
-          />
-          <button className="ml-auto rounded-lg border border-red-300 bg-red-50 px-4 py-1.5 text-sm font-semibold text-red-700">
-            Login
-          </button>
-        </div>
-      </header>
-
       <main className="mx-auto w-full max-w-6xl px-4 py-6">
         <p className="mb-2 text-xs text-slate-500">
           Home / Sell Old Mobile Phone / {selectedBrand}
