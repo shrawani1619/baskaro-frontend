@@ -5,6 +5,7 @@ import { catalog } from '../mock/catalog.js'
 import { gPhoto } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { ProductCard } from '../components/ProductCard'
+import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
 
 const TOP_NAV = [
   'All',
@@ -71,44 +72,6 @@ const HERO_CAROUSEL_SLIDES = [
     ctaTo: '/sell-phone',
     bgClass: 'bg-slate-100',
     img: gPhoto(5),
-  },
-]
-
-const EXCLUSIVE_STORES = [
-  {
-    id: 'gurgaon-1',
-    city: 'GURGAON',
-    name: 'BAS karo Mobile Phone Store Airia Mall Sec 68 Gurugram',
-    address: 'Airia Mall, Sector 68, Gurugram, Haryana',
-    timings: '11:00 AM - 10:00 PM',
-  },
-  {
-    id: 'delhi-1',
-    city: 'DELHI',
-    name: 'BAS karo Experience Centre Connaught Place',
-    address: 'Block A, Connaught Place, New Delhi',
-    timings: '10:30 AM - 9:30 PM',
-  },
-  {
-    id: 'noida-1',
-    city: 'NOIDA',
-    name: 'BAS karo Store DLF Mall of India',
-    address: 'DLF Mall of India, Sector 18, Noida, UP',
-    timings: '11:00 AM - 10:00 PM',
-  },
-  {
-    id: 'bangalore-1',
-    city: 'BENGALURU',
-    name: 'BAS karo Store Phoenix Marketcity',
-    address: 'Phoenix Marketcity, Whitefield, Bengaluru',
-    timings: '10:00 AM - 10:00 PM',
-  },
-  {
-    id: 'mumbai-1',
-    city: 'MUMBAI',
-    name: 'BAS karo Store Infiniti Mall',
-    address: 'Infiniti Mall, Andheri West, Mumbai',
-    timings: '11:00 AM - 10:00 PM',
   },
 ]
 
@@ -1641,15 +1604,15 @@ export default function LandingPage() {
                   <p className="mt-2 text-xs text-slate-500">
                     Timings : {store.timings}
                   </p>
-                  <a
-                    href="#"
+                  <Link
+                    to={`/store/${store.id}`}
                     className="mt-3 inline-flex items-center text-xs font-bold text-blue-600 hover:text-blue-700"
                   >
                     View Details
                     <span className="ml-0.5" aria-hidden="true">
                       →
                     </span>
-                  </a>
+                  </Link>
                 </article>
               ))}
             </div>

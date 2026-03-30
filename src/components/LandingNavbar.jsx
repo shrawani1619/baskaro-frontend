@@ -125,7 +125,7 @@ export function LandingNavbar() {
   ])
 
   return (
-    <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/80 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
+    <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/90">
       <div className="flex h-20 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-12">
         <div className="flex flex-1 items-center justify-start">
           <Link
@@ -193,7 +193,7 @@ export function LandingNavbar() {
         </div>
       </div>
 
-      <nav className="w-full border-t border-slate-100 bg-white/50 backdrop-blur-sm hidden md:block">
+      <nav className="w-full border-t border-slate-100 bg-white hidden md:block">
         <div className="flex w-full items-center justify-center gap-6 px-4 py-2 sm:px-6 lg:px-12">
           <div className="relative" data-topnav-dropdown="true">
             <button

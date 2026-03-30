@@ -105,7 +105,7 @@ export function ServicePageLayout({
 
       {showHotDeals && (
         <section className="w-full px-4 pb-12 sm:px-6">
-          <div className="mx-auto max-w-7xl rounded-2xl bg-gradient-to-r from-red-100 via-white to-blue-100 p-6">
+          <div className="mx-auto max-w-7xl rounded-2xl bg-white p-6">
             <h2 className="text-2xl font-extrabold text-slate-900">{hotDealsTitle}</h2>
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((n) => (
@@ -163,7 +163,7 @@ export function ServicePageLayout({
                   key={phone.name}
                   className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="flex h-36 items-center justify-center rounded-xl bg-gradient-to-br from-slate-100 via-blue-50 to-red-50 p-3">
+                  <div className="flex h-36 items-center justify-center rounded-xl bg-white p-3">
                     <img
                       src={phone.img}
                       alt={phone.name}
