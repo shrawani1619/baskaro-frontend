@@ -72,10 +72,17 @@ export function LandingNavbar() {
     )
       return
 
-    const prevBodyOverflow = document.body.style.overflow
-    const prevHtmlOverflow = document.documentElement.style.overflow
-    document.body.style.overflow = 'hidden'
-    document.documentElement.style.overflow = 'hidden'
+    const isMobileModalOpen = mobileMenuOpen || mobileAllOpen || mobileSellOpen || mobileMoreOpen || mobileAllSellSubOpen
+
+    let prevBodyOverflow = ''
+    let prevHtmlOverflow = ''
+
+    if (isMobileModalOpen) {
+      prevBodyOverflow = document.body.style.overflow
+      prevHtmlOverflow = document.documentElement.style.overflow
+      document.body.style.overflow = 'hidden'
+      document.documentElement.style.overflow = 'hidden'
+    }
 
     const onKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -109,8 +116,10 @@ export function LandingNavbar() {
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('pointerdown', onPointerDown)
-      document.body.style.overflow = prevBodyOverflow
-      document.documentElement.style.overflow = prevHtmlOverflow
+      if (isMobileModalOpen) {
+        document.body.style.overflow = prevBodyOverflow
+        document.documentElement.style.overflow = prevHtmlOverflow
+      }
     }
   }, [
     allDropdownOpen,

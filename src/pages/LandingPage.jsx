@@ -1321,8 +1321,8 @@ export default function LandingPage() {
       </section>
 
       {/* Sell Your Old Device Now */}
-      <section id="sell-your-device" className="w-full scroll-mt-20 px-4 pb-16 sm:px-6">
-        <div className="mx-auto max-w-7xl">
+      <section id="sell-your-device" className="w-full scroll-mt-20 px-4 pt-10 pb-16 sm:px-6">
+        <div className="mx-auto max-w-6xl">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="mb-2 text-xl font-extrabold text-slate-900">
