@@ -55,19 +55,19 @@ export default function ProductDetailsPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           
           {/* Left: Image Gallery */}
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row gap-2">
             {/* Thumbnails Sidebar */}
-            <div className="order-2 md:order-1 flex md:flex-col gap-3">
+            <div className="order-2 md:order-1 flex md:flex-col gap-2">
               <div className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
-                 <button className="hidden md:flex h-8 w-full items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50">
-                    <ChevronLeft className="md:rotate-90" size={16} />
+                 <button className="hidden md:flex h-6 w-full items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50">
+                    <ChevronLeft className="md:rotate-90" size={12} />
                  </button>
                  {product.images.map((img, i) => (
                     <button
                        key={i}
                        onClick={() => setSelectedImg(i)}
-                       className={`h-16 w-16 shrink-0 overflow-hidden rounded-xl border-2 transition-all p-1 ${
-                         selectedImg === i ? 'border-red-600 shadow-md' : 'border-slate-100'
+                       className={`h-12 w-12 shrink-0 overflow-hidden rounded-lg border-2 transition-all p-0.5 ${
+                         selectedImg === i ? 'border-red-600 shadow-sm' : 'border-slate-100'
                        }`}
                     >
                        <img src={img} alt="" className="h-full w-full object-contain" />
@@ -80,7 +80,7 @@ export default function ProductDetailsPage() {
             </div>
  
             {/* Main Stage */}
-            <div className="order-1 md:order-2 relative flex-1 min-h-[320px] md:aspect-square rounded-3xl border border-slate-100 bg-slate-50/30 overflow-hidden flex flex-col group">
+            <div className="order-1 md:order-2 relative flex-1 min-h-[160px] md:aspect-[4/3] rounded-3xl border border-slate-100 bg-slate-50/30 overflow-hidden flex flex-col group">
                <div className="absolute top-4 left-4 z-10">
                   <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
                      <div className="h-6 w-6 rounded-full bg-slate-900 flex items-center justify-center">
@@ -99,7 +99,7 @@ export default function ProductDetailsPage() {
                   </button>
                </div>
 
-               <div className="flex-1 flex items-center justify-center p-4 min-h-[300px]">
+               <div className="flex-1 flex items-center justify-center p-2">
                   <AnimatePresence mode="wait">
                      <motion.img
                         key={selectedImg}
