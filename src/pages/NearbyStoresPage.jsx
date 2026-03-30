@@ -1,5 +1,7 @@
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { gPhoto } from '../constants/googleImages'
+
+const NEARBY_STORE_IMAGE_URL =
+  'https://img.freepik.com/premium-vector/shop-location-icon-3d-illustration-from-online-store-collection-creative-shop-location-3d-icon-web-design-templates-infographics-more_676904-843.jpg?semt=ais_incoming&w=740&q=80'
 
 const CITIES = ['Mumbai', 'Delhi NCR', 'Bengaluru', 'Hyderabad', 'Pune', 'Chennai', 'Kolkata', 'Ahmedabad']
 
@@ -31,12 +33,12 @@ const WHY_US = [
 ]
 
 const STORES = [
-  { name: 'BAS karo — Andheri West', price: '2.1 km', img: gPhoto(0) },
-  { name: 'BAS karo — Koramangala', price: '4.5 km', img: gPhoto(1) },
-  { name: 'BAS karo — Connaught Place', price: '1.8 km', img: gPhoto(2) },
-  { name: 'BAS karo — Hitech City', price: '3.2 km', img: gPhoto(3) },
-  { name: 'BAS karo — Baner', price: '5.0 km', img: gPhoto(4) },
-  { name: 'BAS karo — Salt Lake', price: '2.7 km', img: gPhoto(5) },
+  { name: 'BAS karo — Andheri West', price: '2.1 km', img: NEARBY_STORE_IMAGE_URL },
+  { name: 'BAS karo — Koramangala', price: '4.5 km', img: NEARBY_STORE_IMAGE_URL },
+  { name: 'BAS karo — Connaught Place', price: '1.8 km', img: NEARBY_STORE_IMAGE_URL },
+  { name: 'BAS karo — Hitech City', price: '3.2 km', img: NEARBY_STORE_IMAGE_URL },
+  { name: 'BAS karo — Baner', price: '5.0 km', img: NEARBY_STORE_IMAGE_URL },
+  { name: 'BAS karo — Salt Lake', price: '2.7 km', img: NEARBY_STORE_IMAGE_URL },
 ]
 
 const STORIES = [

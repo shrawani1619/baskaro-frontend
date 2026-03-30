@@ -12,11 +12,17 @@ import AdminLoginPage from './pages/AdminLoginPage'
 import BuyAccessoriesPage from './pages/BuyAccessoriesPage'
 import RepairPhonePage from './pages/RepairPhonePage'
 import FindNewPhonePage from './pages/FindNewPhonePage'
+import BuyPreOwnedPage from './pages/BuyPreOwnedPage'
 import NearbyStoresPage from './pages/NearbyStoresPage'
 import { CartProvider } from './context/CartContext'
 import CartPage from './pages/CartPage'
 import ProductDetailsPage from './pages/ProductDetailsPage'
 import ViewDetailsPage from './pages/ViewDetailsPage'
+import AboutPage from './pages/AboutPage'
+import WarrantyPolicyPage from './pages/WarrantyPolicyPage'
+import ReferEarnPage from './pages/ReferEarnPage'
+import CareersPage from './pages/CareersPage'
+import PressReleasesPage from './pages/PressReleasesPage'
 
 function NotFoundPage() {
   return (
@@ -52,12 +58,19 @@ export default function App() {
                   <Route path="/dashboard" element={<UserDashboard />} />
                   <Route path="/sell-phone" element={<SellPhonePage />} />
                   <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
+                  <Route path="/buy-pre-owned" element={<BuyPreOwnedPage />} />
+                  <Route path="/marketplace" element={<BuyPreOwnedPage />} />
                   <Route path="/repair-phone" element={<RepairPhonePage />} />
                   <Route path="/find-new-phone" element={<FindNewPhonePage />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/nearby-stores" element={<NearbyStoresPage />} />
                   <Route path="/product/:id" element={<ProductDetailsPage />} />
                   <Route path="/store/:storeId" element={<ViewDetailsPage />} />
+                  <Route path="/about" element={<AboutPage />} />
+                  <Route path="/warranty-policy" element={<WarrantyPolicyPage />} />
+                  <Route path="/refer-earn" element={<ReferEarnPage />} />
+                  <Route path="/careers" element={<CareersPage />} />
+                  <Route path="/press-releases" element={<PressReleasesPage />} />
                   <Route path="/landing" element={<Navigate to="/" replace />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

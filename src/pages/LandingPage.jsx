@@ -6,6 +6,7 @@ import { gPhoto } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { ProductCard } from '../components/ProductCard'
 import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
+import { ServiceCard } from '../components/ServiceCard'
 
 // Import premium PNG assets for that "wow" effect
 import s25Front from '../assets/products/s25_titanium.jpg'
@@ -32,6 +33,27 @@ const SERVICES = [
   { label: 'New Accessories', path: '/buy-accessories' },
   { label: 'Buy Smartwatches', path: '/buy-accessories' },
 ]
+
+const NEARBY_STORE_IMAGE_URL =
+  'https://img.freepik.com/premium-vector/shop-location-icon-3d-illustration-from-online-store-collection-creative-shop-location-3d-icon-web-design-templates-infographics-more_676904-843.jpg?semt=ais_incoming&w=740&q=80'
+
+const REPAIR_PHONE_IMAGE_URL =
+  'https://erepaircafe.com/wp-content/uploads/al_opt_content/IMAGE/erepaircafe.com/wp-content/uploads/2025/06/repair-phone.png.bv_resized_mobile.png.bv.webp?bv_host=erepaircafe.com'
+
+const FIND_NEW_PHONE_IMAGE_URL =
+  'https://s3n.cashify.in/builder/4060695bca3447c2b7296aa5ba9ce827.webp'
+
+const BUY_PHONE_IMAGE_URL =
+  'https://s3n.cashify.in/builder/caa3a1efa51541a5aa37fd292790ea81.webp'
+
+const SELL_PHONE_IMAGE_URL =
+  'https://s3ng.cashify.in/builder/81c3c74f0683463da548ae2cbe1fec28.webp?w=300'
+
+const NEW_ACCESSORIES_IMAGE_URL =
+  'https://s3n.cashify.in/builder/75750a866d214239bf52a47ee57e6674.webp'
+
+const BUY_SMARTWATCHES_IMAGE_URL =
+  'https://img.tatacliq.com/images/i10/437Wx649H/MP000000017249001_437Wx649H_202304181258383.jpeg'
 
 const OFFERS = [
   {
@@ -223,13 +245,13 @@ const PRE_OWNED_TOP_BRANDS = [
 ]
 
 const MORE_CATEGORIES = [
-  { title: 'Sell Phone', img: gPhoto(0) },
-  { title: 'Sell Tablet', img: gPhoto(1) },
-  { title: 'Sell Smartwatch', img: gPhoto(2) },
-  { title: 'Sell Earbuds', img: gPhoto(3) },
-  { title: 'Repair Phone', img: gPhoto(4) },
-  { title: 'Buy Pre-Owned Phones', img: gPhoto(5) },
-  { title: 'Find New Phone', img: gPhoto(0) },
+  { title: 'Sell Phone', img: gPhoto(0), path: '/sell-phone' },
+  { title: 'Sell Tablet', img: gPhoto(1), path: '/sell-phone' },
+  { title: 'Sell Smartwatch', img: gPhoto(2), path: '/sell-phone' },
+  { title: 'Sell Earbuds', img: gPhoto(3), path: '/sell-phone' },
+  { title: 'Repair Phone', img: gPhoto(4), path: '/repair-phone' },
+  { title: 'Buy Pre-Owned Phones', img: gPhoto(5), path: '/find-new-phone' },
+  { title: 'Find New Phone', img: gPhoto(0), path: '/find-new-phone' },
 ]
 
 function IconBox({ idx }) {
@@ -377,31 +399,18 @@ function IconBox({ idx }) {
 }
 
 const SERVICE_THUMBS = {
-  'Sell Phone': gPhoto(0),
+  'Sell Phone': SELL_PHONE_IMAGE_URL,
   'Buy Gadgets': gPhoto(1),
-  'Buy Phone': gPhoto(2),
+  'Buy Phone': BUY_PHONE_IMAGE_URL,
   'Buy Laptops': gPhoto(3),
-  'Buy Accessories': gPhoto(4),
-  'Repair Phone': gPhoto(5),
+  'Buy Accessories': NEW_ACCESSORIES_IMAGE_URL,
+  'Repair Phone': REPAIR_PHONE_IMAGE_URL,
   'Repair Laptop': gPhoto(0),
   Recycle: gPhoto(1),
-  'Find New Phone': gPhoto(2),
-  'Nearby Stores': gPhoto(3),
-  'New Accessories': gPhoto(4),
-  'Buy Smartwatches': gPhoto(5),
-}
-
-function ServiceThumb({ label }) {
-  const url = SERVICE_THUMBS[label] ?? SERVICE_THUMBS['Sell Phone']
-  return (
-    <img
-      src={url}
-      alt=""
-      aria-hidden="true"
-      loading="lazy"
-      className="mx-auto h-20 w-20 object-contain"
-    />
-  )
+  'Find New Phone': FIND_NEW_PHONE_IMAGE_URL,
+  'Nearby Stores': NEARBY_STORE_IMAGE_URL,
+  'New Accessories': NEW_ACCESSORIES_IMAGE_URL,
+  'Buy Smartwatches': BUY_SMARTWATCHES_IMAGE_URL,
 }
 
 const PRE_OWNED_DEVICES_CAROUSEL = [
@@ -471,8 +480,8 @@ function CarouselSection({ title, viewAllText, products }) {
   }
 
   return (
-    <section className="w-full px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-6xl">
+    <section className="w-full py-10">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="text-lg font-extrabold text-slate-900">{title}</h2>
           <a
@@ -517,8 +526,8 @@ function CarouselSection({ title, viewAllText, products }) {
 
 function PromoImageCard({ title, imageUrl }) {
   return (
-    <div className="w-[255px] shrink-0 overflow-hidden rounded-2xl bg-slate-100 shadow-sm">
-      <div className="relative aspect-[4/3] w-full">
+    <div className="w-[280px] shrink-0 overflow-hidden rounded-2xl bg-slate-100 shadow-sm lg:w-[calc((100%-3rem)/4)]">
+      <div className="relative aspect-[16/10] w-full">
         <img
           src={imageUrl}
           alt={title}
@@ -526,7 +535,7 @@ function PromoImageCard({ title, imageUrl }) {
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-        <div className="absolute inset-x-0 bottom-0 p-4">
+        <div className="absolute inset-x-0 bottom-0 p-3">
           <div className="text-[13px] font-extrabold leading-snug text-white line-clamp-2">
             {title}
           </div>
@@ -546,8 +555,8 @@ function PromoSliderRow({ title, cards, viewAllText = 'See all' }) {
   }
 
   return (
-    <section className="w-full px-4 py-8 sm:px-6">
-      <div className="mx-auto max-w-7xl">
+    <section className="w-full py-8">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="text-lg font-extrabold text-slate-900">{title}</h2>
           <a
@@ -561,7 +570,7 @@ function PromoSliderRow({ title, cards, viewAllText = 'See all' }) {
         <div className="relative">
           <div
             ref={scrollerRef}
-            className="flex gap-4 overflow-x-auto pb-2 pr-16 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
+            className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
           >
             {cards.map((c) => (
               <PromoImageCard key={c.title} title={c.title} imageUrl={c.imageUrl} />
@@ -572,7 +581,7 @@ function PromoSliderRow({ title, cards, viewAllText = 'See all' }) {
             type="button"
             onClick={onScrollRight}
             aria-label={`Scroll ${title} right`}
-            className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/90 p-2 text-blue-700 shadow-sm hover:bg-white"
+            className="absolute right-1 top-1/2 z-10 flex -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 p-2 text-blue-700 shadow-sm hover:bg-white"
           >
             <svg
               width="18"
@@ -634,8 +643,8 @@ function FaqsSection() {
   const [openId, setOpenId] = useState(null)
 
   return (
-    <section className="w-full px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-6xl">
+    <section className="w-full py-12">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="mb-6">
           <h2 className="text-2xl font-extrabold text-slate-900 sm:text-3xl">
             FAQs
@@ -727,70 +736,6 @@ function FaqsSection() {
     </section>
   )
 }
-
-const TRENDING_ARTICLES = [
-  {
-    id: 'a1',
-    category: 'Guide',
-    title: 'All Details About Apple Macbook Ultra Launching in 2026!',
-    excerpt:
-      'Being a MacBook fan, it gets pretty exciting when you get to know about the upcoming launch in 2026.',
-    readTime: '6 min read',
-    date: '13th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Laptop_picture.jpg',
-  },
-  {
-    id: 'a2',
-    category: 'Comparison',
-    title:
-      'iQOO Z11x vs OPPO K13: Confusion Solved, See Who is Better Under 20k',
-    excerpt:
-      'The budget range is getting heated up just as the weather is getting ahead. In this summer, both phones are competing fiercely.',
-    readTime: '5 min read',
-    date: '13th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-  },
-  {
-    id: 'a3',
-    category: 'Guide',
-    title: 'Oppo Find N6 Launch Date, Specs, Price, And More',
-    excerpt:
-      'If you are someone who loves staying ahead with the latest smartphone technology, this article is for you.',
-    readTime: '4 min read',
-    date: '13th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-  },
-  {
-    id: 'a4',
-    category: 'Comparison',
-    title: 'Xiaomi 17 Ultra Vs Samsung Galaxy S26 Ultra: Which Is Better',
-    excerpt:
-      'Both phones aim to deliver premium camera and performance experiences, but their focus areas differ.',
-    readTime: '7 min read',
-    date: '13th Mar 2026',
-    imageUrl: s25Front,
-  },
-  {
-    id: 'a5',
-    category: 'Tips',
-    title: 'Apple iPhone 17e vs Google Pixel 10a: Full Specs & Features Compared',
-    excerpt:
-      'A practical comparison on camera, battery, performance, and value so you can pick the better daily driver.',
-    readTime: '6 min read',
-    date: '12th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-  },
-  {
-    id: 'a6',
-    category: 'Tips',
-    title: 'How to Verify Used Phone Condition Before Buying',
-    excerpt:
-      'Use this quick checklist to spot hidden issues and avoid overpaying when purchasing a pre-owned smartphone.',
-    readTime: '3 min read',
-    date: '11th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
-  },
-]
 
 const RECENT_NEWS = [
   {
@@ -932,53 +877,6 @@ function BottomArticleCard({ article }) {
   )
 }
 
-function TrendingArticlesSection() {
-  const featured = TRENDING_ARTICLES[0]
-  const stacked = TRENDING_ARTICLES.slice(1, 3)
-  const bottom = TRENDING_ARTICLES.slice(3, 6)
-
-  return (
-    <section className="w-full px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
-              Trending Articles
-            </h2>
-            <div className="mt-1 text-xs font-semibold text-slate-400">
-              Fresh insights for smarter buying and selling
-            </div>
-          </div>
-          <a
-            href="#"
-            className="text-sm font-semibold text-blue-600 hover:text-blue-700"
-          >
-            View All
-          </a>
-        </div>
-
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-10">
-          <div className="lg:col-span-7">
-            <FeaturedArticleCard article={featured} />
-          </div>
-
-          <div className="space-y-5 lg:col-span-3">
-            {stacked.map((article) => (
-              <SideArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {bottom.map((article) => (
-            <BottomArticleCard key={article.id} article={article} />
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 function RecentNewsSection() {
   const scrollerRef = useRef(null)
 
@@ -989,8 +887,8 @@ function RecentNewsSection() {
   }
 
   return (
-    <section className="w-full px-4 py-10 sm:px-6">
-      <div className="mx-auto max-w-6xl">
+    <section className="w-full py-10">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
         <div className="mb-5 flex items-end justify-between gap-4">
           <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
             Recent News
@@ -1294,35 +1192,28 @@ export default function LandingPage() {
             <span className="text-xs font-semibold text-slate-400">Tap to open →</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
-            {SERVICES.map((service) => (
-              <button
-                key={service.label}
-                type="button"
-                onClick={() => navigate(service.path)}
-                className="group flex flex-col items-center justify-start rounded-xl p-1 text-left transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02]"
-              >
-                <div className="relative flex h-24 w-full max-w-[118px] items-center justify-center rounded-2xl bg-[#eaf3f2] ring-2 ring-transparent transition-all duration-200 group-hover:bg-[#dff0ee] group-hover:ring-red-200 group-hover:shadow-md">
-                  <ServiceThumb label={service.label} />
-                  {/* Hover arrow badge */}
-                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 scale-75">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
+          <div className="overflow-x-auto px-2 pt-2 pb-4 sm:px-3 [scrollbar-width:thin] [-ms-overflow-style:auto]">
+            <div className="flex min-w-max gap-5">
+              {SERVICES.map((service) => (
+                <div
+                  key={service.label}
+                  className="w-[190px] shrink-0 sm:w-[200px] lg:w-[210px]"
+                >
+                  <ServiceCard
+                    label={service.label}
+                    path={service.path}
+                    thumbUrl={SERVICE_THUMBS[service.label] ?? SERVICE_THUMBS['Sell Phone']}
+                  />
                 </div>
-                <span className="mt-2 text-center text-xs font-bold text-slate-800 transition-colors duration-150 group-hover:text-red-700">
-                  {service.label}
-                </span>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Sell Your Old Device Now */}
-      <section id="sell-your-device" className="w-full scroll-mt-20 px-4 pt-10 pb-16 sm:px-6">
-        <div className="mx-auto max-w-6xl">
+      <section id="sell-your-device" className="w-full scroll-mt-20 pt-10 pb-16">
+        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="mb-2 text-xl font-extrabold text-slate-900">
@@ -1335,72 +1226,99 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-8">
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
-              {[
-                {
-                  title: 'Sell Phone',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-                  path: '/sell-phone',
-                },
-                {
-                  title: 'Get estimate',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
-                  path: '/sell-phone',
-                },
-                {
-                  title: 'Buy Accessories',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cellphones%20being%20disassembled%20and%20sorted%20for%20recycling.jpg',
-                  path: '/buy-accessories',
-                },
-                {
-                  title: 'Repair Phone',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smart%20Phone.jpeg',
-                  path: '/repair-phone',
-                },
-                {
-                  title: 'Find New Phone',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Smartphone.png',
-                  path: '/find-new-phone',
-                },
-                {
-                  title: 'Nearby Stores',
-                  img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mobile%20Phone.jpg',
-                  path: '/nearby-stores',
-                },
-                {
-                  title: 'More',
-                  img: '',
-                  dots: true,
-                },
-              ].map((card, idx) => (
-                <button
-                  key={`${card.title}-${idx}`}
-                  type="button"
-                  className="group flex min-h-[140px] flex-col items-center justify-start rounded-2xl border border-slate-100 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-md"
-                  onClick={() => {
-                    if (card.dots) setMoreOpen(true)
-                    else if (card.path) navigate(card.path)
-                  }}
-                >
-                  {card.dots ? (
-                    <span className="mt-4 flex items-center gap-1 text-xl text-slate-500">
-                      <span>•</span>
-                      <span>•</span>
-                      <span>•</span>
-                    </span>
-                  ) : (
-                    <img
-                      src={card.img}
-                      alt={card.title}
-                      className="h-20 w-20 object-contain"
-                      loading="lazy"
-                    />
-                  )}
-                  <span className="mt-4 text-center text-sm font-bold leading-tight text-slate-700">
-                    {card.title}
-                  </span>
-                </button>
-              ))}
+            <div className="overflow-x-auto px-2 pt-2 pb-4 sm:px-3">
+              <div className="flex min-w-max gap-5">
+                {[
+                  {
+                    title: 'Sell Phone',
+                    img: SERVICE_THUMBS['Sell Phone'],
+                    path: '/sell-phone',
+                  },
+                  {
+                    title: 'Get estimate',
+                    img: 'https://commons.wikimedia.org/wiki/Special:FilePath/Hand%20holding%20Smartphone.jpg',
+                    path: '/sell-phone',
+                  },
+                  {
+                    title: 'Buy Accessories',
+                    img: SERVICE_THUMBS['Buy Accessories'],
+                    path: '/buy-accessories',
+                  },
+                  {
+                    title: 'Repair Phone',
+                    img: SERVICE_THUMBS['Repair Phone'],
+                    path: '/repair-phone',
+                  },
+                  {
+                    title: 'Find New Phone',
+                    img: SERVICE_THUMBS['Find New Phone'],
+                    path: '/find-new-phone',
+                  },
+                  {
+                    title: 'Nearby Stores',
+                    img: SERVICE_THUMBS['Nearby Stores'],
+                    path: '/nearby-stores',
+                  },
+                  {
+                    title: 'More',
+                    img: '',
+                    dots: true,
+                  },
+                ].map((card, idx) => (
+                  <div key={`${card.title}-${idx}`} className="w-[190px] shrink-0 sm:w-[200px]">
+                    <button
+                      type="button"
+                      className="group flex w-full flex-col items-center justify-start rounded-2xl border border-slate-100 bg-white p-3 transition hover:-translate-y-0.5 hover:shadow-md"
+                      onClick={() => {
+                        if (card.dots) setMoreOpen(true)
+                        else if (card.path) navigate(card.path)
+                      }}
+                    >
+                      <div className="relative flex h-40 w-full max-w-[190px] items-center justify-center rounded-3xl bg-[#eaf3f2] ring-2 ring-transparent transition-all duration-200 group-hover:bg-[#dff0ee] group-hover:ring-red-200 group-hover:shadow-md">
+                        {card.dots ? (
+                          <span className="flex items-center gap-1 text-xl text-slate-500">
+                            <span>•</span>
+                            <span>•</span>
+                            <span>•</span>
+                          </span>
+                        ) : (
+                          <img
+                            src={card.img}
+                            alt={card.title}
+                            className="h-36 w-36 object-contain"
+                            loading="lazy"
+                          />
+                        )}
+
+                        {/* Hover arrow badge */}
+                        {!card.dots ? (
+                          <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 scale-75">
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M9 18l6-6-6-6"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                        ) : null}
+                      </div>
+
+                      <span className="mt-4 text-center text-sm font-bold leading-tight text-slate-700">
+                        {card.title}
+                      </span>
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -1454,12 +1372,16 @@ export default function LandingPage() {
             </div>
 
             <div className="h-full overflow-y-auto px-4 py-5">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 {MORE_CATEGORIES.map((c) => (
                   <button
                     key={c.title}
                     type="button"
                     className="group"
+                    onClick={() => {
+                      setMoreOpen(false)
+                      if (c.path) navigate(c.path)
+                    }}
                   >
                     <div className="flex h-20 items-center justify-center rounded-xl bg-slate-50 ring-1 ring-slate-100">
                       <img
@@ -1489,8 +1411,8 @@ export default function LandingPage() {
       />
 
       {/* Our Exclusive Stores */}
-      <section className="w-full px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-6xl">
+      <section className="w-full py-10">
+        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
             <h2 className="text-xl font-extrabold text-slate-900">
               Our Exclusive Stores
@@ -1588,6 +1510,15 @@ export default function LandingPage() {
                   key={store.id}
                   className="min-w-[260px] max-w-[280px] shrink-0 rounded-xl border border-slate-100 bg-white p-4 shadow-sm"
                 >
+                  <div className="relative mb-3 aspect-[4/3] w-full overflow-hidden rounded-lg bg-slate-50 ring-1 ring-inset ring-slate-100/80">
+                    <img
+                      src={NEARBY_STORE_IMAGE_URL}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
                   <div className="inline-block rounded-full bg-slate-900 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-white">
                     {store.city}
                   </div>
@@ -1618,7 +1549,7 @@ export default function LandingPage() {
 
       {/* Trust & social proof — full-width band + edge-to-edge partner strip */}
       <section className="w-full bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900 text-white">
-        <div className="mx-auto w-full max-w-[1920px] px-4 py-12 sm:px-6 md:px-8 md:py-16 lg:px-10 xl:px-14">
+        <div className="w-full px-4 py-12 sm:px-6 md:py-16 lg:px-10 xl:px-16">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-12">
             <h2 className="max-w-2xl text-2xl font-bold leading-tight tracking-tight sm:text-3xl lg:text-4xl">
               Trusted by 176.02 Lac + Happy Users and Major Brands since 2015
@@ -1846,7 +1777,6 @@ export default function LandingPage() {
 
       <FaqsSection />
 
-      <TrendingArticlesSection />
       <RecentNewsSection />
       <DownloadAppSection />
     </div>

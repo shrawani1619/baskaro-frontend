@@ -89,7 +89,7 @@ export function MainLayout({ children }) {
             </div>
           </div>
 
-          <div className="mt-10 border-t pt-6 text-center text-xs font-semibold text-slate-500 sm:text-left">
+          <div className="mt-10 border-t border-blue-800/70 pt-6 text-center text-xs font-semibold text-blue-300/80 sm:text-left">
             Copyright &copy; {new Date().getFullYear()} BAS karo. All rights reserved.
           </div>
         </div>

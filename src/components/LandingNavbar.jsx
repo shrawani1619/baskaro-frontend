@@ -348,10 +348,10 @@ export function LandingNavbar() {
                   >
                     {[
                       { label: 'About Us', path: '/about' },
-                      { label: 'Warranty Policy', path: '#' },
-                      { label: 'Refer & Earn', path: '#' },
-                      { label: 'Careers', path: '#' },
-                      { label: 'Press Releases', path: '#' },
+                      { label: 'Warranty Policy', path: '/warranty-policy' },
+                      { label: 'Refer & Earn', path: '/refer-earn' },
+                      { label: 'Careers', path: '/careers' },
+                      { label: 'Press Releases', path: '/press-releases' },
                     ].map((sub) => (
                       <Link
                         key={sub.label}
@@ -401,6 +401,10 @@ export function LandingNavbar() {
                   { label: 'Repairs', path: '/repair-phone' },
                   { label: 'Store Locator', path: '/nearby-stores' },
                   { label: 'About Us', path: '/about' },
+                  { label: 'Warranty Policy', path: '/warranty-policy' },
+                  { label: 'Refer & Earn', path: '/refer-earn' },
+                  { label: 'Careers', path: '/careers' },
+                  { label: 'Press Releases', path: '/press-releases' },
                 ].map((link) => (
                   <Link
                     key={link.label}
