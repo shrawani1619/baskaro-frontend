@@ -15,6 +15,7 @@ import FindNewPhonePage from './pages/FindNewPhonePage'
 import NearbyStoresPage from './pages/NearbyStoresPage'
 import { CartProvider } from './context/CartContext'
 import CartPage from './pages/CartPage'
+import ProductDetailsPage from './pages/ProductDetailsPage'
 
 function NotFoundPage() {
   return (
@@ -54,6 +55,7 @@ export default function App() {
                   <Route path="/find-new-phone" element={<FindNewPhonePage />} />
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/nearby-stores" element={<NearbyStoresPage />} />
+                  <Route path="/product/:id" element={<ProductDetailsPage />} />
                   <Route path="/landing" element={<Navigate to="/" replace />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Routes>

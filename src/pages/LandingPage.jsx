@@ -436,6 +436,7 @@ function ServiceThumb({ label }) {
 
 const PRE_OWNED_DEVICES_CAROUSEL = [
   {
+    id: 'samsung-s25-edge',
     image: gPhoto(0),
     title: 'Samsung Galaxy S25 Edge - Pre-Owned',
     price: '₹57,599',
@@ -446,6 +447,7 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
+    id: 'oneplus-nord-ce',
     image: gPhoto(1),
     title: 'OnePlus Nord CE 5G - Pre-Owned',
     price: '₹11,699',
@@ -454,6 +456,7 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
+    id: 'samsung-s20-fe',
     image: gPhoto(2),
     title: 'Samsung Galaxy S20 FE 5G - Pre-Owned',
     price: '₹14,699',
@@ -464,6 +467,7 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
+    id: 'xiaomi-note-10-pro',
     image: gPhoto(3),
     title: 'Xiaomi Redmi Note 10 Pro - Pre-Owned',
     price: '₹8,525',
@@ -474,6 +478,7 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
+    id: 'iphone-14',
     image: gPhoto(4),
     title: 'Apple iPhone 14 - Pre-Owned',
     price: '₹29,999',
@@ -484,6 +489,7 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     brand: 'BASKARO',
   },
   {
+    id: 'realme-phone',
     image: gPhoto(5),
     title: 'Realme Phone - Pre-Owned',
     price: '₹12,999',
