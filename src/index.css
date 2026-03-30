@@ -53,3 +53,8 @@
   background: #4f46e5; /* indigo-600 */
 }
 
+/* Hide the dashed "Compare with similar devices" CTA on Product Details */
+div.border-2.border-dashed.border-slate-200.rounded-3xl.bg-white.group.cursor-pointer {
+  display: none !important;
+}
+

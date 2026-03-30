@@ -35,6 +35,8 @@ export default function ProductDetailsPage() {
     ]
   }
 
+  const showThumbScroll = product.images?.length > 5
+
   const formatPrice = (p) => new Intl.NumberFormat('en-IN').format(p)
 
   return (
@@ -52,16 +54,19 @@ export default function ProductDetailsPage() {
           <span className="text-slate-900 truncate">{product.title}</span>
         </nav>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-[480px_1fr] lg:items-start">
           
-          {/* Left: Image Gallery */}
-          <div className="flex flex-col md:flex-row gap-2">
-            {/* Thumbnails Sidebar */}
-            <div className="order-2 md:order-1 flex md:flex-col gap-2">
-              <div className="flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
-                 <button className="hidden md:flex h-6 w-full items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50">
-                    <ChevronLeft className="md:rotate-90" size={12} />
-                 </button>
+          {/* Left: Image Gallery — align start so column height follows media, not the tall right column */}
+          <div className="flex w-full flex-col gap-4 lg:max-w-[480px]">
+            <div className="flex w-full flex-col md:flex-row md:items-start gap-2">
+              {/* Thumbnails Sidebar */}
+              <div className="order-2 md:order-1 flex md:flex-col gap-2">
+              <div
+                className={[
+                  'flex flex-row md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0',
+                  showThumbScroll ? 'md:overflow-y-auto md:max-h-[280px] md:pr-1' : 'md:overflow-visible'
+                ].join(' ')}
+              >
                  {product.images.map((img, i) => (
                     <button
                        key={i}
@@ -73,14 +78,11 @@ export default function ProductDetailsPage() {
                        <img src={img} alt="" className="h-full w-full object-contain" />
                     </button>
                  ))}
-                 <button className="hidden md:flex h-8 w-full items-center justify-center rounded border border-slate-200 text-slate-400 hover:bg-slate-50">
-                    <ChevronRight className="md:rotate-90" size={16} />
-                 </button>
               </div>
             </div>
  
-            {/* Main Stage */}
-            <div className="order-1 md:order-2 relative flex-1 min-h-[160px] md:aspect-[4/3] rounded-3xl border border-slate-100 bg-slate-50/30 overflow-hidden flex flex-col group">
+            {/* Main Stage — self-start + aspect: no extra vertical stretch beside long right column */}
+            <div className="order-1 md:order-2 relative w-full min-w-0 md:flex-1 md:max-w-none self-start rounded-3xl border border-slate-100 bg-slate-50/30 overflow-hidden flex flex-col group aspect-[3/4] max-md:min-h-[320px]">
                <div className="absolute top-4 left-4 z-10">
                   <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full border border-slate-100 shadow-sm">
                      <div className="h-6 w-6 rounded-full bg-slate-900 flex items-center justify-center">
@@ -99,7 +101,8 @@ export default function ProductDetailsPage() {
                   </button>
                </div>
 
-               <div className="flex-1 flex items-center justify-center p-2">
+               {/* Image sits in the upper part of the aspect box; no flex-1 gap above CTAs */}
+               <div className="relative flex min-h-0 flex-1 items-center justify-center p-2 pb-4">
                   <AnimatePresence mode="wait">
                      <motion.img
                         key={selectedImg}
@@ -108,22 +111,100 @@ export default function ProductDetailsPage() {
                         exit={{ opacity: 0, scale: 0.95 }}
                         src={product.images[selectedImg]}
                         alt={product.title}
-                        className="max-h-full max-w-full object-contain mix-blend-multiply"
+                        className="h-full w-full max-h-full object-contain mix-blend-multiply"
                      />
                   </AnimatePresence>
                </div>
 
-               {/* Primary Actions (Now in flex flow to remove gap) */}
-               <div className="grid grid-cols-2 bg-white border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-                  <button className="flex flex-col items-center justify-center py-4 border-r border-rose-100 bg-rose-50/50 transition-all hover:bg-rose-100/50 group active:scale-95 outline-none">
-                      <span className="text-[14px] font-black text-slate-900 leading-none">Pay with EMI</span>
-                      <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest leading-none">from ₹3,658/mo</span>
+               <div className="grid shrink-0 grid-cols-2 bg-white border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                  <button type="button" className="flex flex-col items-center justify-center py-3 border-r border-rose-100 bg-rose-50/50 transition-all hover:bg-rose-100/50 group active:scale-95 outline-none">
+                      <span className="text-[13px] font-black text-slate-900 leading-none">Pay with EMI</span>
+                      <span className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest leading-none">from ₹3,658/mo</span>
                   </button>
-                  <button className="py-4 bg-slate-900 text-white font-black text-[15px] uppercase tracking-[0.1em] hover:bg-black active:scale-95 transition-all outline-none">
+                  <button type="button" className="py-3 bg-slate-900 text-white font-black text-[14px] uppercase tracking-[0.1em] hover:bg-black active:scale-95 transition-all outline-none">
                      Buy Now
                   </button>
                </div>
+              </div>
             </div>
+
+            {/* Technical Specifications (Toggleable) */}
+            <section className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
+              <button
+                onClick={() => setShowAllSpecs(!showAllSpecs)}
+                className="w-full flex items-center justify-between p-4 md:p-6 hover:bg-slate-50 transition-colors group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-9 w-9 rounded-xl bg-slate-900 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                    <Info size={18} />
+                  </div>
+                  <div className="text-left">
+                    <h2 className="text-[14px] font-black text-slate-900 uppercase tracking-tight leading-none mb-1">
+                      Technical Specifications
+                    </h2>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                      Model, Performance, Display & More
+                    </p>
+                  </div>
+                </div>
+                <div
+                  className={`h-10 w-10 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 transition-all ${
+                    showAllSpecs
+                      ? 'rotate-180 bg-slate-900 border-slate-900 text-white'
+                      : ''
+                  }`}
+                >
+                  <ChevronLeft className="-rotate-90" size={20} />
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {showAllSpecs && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    className="overflow-hidden bg-slate-50/30"
+                  >
+                    <div className="p-6 md:p-8 border-t border-slate-100">
+                      <div className="grid gap-x-6 gap-y-6 md:grid-cols-2">
+                        {[
+                          { label: 'General', specs: [{ k: 'Model', v: 'Samsung Galaxy S25 Edge' }, { k: 'Launched', v: 'Jan 2025' }, { k: 'OS', v: 'Android 15' }] },
+                          { label: 'Performance', specs: [{ k: 'Processor', v: 'Snapdragon 8 Gen 4' }, { k: 'RAM', v: '12 GB' }, { k: 'Graphics', v: 'Adreno 850' }] },
+                          { label: 'Display', specs: [{ k: 'Size', v: '6.8 inch' }, { k: 'Type', v: 'Dynamic AMOLED' }, { k: 'Refresh Rate', v: '120 Hz' }] },
+                          { label: 'Camera', specs: [{ k: 'Main', v: '200 MP Quad' }, { k: 'Selfie', v: '32 MP' }, { k: 'Video', v: '8K @ 30fps' }] },
+                        ].map((group, i) => (
+                          <div key={i} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
+                            <div className="flex items-center gap-2 mb-3">
+                              <div className="h-1 w-6 bg-red-600 rounded-full" />
+                              <h4 className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em]">{group.label}</h4>
+                            </div>
+                            <div className="space-y-3">
+                              {group.specs.map((s, j) => (
+                                <div key={j} className="flex flex-col gap-1 border-b border-slate-200/50 pb-2 last:border-b-0">
+                                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{s.k}</span>
+                                  <span className="text-[13px] font-extrabold text-slate-800">{s.v}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-8 flex items-center justify-center p-5 border-2 border-dashed border-slate-200 rounded-3xl bg-white group hover:border-red-200 transition-colors cursor-pointer">
+                        <div className="flex flex-col items-center">
+                          <PlusCircle size={26} className="text-slate-300 mb-2 group-hover:text-red-500 transition-colors group-hover:rotate-90 transition-transform" />
+                          <p className="text-[12px] font-black text-slate-900 uppercase tracking-widest">
+                            Compare with similar devices
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </section>
           </div>
 
           {/* Right: Info Panels */}
@@ -294,7 +375,7 @@ export default function ProductDetailsPage() {
         {/* --- Post Hero Content (Full Width) --- */}
         <div className="mt-16 space-y-20 pb-12">
            {/* Technical Specifications (Toggleable) */}
-           <section className="bg-white rounded-3xl border border-slate-100 overflow-hidden">
+           <section className="hidden bg-white rounded-3xl border border-slate-100 overflow-hidden">
               <button 
                 onClick={() => setShowAllSpecs(!showAllSpecs)}
                 className="w-full flex items-center justify-between p-6 md:p-8 hover:bg-slate-50 transition-colors group cursor-pointer"
