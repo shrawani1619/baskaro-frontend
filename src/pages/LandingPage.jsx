@@ -15,7 +15,11 @@ import {
   ChevronLeft,
   TrendingUp,
   MapPin,
-  ArrowRight
+  ArrowRight,
+  Menu,
+  X,
+  ShoppingBag,
+  Bell
 } from 'lucide-react'
 import { catalog } from '../mock/catalog.js'
 import { gPhoto, gBrandLogo } from '../constants/googleImages'
@@ -1323,241 +1327,105 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Modern premium navbar (mobile-selling only mega dropdown) */}
-      <header className="sticky top-0 z-[80] border-b bg-white/95 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-white/90">
-        <div className="mx-auto flex h-16 w-full items-center justify-between gap-3 px-4 sm:px-6">
-          <a href="/" className="ml-2 flex shrink-0 items-center gap-2" aria-label="BAS karo home">
-            <img
-              src="/logo.png"
-              alt="BAS karo"
-              className="h-9 w-auto max-w-[160px] object-contain object-left"
-            />
-          </a>
-
-          {/* Search (desktop) */}
-          <div className="relative hidden w-full max-w-xl flex-1 md:block">
-            <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-              {/* magnifier */}
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-              >
-                <path
-                  d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                />
-                <path
-                  d="M21 21L16.65 16.65"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <input
-              className="w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-red-400"
-              placeholder="Search for mobiles, accessories & More"
-              type="search"
-            />
-          </div>
-
-          {/* Desktop Sell Phone mega menu */}
-          <div className="hidden items-center gap-6">
-            <div
-              className="relative"
-              onMouseEnter={() => setSellDesktopOpen(true)}
-            >
-              <button
-                type="button"
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-900 hover:bg-red-50"
-                aria-haspopup="menu"
-                aria-expanded={sellDesktopOpen}
-              >
-                Sell Phone
-              </button>
-
-              {/* Mega dropdown */}
-              <div
-                className={[
-                  'absolute left-0 top-full z-50 mt-3 w-[calc(100vw-2rem)] max-w-[720px] rounded-2xl border border-slate-200 bg-white shadow-lg max-h-[calc(100vh-140px)] overflow-y-auto',
-                  'transition duration-200 ease-out',
-                  sellDesktopOpen
-                    ? 'opacity-100 -translate-y-0 pointer-events-auto'
-                    : 'opacity-0 -translate-y-2 pointer-events-none',
-                ].join(' ')}
-              >
-                <div className="p-6">
-                  <div className="grid grid-cols-[220px_1fr] gap-8">
-                    {/* Left category */}
-                    <div>
-                      <div className="text-sm font-extrabold text-slate-900">Sell</div>
-                      <button
-                        type="button"
-                        className="mt-4 flex w-full items-center justify-between rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50"
-                      >
-                        <span>Phone</span>
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                          aria-hidden="true"
-                          className="text-current opacity-70"
-                        >
-                          <path
-                            d="M9 18l6-6-6-6"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-
-                    {/* Right lists */}
-                    <div className="grid grid-cols-1 gap-6">
-                      <div>
-                        <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                          Top Brands
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          {SELL_MEGA_BRANDS.map((b) => (
-                            <button
-                              key={b}
-                              type="button"
-                              onClick={() => {
-                                setSellDesktopOpen(false)
-                                navigate(`/brand/${b}`)
-                              }}
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-rose-600"
-                            >
-                              {b}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                          Top Selling Phones
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          {SELL_TOP_PHONES.map((p) => (
-                            <button
-                              key={p}
-                              type="button"
-                              className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-rose-600"
-                            >
-                              {p}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right actions */}
-          <div className="hidden items-center gap-3 md:flex">
-            <select
-              className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              aria-label="Select location"
-            >
-              {locationOptions.map((opt) => (
-                <option key={opt} value={opt}>
-                  {opt}
-                </option>
-              ))}
-            </select>
-
-            <Link to="/login" className="rounded-xl bg-rose-600 px-6 py-2 text-sm font-black text-white shadow-lg shadow-rose-600/20 hover:bg-rose-700 transition-all hover:scale-105 active:scale-95">
-              Login
+      {/* Modern premium navbar (Cyber Red Aesthetic) */}
+      <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/80 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/70">
+        <div className="flex h-20 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-12">
+          {/* Logo container (flex-1 to balance) */}
+          <div className="flex flex-1 items-center justify-start">
+            <Link to="/" className="flex shrink-0 items-center gap-2 group transition-transform hover:scale-105 active:scale-95" aria-label="BASkaro home">
+              <img
+                src="/logo.png"
+                alt="BAS karo"
+                className="h-14 w-auto object-contain object-left translate-y-3"
+              />
             </Link>
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="hidden md:hidden rounded-md bg-red-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? 'Close' : 'Menu'}
-          </button>
+          {/* Search (desktop - perfectly centered) */}
+          <div className="relative hidden w-full max-w-2xl md:block group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-600 transition-colors">
+              <Search size={19} strokeWidth={2.5} />
+            </div>
+            <input
+              className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 pl-12 pr-28 py-3 text-[14px] font-bold outline-none focus:border-rose-500/50 focus:bg-white focus:ring-8 focus:ring-rose-500/5 transition-all placeholder:text-slate-400/80 shadow-sm group-hover:bg-slate-50 transition-all font-inter"
+              placeholder="Search for iPhone 16, Samsung S24 & more..."
+              type="search"
+            />
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+               <button className="rounded-xl bg-slate-900 px-4 py-2 text-[11px] font-black text-white uppercase tracking-widest hover:bg-rose-600 transition-all shadow-md active:scale-95 group-focus-within:bg-rose-600">
+                  Search
+               </button>
+            </div>
+          </div>
+
+          {/* Right actions (flex-1 to balance) */}
+          <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
+            <button className="hidden rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors lg:block">
+              <Bell size={20} />
+            </button>
+
+            <div className="hidden items-center gap-2 sm:flex">
+              <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-bold text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer group">
+                <MapPin size={14} className="text-rose-600 group-hover:scale-110 transition-transform" />
+                <span>{location}</span>
+              </div>
+            </div>
+
+            <Link
+              to="/login"
+              className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white shadow-lg shadow-slate-900/10 hover:bg-rose-600 hover:shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
+            >
+              Login
+            </Link>
+
+            <button
+              type="button"
+              className="md:hidden rounded-xl bg-slate-100 p-2 text-slate-900 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+              onClick={() => setMobileMenuOpen((v) => !v)}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
 
-        {/* Desktop nav row (shown right after navbar) */}
-        <nav className="w-full border-b bg-white">
-          <div className="mx-auto flex max-w-6xl items-center gap-6 overflow-x-visible px-4 py-2 sm:px-6">
-            {/* All dropdown */}
-            <div
-              className="relative"
-              data-topnav-dropdown="true"
-            >
+        {/* Global Sub-navigation row */}
+        <nav className="w-full border-t border-slate-100 bg-white/50 backdrop-blur-sm hidden md:block">
+          <div className="flex w-full items-center justify-center gap-6 px-4 py-2 sm:px-6 lg:px-12">
+
+            {/* All Dropdown */}
+            <div className="relative" data-topnav-dropdown="true">
               <button
                 type="button"
                 className={[
-                  "flex items-center gap-2 whitespace-nowrap px-4 py-2 rounded-xl text-sm font-black transition-all duration-300",
-                  allDropdownOpen
-                    ? "bg-rose-50 text-rose-600 shadow-sm"
-                    : "text-slate-900 hover:bg-slate-100/80 hover:text-rose-600"
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-black tracking-tight transition-all",
+                  allDropdownOpen ? "bg-rose-600 text-white shadow-md shadow-rose-600/20" : "text-slate-600 hover:text-rose-600 hover:bg-rose-50"
                 ].join(' ')}
-                aria-haspopup="menu"
-                aria-expanded={allDropdownOpen}
                 onClick={() => {
                   setAllDropdownOpen(!allDropdownOpen)
                   setAllSellSubOpen(true)
-                  setMoreDropdownOpen(false)
                   setSellDesktopOpen(false)
                   setPreOwnedDropdownOpen(false)
+                  setMoreDropdownOpen(false)
                 }}
               >
-                <span>All</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                  className={["transition-transform duration-300", allDropdownOpen ? "rotate-180" : ""].join(' ')}
-                >
-                  <path
-                    d="M6 9L12 15L18 9"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <span>ALL CATEGORIES</span>
+                <ChevronRight size={14} className={["transition-transform", allDropdownOpen ? "rotate-90" : ""].join(' ')} />
               </button>
 
-              <AnimatePresence mode="wait">
+              <AnimatePresence>
                 {allDropdownOpen && (
                   <motion.div
-                    initial={{ opacity: 0, y: 5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute left-0 top-full z-[120] mt-3 w-[620px] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)]"
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="absolute left-0 top-full z-[120] mt-3 w-[680px] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]"
                   >
-                    <div className="flex h-[440px]">
-                      {/* Text-Only Switcher (Left) */}
-                      <div className="w-[180px] bg-slate-50/50 border-r border-slate-100 flex flex-col py-8 px-8 gap-4">
-                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Categories</h4>
+                    <div className="flex h-[460px]">
+                      {/* Left Sidebar */}
+                      <div className="w-[200px] bg-slate-50/50 border-r border-slate-100 p-6 flex flex-col gap-2">
+                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Marketplace</h4>
                         {Object.entries(CATEGORY_DATA).map(([label, data]) => {
                           const active = allSellCategory === label
                           return (
@@ -1565,57 +1433,64 @@ export default function LandingPage() {
                               key={label}
                               onClick={() => setAllSellCategory(label)}
                               className={[
-                                'text-left transition-all duration-200 text-sm font-bold uppercase tracking-tight',
-                                active ? 'text-rose-600' : 'text-slate-600 hover:text-slate-900'
+                                'flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 text-[13px] font-bold tracking-tight',
+                                active ? 'bg-white text-rose-600 shadow-sm ring-1 ring-slate-100' : 'text-slate-600 hover:text-rose-600 hover:bg-white/50'
                               ].join(' ')}
                             >
-                               {label}
+                              <span>{label}</span>
+                              <ChevronRight size={12} className={active ? 'translate-x-0.5' : 'opacity-0'} />
                             </button>
                           )
                         })}
                       </div>
 
-                      {/* Text-Only Content (Right) */}
-                      <div className="flex-1 bg-white py-8 px-10 overflow-y-auto custom-scrollbar">
+                      {/* Right Panel Content */}
+                      <div className="flex-1 bg-white p-8 overflow-y-auto custom-scrollbar">
                         <AnimatePresence mode="wait">
                           <motion.div
                             key={allSellCategory}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.1 }}
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{ duration: 0.15 }}
                             className="h-full"
                           >
                             {allSellCategory === 'Phone' ? (
                               <div className="space-y-10">
                                 <div>
-                                  <h4 className="text-base font-black text-slate-900 mb-6">Top Brands</h4>
-                                  <div className="flex flex-col gap-4">
-                                    {[
-                                      'Apple', 'Samsung', 'Xiaomi', 'OnePlus', 'Vivo', 'Oppo'
-                                    ].map((brand) => (
+                                  <div className="flex items-center justify-between mb-6">
+                                    <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">Top Brand Portals</h4>
+                                    <button className="text-xs font-bold text-rose-600 hover:underline">View All Brands</button>
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                                    {TOP_BRANDS.slice(0, 8).map((brand) => (
                                       <button
-                                        key={brand}
+                                        key={brand.name}
                                         onClick={() => {
                                           setAllDropdownOpen(false)
-                                          navigate(`/brand/${brand}`)
+                                          navigate(`/brand/${brand.name}`)
                                         }}
-                                        className="text-left text-[15px] font-bold text-slate-600 hover:text-rose-600 transition-colors tracking-tight"
+                                        className="flex items-center gap-3 text-left group"
                                       >
-                                        {brand}
+                                        <div className="h-8 w-8 rounded-lg bg-slate-50 p-1.5 group-hover:bg-rose-50 transition-colors">
+                                          <img src={brand.logoUrl} alt={brand.name} className="h-full w-full object-contain mix-blend-multiply" />
+                                        </div>
+                                        <span className="text-[14px] font-bold text-slate-600 group-hover:text-rose-600 transition-colors tracking-tight">
+                                          {brand.name}
+                                        </span>
                                       </button>
                                     ))}
-                                    <button className="text-left text-[14px] font-black text-rose-600 hover:underline mt-2">More Phone Brands</button>
                                   </div>
                                 </div>
 
-                                <div>
-                                  <h4 className="text-base font-black text-slate-900 mb-6 border-t border-slate-50 pt-8">Top Selling Phones</h4>
-                                  <div className="flex flex-col gap-4 pb-4">
+                                <div className="pt-8 border-t border-slate-50">
+                                  <h4 className="text-base font-black text-slate-900 mb-6 uppercase tracking-tight">Trending Now</h4>
+                                  <div className="grid grid-cols-2 gap-4">
                                     {[
-                                      'iPhone 16 Pro Max', 'iPhone 15', 'Galaxy S24 Ultra', 'OnePlus 12', 'Pixel 9 Pro'
+                                      'iPhone 16 Pro Max', 'Galaxy S24 Ultra', 'OnePlus 12', 'Pixel 9 Pro'
                                     ].map(phone => (
-                                      <button key={phone} className="text-left text-[15px] font-bold text-slate-600 hover:text-rose-600 transition-colors tracking-tight">
+                                      <button key={phone} className="flex items-center gap-2 text-left text-[14px] font-bold text-slate-500 hover:text-rose-600 transition-colors">
+                                        <div className="h-1.5 w-1.5 rounded-full bg-rose-500" />
                                         {phone}
                                       </button>
                                     ))}
@@ -1623,10 +1498,13 @@ export default function LandingPage() {
                                 </div>
                               </div>
                             ) : (
-                              <div className="flex flex-col justify-center h-full">
-                                <h4 className="text-base font-black text-slate-900 uppercase tracking-tight">Expert {allSellCategory} Portal</h4>
-                                <p className="text-[12px] font-medium text-slate-400 mt-2 leading-relaxed italic opacity-80">Our premium {allSellCategory.toLowerCase()} services are launching soon. Check back for high-end valuations.</p>
-                                <button className="mt-8 text-left text-[11px] font-black text-rose-600 uppercase tracking-widest hover:underline">Notify Me</button>
+                              <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                                <div className="h-16 w-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 mb-6">
+                                  {CATEGORY_DATA[allSellCategory]?.icon}
+                                </div>
+                                <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">Expert {allSellCategory} Services</h4>
+                                <p className="text-[13px] font-medium text-slate-400 mt-3 max-w-[240px] leading-relaxed">Our premium {allSellCategory.toLowerCase()} portal is currently being optimized for elite valuations.</p>
+                                <button className="mt-8 rounded-xl bg-slate-900 px-6 py-2.5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-rose-600 transition-all shadow-lg active:scale-95">Notify Me</button>
                               </div>
                             )}
                           </motion.div>
@@ -1638,898 +1516,140 @@ export default function LandingPage() {
               </AnimatePresence>
             </div>
 
-            {/* Sell Phone mega dropdown (hover) */}
-            <div
-              className="relative"
-              data-topnav-dropdown="true"
-            >
-              <button
-                type="button"
-                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-rose-600"
-                aria-haspopup="menu"
-                aria-expanded={sellDesktopOpen}
-                onClick={() => {
-                  setSellDesktopOpen(!sellDesktopOpen)
-                  setAllDropdownOpen(false)
-                  setAllSellSubOpen(false)
-                  setMoreDropdownOpen(false)
-                  setPreOwnedDropdownOpen(false)
-                }}
-              >
-                Sell Phone
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
+            {/* Sub Nav Items */}
+            <div className="flex items-center gap-1">
+              {[
+                { label: 'Home', path: '/' },
+                { label: 'Sell Phone', path: '/sell-phone' },
+                { label: 'Buy Pre-Owned', path: '/marketplace' },
+                { label: 'Find New Phone', path: '/find-new-phone' },
+                { label: 'Repairs', path: '/repair-phone' },
+                { label: 'Store Locator', path: '/nearby-stores' },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  className="px-4 py-2 text-[13px] font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all tracking-tight"
                 >
-                  <path
-                    d="M6 9L12 15L18 9"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                  {item.label}
+                </Link>
+              ))}
 
-              <div
-                className={[
-                  'absolute left-0 top-full z-[120] mt-3 w-72 rounded-xl border border-slate-200 bg-white shadow-lg max-h-[calc(100vh-140px)] overflow-y-auto',
-                  'transition-all duration-200 ease-out',
-                  sellDesktopOpen
-                    ? 'opacity-100 translate-y-0 pointer-events-auto'
-                    : 'opacity-0 -translate-y-1 pointer-events-none',
-                ].join(' ')}
-              >
-                <div className="p-4">
-                  <Link
-                    to="/sell-phone"
-                    className="block rounded-lg bg-red-50 px-3 py-2.5 text-center text-sm font-extrabold text-red-700 ring-1 ring-red-100 hover:bg-red-100"
-                    onClick={() => setSellDesktopOpen(false)}
-                  >
-                    Sell your phone — get price
-                  </Link>
-                  <div className="mt-4 text-sm font-extrabold text-slate-900">
-                    Top Brands
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {SELL_MEGA_BRANDS.map((b) => (
-                      <button
-                        key={b}
-                        type="button"
-                        onClick={() => {
-                          setSellDesktopOpen(false)
-                          navigate(`/brand/${b}`)
-                        }}
-                        className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                      >
-                        {b}
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      className="mt-1 text-left text-sm font-extrabold text-red-700 hover:text-red-800"
-                      onClick={() => setSellDesktopOpen(false)}
+              {/* More Dropdown */}
+              <div className="relative" data-topnav-dropdown="true">
+                <button
+                  onClick={() => setMoreDropdownOpen(!moreDropdownOpen)}
+                  className="px-4 py-2 text-[13px] font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all tracking-tight flex items-center gap-1"
+                >
+                  <span>MORE</span>
+                  <ChevronRight size={14} className={moreDropdownOpen ? 'rotate-90' : ''} />
+                </button>
+
+                <AnimatePresence>
+                  {moreDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 top-full z-[120] mt-3 w-64 rounded-2xl border border-slate-100 bg-white p-2 shadow-2xl"
                     >
-                      More Phone Brands
-                    </button>
-                  </div>
-
-                  <div className="mt-5 text-sm font-extrabold text-slate-900">
-                    Top Selling Phones
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    {SELL_TOP_PHONES.map((p) => (
-                      <button
-                        key={p}
-                        type="button"
-                        className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                      {[
+                        { label: 'About Us', path: '/about' },
+                        { label: 'Warranty Policy', path: '#' },
+                        { label: 'Refer & Earn', path: '#' },
+                        { label: 'Careers', path: '#' },
+                        { label: 'Press Releases', path: '#' }
+                      ].map(sub => (
+                        <Link key={sub.label} to={sub.path} className="block w-full text-left px-4 py-2.5 text-[13px] font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors">
+                          {sub.label}
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
-
-            <div
-              className="relative"
-              data-topnav-dropdown="true"
-            >
-              <button
-                type="button"
-                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
-                aria-haspopup="menu"
-                aria-expanded={preOwnedDropdownOpen}
-                onClick={() =>
-                  setPreOwnedDropdownOpen((v) => {
-                    const next = !v
-                    if (next) {
-                      setAllDropdownOpen(false)
-                      setAllSellSubOpen(false)
-                      setSellDesktopOpen(false)
-                      setMoreDropdownOpen(false)
-                    }
-                    return next
-                  })
-                }
-              >
-                <span>Buy Pre-Owned Devices</span>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M6 9L12 15L18 9"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {preOwnedDropdownOpen && (
-                <div className="absolute left-0 top-full z-[120] mt-3 w-72 max-h-[calc(100vh-140px)] overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-lg">
-                  <div className="p-3">
-                    <div className="space-y-1">
-                      {PRE_OWNED_CATEGORIES.map((label) => (
-                        <button
-                          key={label}
-                          type="button"
-                          className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                          onClick={() => setPreOwnedDropdownOpen(false)}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="mt-4 border-t border-slate-100" />
-
-                    <div className="mt-4 text-sm font-extrabold text-slate-900">
-                      Top Brands
-                    </div>
-                    <div className="mt-2 space-y-1">
-                      {PRE_OWNED_TOP_BRANDS.map((label) => (
-                        <button
-                          key={label}
-                          type="button"
-                          className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                          onClick={() => setPreOwnedDropdownOpen(false)}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            <button
-              type="button"
-              className="whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
-            >
-              Find New Phone
-            </button>
-            <button
-              type="button"
-              className="whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
-            >
-              Cashify Store
-            </button>
-
-            {/* More dropdown */}
-            <div className="relative ml-auto" data-topnav-dropdown="true">
-              <button
-                type="button"
-                className="flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-slate-900 hover:text-red-700"
-                aria-haspopup="menu"
-                aria-expanded={moreDropdownOpen}
-                onClick={() =>
-                  setMoreDropdownOpen((v) => {
-                    const next = !v
-                    if (next) {
-                      setAllDropdownOpen(false)
-                      setAllSellSubOpen(false)
-                      setSellDesktopOpen(false)
-                      setPreOwnedDropdownOpen(false)
-                    }
-                    return next
-                  })
-                }
-              >
-                <span>More</span>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M6 9L12 15L18 9"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {moreDropdownOpen && (
-                <div className="absolute right-0 top-full z-[120] mt-3 w-64 max-h-[calc(100vh-140px)] overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-lg">
-                  <div className="p-3">
-                    <div className="space-y-1">
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        New Offers
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Partner with Us
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Contact Us
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Warranty Policy
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Refer &amp; Earn
-                      </button>
-                    </div>
-
-                    <div className="mt-4 border-t border-slate-100" />
-
-                    <div className="mt-4 text-sm font-extrabold text-slate-900">
-                      Company
-                    </div>
-                    <div className="mt-2 space-y-1">
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        About Us
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Careers
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Articles
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Become Supersale Partner
-                      </button>
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Press Releases
-                      </button>
-                    </div>
-
-                    <div className="mt-4">
-                      <button
-                        type="button"
-                        className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => setMoreDropdownOpen(false)}
-                      >
-                        Terms &amp; Conditions
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </nav>
 
-        {/* Mobile accordion menu */}
-        {false && (
-          <div className="border-t bg-white">
-            <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-              <div className="space-y-2">
-                {/* All (accordion) */}
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-0 z-[200] flex flex-col bg-white md:hidden"
+            >
+              <div className="flex items-center justify-between border-b px-4 py-4 sm:px-6">
+                <Link to="/" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                  <img
+                    src="/logo.png"
+                    alt="BAS karo"
+                    className="h-8 w-auto object-contain"
+                  />
+                </Link>
                 <button
                   type="button"
-                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                  onClick={() => {
-                    if (mobileAllOpen) setMobileAllSellSubOpen(false)
-                    setMobileAllOpen((v) => !v)
-                  }}
-                  aria-expanded={mobileAllOpen}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-xl bg-slate-100 p-2 text-slate-900 hover:text-rose-600 transition-colors"
                 >
-                  <span>All</span>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    className="text-current opacity-70"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <X size={24} />
                 </button>
-
-                <div
-                  className={[
-                    'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm',
-                    'transition duration-200 ease-out',
-                    mobileAllOpen
-                      ? 'opacity-100 -translate-y-0 pointer-events-auto'
-                      : 'opacity-0 -translate-y-2 pointer-events-none',
-                  ].join(' ')}
-                >
-                  <div className="p-3">
-                    <button
-                      type="button"
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => {
-                        setMobileAllSellSubOpen((v) => !v)
-                      }}
-                    >
-                      Sell Phone
-                    </button>
-
-                    {mobileAllSellSubOpen && (
-                      <div className="mt-2 rounded-xl border border-slate-100 bg-white p-3 shadow-sm">
-                        <div className="mb-2 text-sm font-extrabold text-slate-900">
-                          Sell
-                        </div>
-
-                        {[
-                          { label: 'Phone', active: true },
-                          { label: 'Repair' },
-                          { label: 'Find New Phone' },
-                          { label: 'Cashify Store' },
-                        ].map((row) => (
-                          <button
-                            key={row.label}
-                            type="button"
-                            className={[
-                              'mt-2 flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-semibold transition-colors duration-150',
-                              row.active
-                                ? 'bg-red-50 text-red-700'
-                                : 'bg-white text-slate-700 hover:bg-red-50 hover:text-red-700',
-                            ].join(' ')}
-                            onClick={() => {
-                              setMobileAllSellSubOpen(false)
-                              setMobileAllOpen(false)
-                            }}
-                          >
-                            <span>{row.label}</span>
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                              aria-hidden="true"
-                              className="text-current opacity-70"
-                            >
-                              <path
-                                d="M9 18l6-6-6-6"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => {
-                        setMobileAllSellSubOpen(false)
-                        setMobileAllOpen(false)
-                      }}
-                    >
-                      Buy Pre-Owned Phones
-                    </button>
-                    <button
-                      type="button"
-                      className="mt-1 w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => {
-                        setMobileAllSellSubOpen(false)
-                        setMobileAllOpen(false)
-                      }}
-                    >
-                      Find New Phone
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileSellOpen((v) => !v)}
-                  aria-expanded={mobileSellOpen}
-                >
-                  <span>Sell Phone</span>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    className="text-current opacity-70"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-
-                <div
-                  className={[
-                    'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm',
-                    'transition duration-200 ease-out',
-                    mobileSellOpen
-                      ? 'opacity-100 -translate-y-0 pointer-events-auto'
-                      : 'opacity-0 -translate-y-2 pointer-events-none',
-                  ].join(' ')}
-                >
-                  <div className="p-4">
-                    <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-                      <div>
-                        <div className="text-sm font-extrabold text-slate-900">Sell</div>
-                        <button
-                          type="button"
-                          className="mt-4 flex w-full items-center justify-between rounded-xl bg-red-50 px-3 py-2 text-sm font-bold text-red-700 hover:bg-red-50"
-                        >
-                          <span>Phone</span>
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            aria-hidden="true"
-                            className="text-current opacity-70"
-                          >
-                            <path
-                              d="M9 18l6-6-6-6"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-6">
-                        <div>
-                          <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                            Top Brands
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            {SELL_MEGA_BRANDS.map((b) => (
-                              <button
-                                key={b}
-                                type="button"
-                                className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                              >
-                                {b}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                            Top Selling Phones
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            {SELL_TOP_PHONES.map((p) => (
-                              <button
-                                key={p}
-                                type="button"
-                                className="block w-full text-left text-sm font-semibold text-slate-700 hover:text-red-700"
-                              >
-                                {p}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Other mobile nav items */}
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                >
-                  Buy Pre-Owned Devices
-                </button>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                >
-                  Find New Phone
-                </button>
-                <button
-                  type="button"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                >
-                  Cashify Store
-                </button>
-
-                {/* More (accordion) */}
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left text-sm font-semibold text-slate-900"
-                  onClick={() => setMobileMoreOpen((v) => !v)}
-                  aria-expanded={mobileMoreOpen}
-                >
-                  <span>More</span>
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    className="text-current opacity-70"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
-
-                <div
-                  className={[
-                    'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm',
-                    'transition duration-200 ease-out',
-                    mobileMoreOpen
-                      ? 'opacity-100 -translate-y-0 pointer-events-auto'
-                      : 'opacity-0 -translate-y-2 pointer-events-none',
-                  ].join(' ')}
-                >
-                  <div className="p-3 space-y-1">
-                    <button
-                      type="button"
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => setMobileMoreOpen(false)}
-                    >
-                      About Us
-                    </button>
-                    <button
-                      type="button"
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => setMobileMoreOpen(false)}
-                    >
-                      Help
-                    </button>
-                    <button
-                      type="button"
-                      className="w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-red-50 hover:text-red-700"
-                      onClick={() => setMobileMoreOpen(false)}
-                    >
-                      Contact
-                    </button>
-                  </div>
-                </div>
-
               </div>
-            </div>
-          </div>
-        )}
+
+              <div className="flex-1 overflow-y-auto px-4 py-8 sm:px-6 custom-scrollbar">
+                <nav className="flex flex-col gap-2">
+                  {[
+                    { label: 'Home', path: '/' },
+                    { label: 'Sell Phone', path: '/sell-phone' },
+                    { label: 'Buy Pre-Owned', path: '/marketplace' },
+                    { label: 'Find New Phone', path: '/find-new-phone' },
+                    { label: 'Repairs', path: '/repair-phone' },
+                    { label: 'Store Locator', path: '/nearby-stores' },
+                    { label: 'About Us', path: '/about' },
+                  ].map((link) => (
+                    <Link
+                      key={link.label}
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center justify-between rounded-xl px-4 py-4 text-sm font-black text-slate-900 hover:bg-rose-50 hover:text-rose-600 transition-all border border-transparent hover:border-rose-100"
+                    >
+                      <span>{link.label}</span>
+                      <ChevronRight size={18} className="opacity-50" />
+                    </Link>
+                  ))}
+                </nav>
+
+                <div className="mt-12 bg-slate-50 rounded-2xl p-6 border border-slate-100">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Partner Programs</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {['Warranty', 'Insurance', 'Referral', 'Corporate'].map(item => (
+                      <button key={item} className="flex flex-col gap-1 text-left p-3 rounded-xl bg-white border border-slate-100 shadow-sm">
+                        <span className="text-[12px] font-black text-slate-900">{item}</span>
+                        <span className="text-[10px] font-bold text-slate-400">Learn More</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t bg-slate-50/50 p-6">
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 text-sm font-black text-white shadow-xl hover:bg-rose-600 transition-all active:scale-95"
+                >
+                  <LogIn size={18} />
+                  Login / Register
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      {/* Top header */}
-      <header className="hidden sticky top-0 z-40 border-b bg-white">
-        <div className="mx-auto flex h-16 w-full items-center gap-4 px-4 sm:px-6">
-          <a href="/" className="ml-2 flex shrink-0 items-center gap-2" aria-label="BAS karo home">
-            <img
-              src="/logo.png"
-              alt="BAS karo"
-              className="h-9 w-auto max-w-[160px] object-contain object-left"
-            />
-          </a>
-
-          <div className="flex flex-1 items-center gap-3">
-            <div className="relative flex-1">
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                {/* magnifier */}
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M10.5 18C14.6421 18 18 14.6421 18 10.5C18 6.35786 14.6421 3 10.5 3C6.35786 3 3 6.35786 3 10.5C3 14.6421 6.35786 18 10.5 18Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
-                  <path
-                    d="M21 21L16.65 16.65"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </div>
-              <input
-                className="w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 py-2 text-sm outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="Search for mobiles, accessories & More"
-                type="search"
-              />
-            </div>
-
-            <div className="hidden items-center gap-2 md:flex">
-              <select
-                className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-semibold text-slate-900"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                aria-label="Select location"
-              >
-                {locationOptions.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <button className="rounded-md bg-red-600 px-4 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-700">
-            Login
-          </button>
-        </div>
-      </header>
-
-      {/* Top nav */}
-      <nav className="hidden border-b bg-white">
-        <div className="mx-auto flex w-full items-center justify-start gap-6 px-4 py-2 overflow-x-auto sm:justify-between sm:px-6">
-          {TOP_NAV.map((item) => (
-            item === 'More' ? (
-              <button
-                key={item}
-                type="button"
-                className="whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-semibold text-slate-900 hover:bg-red-50"
-                onClick={() => {
-                  setMoreOpen(true)
-                  setNavDropdownOpen(null)
-                }}
-              >
-                {item}
-              </button>
-            ) : (
-              <div
-                key={item}
-                className="relative"
-                data-nav-dropdown-wrap="true"
-              >
-                <button
-                  type="button"
-                  className="whitespace-nowrap rounded-lg px-4 py-1.5 text-sm font-semibold text-slate-900 hover:bg-red-50"
-                  aria-haspopup="menu"
-                  aria-expanded={navDropdownOpen === item}
-                  onClick={() => {
-                    setAllSellCategory('Phone')
-                    setNavDropdownOpen((v) => (v === item ? null : item))
-                  }}
-                >
-                  {item}
-                </button>
-
-                {navDropdownOpen === item && (
-                  <div className="absolute left-0 top-full z-50 mt-2 w-[680px] max-h-[calc(100vh-120px)] overflow-y-auto overflow-x-hidden rounded-2xl border border-slate-200 bg-white shadow-xl">
-                    <div className="grid grid-cols-[240px_1fr]">
-                      <div className="bg-slate-50 p-4">
-                        <div className="text-sm font-extrabold text-slate-900">
-                          Sell
-                        </div>
-                        <div className="mt-3 space-y-2">
-                          {[
-                            { label: 'Phone' },
-                            { label: 'More' },
-                          ].map((row) => {
-                            const active = allSellCategory === row.label
-                            return (
-                              <button
-                                key={row.label}
-                                type="button"
-                                onMouseEnter={() => setAllSellCategory(row.label)}
-                                onClick={() => setAllSellCategory(row.label)}
-                                className={[
-                                  'flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-bold transition-colors',
-                                  active
-                                    ? 'bg-red-50 text-red-700'
-                                    : 'text-slate-700 hover:bg-white',
-                                ].join(' ')}
-                              >
-                                {row.label}
-                                <svg
-                                  width="16"
-                                  height="16"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-hidden="true"
-                                  className="text-current opacity-70"
-                                >
-                                  <path
-                                    d="M9 18l6-6-6-6"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
-                              </button>
-                            )
-                          })}
-                        </div>
-
-                        <div className="mt-5 space-y-2">
-                          {[
-                            'Repair',
-                            'Recycle',
-                            'Find New Phone',
-                            'Cashify Store',
-                          ].map((label) => (
-                            <button
-                              key={label}
-                              type="button"
-                              className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-extrabold text-slate-900 hover:bg-white hover:text-red-700"
-                            >
-                              <span>{label}</span>
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                xmlns="http://www.w3.org/2000/svg"
-                                aria-hidden="true"
-                                className="text-current opacity-70"
-                              >
-                                <path
-                                  d="M9 18l6-6-6-6"
-                                  stroke="currentColor"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {allSellCategory === 'Phone' ? (
-                        <div className="p-5">
-                          <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                            More in Sell
-                          </div>
-
-                          <div className="mt-2 text-sm font-extrabold text-slate-900">
-                            Top Brands
-                          </div>
-                          <div className="mt-2 grid grid-cols-2 gap-y-2 text-sm font-semibold text-slate-700">
-                            {topBrands.map((b) => (
-                              <button
-                                key={b}
-                                type="button"
-                                className="text-left hover:text-red-700"
-                              >
-                                {b}
-                              </button>
-                            ))}
-                            <button
-                              type="button"
-                              className="mt-1 text-left text-sm font-extrabold text-red-700 hover:text-red-800"
-                              onClick={() => {
-                                setNavDropdownOpen(null)
-                              }}
-                            >
-                              More Phone Brands
-                            </button>
-                          </div>
-
-                          <div className="mt-5 text-sm font-extrabold text-slate-900">
-                            Top Selling Phones
-                          </div>
-                          <div className="mt-2 space-y-2 text-sm font-semibold text-slate-700">
-                            {topSellingPhones.map((p) => (
-                              <button
-                                key={`${p.brand}-${p.model}`}
-                                type="button"
-                                className="block w-full text-left hover:text-red-700"
-                                onClick={() => setNavDropdownOpen(null)}
-                              >
-                                {p.brand} {p.model}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="p-5">
-                          <div className="text-xs font-extrabold tracking-wide text-slate-500">
-                            More in Sell
-                          </div>
-                          <div className="mt-3 text-sm font-semibold text-slate-600">
-                            Hover on <span className="font-extrabold text-slate-900">Phone</span> to open top brands and top selling phones.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          ))}
-        </div>
-      </nav>
 
       {/* Hero carousel — full width (inset matches Our Services) */}
       <section className="w-full pt-6 pb-2">
@@ -2683,7 +1803,7 @@ export default function LandingPage() {
                   {/* Hover arrow badge */}
                   <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white opacity-0 shadow-sm transition-all duration-200 group-hover:opacity-100 group-hover:scale-100 scale-75">
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </span>
                 </div>

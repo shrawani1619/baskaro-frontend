@@ -51,9 +51,12 @@ export default function AdminDashboard() {
       {/* ── Desktop Sidebar ── */}
       <aside className="hidden w-64 flex-col border-r border-slate-200 bg-slate-900 text-white md:flex xl:w-72 shrink-0">
         <div className="flex h-16 items-center border-b border-slate-800 px-6">
-          <Link to="/admin" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 font-bold shadow-lg shadow-red-500/20">A</div>
-            <span className="text-xl font-black tracking-tight text-white">BAS<span className="text-red-500">admin</span></span>
+          <Link to="/admin" className="flex items-center gap-2 group transition-all hover:scale-105">
+            <img 
+              src="/logo.png" 
+              alt="BAS karo" 
+              className="h-9 w-auto object-contain brightness-0 invert opacity-90 group-hover:opacity-100" 
+            />
           </Link>
         </div>
 
@@ -133,8 +136,15 @@ export default function AdminDashboard() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm md:hidden" onClick={() => setIsMobileMenuOpen(false)} />
             <motion.div initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 shadow-2xl md:hidden flex flex-col pt-16 flex-1 px-5"
+              className="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 shadow-2xl md:hidden flex flex-col flex-1"
             >
+              <div className="flex h-16 items-center border-b border-slate-800 px-6">
+                <Link to="/admin" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 group transition-all">
+                  <img src="/logo.png" alt="BAS karo" className="h-8 w-auto object-contain brightness-0 invert" />
+                </Link>
+              </div>
+
+              <div className="px-5 py-6">
               <nav className="space-y-2 mt-4">
                 {navItems.map(({ id, label, Icon }) => (
                   <button key={id} onClick={() => { setTab(id); setIsMobileMenuOpen(false) }}
@@ -144,6 +154,7 @@ export default function AdminDashboard() {
                   </button>
                 ))}
               </nav>
+              </div>
             </motion.div>
           </>
         )}
