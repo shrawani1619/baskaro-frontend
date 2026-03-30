@@ -3,6 +3,12 @@ import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
 import { gPhoto } from '../constants/googleImages'
 import { useCart } from '../context/CartContext'
 
+// Import premium PNG assets
+import s25Front from '../assets/products/s25_titanium.jpg'
+import s25Back from '../assets/products/s25_back.png'
+import s25Perspective from '../assets/products/s25_inner.png'
+import iphone14Front from '../assets/products/iphone14_purple.jpg'
+
 const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Vivo', 'Xiaomi', 'OPPO', 'Realme', 'Motorola']
 
 const HOW_IT_WORKS = [
@@ -33,12 +39,12 @@ const WHY_US = [
 ]
 
 const PHONES = [
-  { id: 'app-14-128', name: 'Apple iPhone 14 (128 GB) — Pre-Owned', price: '42,990', img: gPhoto(0) },
-  { id: 'sam-fla-256', name: 'Samsung Galaxy flagship (8/256 GB)', price: '48,499', img: gPhoto(1) },
+  { id: 'app-14-128', name: 'Apple iPhone 14 (128 GB) — Pre-Owned', price: '42,990', img: iphone14Front },
+  { id: 'sam-fla-256', name: 'Samsung Galaxy S25 Edge — Pre-Owned', price: '48,499', img: s25Front },
+  { id: 'sam-fla-back', name: 'Samsung Galaxy S25 Edge (12/256 GB)', price: '56,499', img: s25Perspective },
   { id: 'one-fla', name: 'OnePlus flagship', price: '35,999', img: gPhoto(2) },
   { id: 'viv-v-ser', name: 'Vivo V-series', price: '28,999', img: gPhoto(3) },
   { id: 'xia-fla', name: 'Xiaomi flagship', price: '31,499', img: gPhoto(4) },
-  { id: 'app-13-128', name: 'Apple iPhone 13 (128 GB) — Pre-Owned', price: '36,499', img: gPhoto(5) },
 ]
 
 const STORIES = [

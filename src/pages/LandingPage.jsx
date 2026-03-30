@@ -7,6 +7,13 @@ import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { ProductCard } from '../components/ProductCard'
 import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
 
+// Import premium PNG assets for that "wow" effect
+import s25Front from '../assets/products/s25_titanium.jpg'
+import s25Back from '../assets/products/s25_back.png'
+import s25Perspective from '../assets/products/s25_inner.png'
+import iphone14Front from '../assets/products/iphone14_purple.jpg'
+import iphone13Blue from '../assets/products/iphone13_blue.jpg'
+
 const TOP_NAV = [
   'All',
   'Sell Phone',
@@ -53,7 +60,7 @@ const HERO_CAROUSEL_SLIDES = [
     cta: 'Sell now',
     ctaTo: '/sell-phone',
     bgClass: 'bg-red-50',
-    img: gPhoto(3),
+    img: s25Back, // Using back view for 'Sell' to suggest detail
   },
   {
     id: 'buy',
@@ -62,7 +69,7 @@ const HERO_CAROUSEL_SLIDES = [
     cta: 'Shop deals',
     ctaTo: '/find-new-phone',
     bgClass: 'bg-blue-50',
-    img: gPhoto(4),
+    img: s25Perspective, // "Wow" perspective shot
   },
   {
     id: 'exchange',
@@ -71,7 +78,7 @@ const HERO_CAROUSEL_SLIDES = [
     cta: 'Start exchange',
     ctaTo: '/sell-phone',
     bgClass: 'bg-slate-100',
-    img: gPhoto(5),
+    img: iphone14Front, // iPhone is great for exchange context
   },
 ]
 
@@ -400,13 +407,35 @@ function ServiceThumb({ label }) {
 const PRE_OWNED_DEVICES_CAROUSEL = [
   {
     id: 'samsung-s25-edge',
-    image: gPhoto(0),
+    image: s25Front, // Premium PNG
     title: 'Samsung Galaxy S25 Edge - Pre-Owned',
     price: '₹57,599',
     originalPrice: '₹75,900',
     discount: 57,
     rating: 4.8,
     tag: ['Flash Sale', 'Month End Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    id: 'iphone-14',
+    image: iphone14Front, // Premium PNG
+    title: 'Apple iPhone 14 - Pre-Owned',
+    price: '₹29,999',
+    originalPrice: '₹42,900',
+    discount: 30,
+    rating: 4.8,
+    tag: ['Flash Sale'],
+    brand: 'BASKARO',
+  },
+  {
+    id: 'samsung-s25-back',
+    image: s25Back,
+    title: 'Samsung Galaxy S25 Edge (12/256GB)',
+    price: '₹56,499',
+    originalPrice: '₹113,799',
+    discount: 50,
+    rating: 4.9,
+    tag: ['Top Seller'],
     brand: 'BASKARO',
   },
   {
@@ -427,39 +456,6 @@ const PRE_OWNED_DEVICES_CAROUSEL = [
     discount: 21,
     rating: 4.4,
     tag: ['Month End Sale', 'Flash Sale'],
-    brand: 'BASKARO',
-  },
-  {
-    id: 'xiaomi-note-10-pro',
-    image: gPhoto(3),
-    title: 'Xiaomi Redmi Note 10 Pro - Pre-Owned',
-    price: '₹8,525',
-    originalPrice: '₹9,800',
-    discount: 13,
-    rating: 4.2,
-    tag: ['Month End Sale'],
-    brand: 'BASKARO',
-  },
-  {
-    id: 'iphone-14',
-    image: gPhoto(4),
-    title: 'Apple iPhone 14 - Pre-Owned',
-    price: '₹29,999',
-    originalPrice: '₹42,900',
-    discount: 30,
-    rating: 4.8,
-    tag: ['Flash Sale'],
-    brand: 'BASKARO',
-  },
-  {
-    id: 'realme-phone',
-    image: gPhoto(5),
-    title: 'Realme Phone - Pre-Owned',
-    price: '₹12,999',
-    originalPrice: '₹14,999',
-    discount: 13,
-    rating: 4.3,
-    tag: ['Flash Sale', 'Month End Sale'],
     brand: 'BASKARO',
   },
 ]
@@ -772,7 +768,7 @@ const TRENDING_ARTICLES = [
       'Both phones aim to deliver premium camera and performance experiences, but their focus areas differ.',
     readTime: '7 min read',
     date: '13th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+    imageUrl: s25Front,
   },
   {
     id: 'a5',
@@ -835,7 +831,7 @@ const RECENT_NEWS = [
     excerpt:
       'Early screenshots suggest fresh lock-screen tools, smoother animations, and camera quality improvements.',
     date: '14th Mar 2026',
-    imageUrl: 'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+    imageUrl: s25Back,
   },
 ]
 
@@ -1801,8 +1797,7 @@ export default function LandingPage() {
         cards={[
           {
             title: 'Apple iPhone 13 Mini Pre-Owned Deal...',
-            imageUrl:
-              'https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png',
+            imageUrl: iphone13Blue,
           },
           {
             title: 'Get Pre-Owned Bose Portable Smart Speaker with...',

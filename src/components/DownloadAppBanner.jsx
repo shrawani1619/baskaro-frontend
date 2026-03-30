@@ -1,3 +1,5 @@
+import iphone14Front from '../assets/products/iphone14_purple.jpg'
+
 /**
  * Full-width teal “Download the App” strip (matches home page CTA).
  */
@@ -72,9 +74,9 @@ export function DownloadAppBanner({
 
           <div className="relative h-[220px] w-full max-w-[420px] shrink-0 self-end sm:h-[260px]">
             <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Apple_iPhone.png"
+              src={iphone14Front}
               alt=""
-              className="absolute bottom-0 right-6 h-[220px] w-auto rounded-2xl object-contain drop-shadow-2xl sm:h-[260px]"
+              className="absolute bottom-0 right-6 h-[220px] w-auto rounded-2xl object-contain drop-shadow-2xl sm:h-[260px] mix-blend-multiply"
               loading="lazy"
             />
             <img

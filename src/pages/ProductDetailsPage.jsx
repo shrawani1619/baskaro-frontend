@@ -5,6 +5,12 @@ import { Star, ChevronRight, ChevronLeft, ShieldCheck, Heart, Share2, Info, Chec
 import { gPhoto } from '../constants/googleImages'
 import { catalog } from '../mock/catalog.js'
 
+// Import premium PNG assets
+import s25Front from '../assets/products/s25_titanium.jpg'
+import s25Back from '../assets/products/s25_back.png'
+import s25Perspective from '../assets/products/s25_inner.png'
+import iphone14Purple from '../assets/products/iphone14_purple.jpg'
+
 export default function ProductDetailsPage() {
    const { id } = useParams()
    const [selectedImg, setSelectedImg] = useState(0)
@@ -27,7 +33,7 @@ export default function ProductDetailsPage() {
       originalPrice: 113799,
       discount: 50,
       emi: 3658,
-      images: [gPhoto(0), gPhoto(1), gPhoto(2), gPhoto(3)],
+      images: [s25Front, s25Back, s25Perspective, gPhoto(0)],
       conditionGrades: [
          { id: 'Fair', label: 'Fair', desc: 'Noticeable signs of use' },
          { id: 'Good', label: 'Good', desc: 'Minor signs of use' },
