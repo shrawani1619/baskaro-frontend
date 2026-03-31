@@ -14,8 +14,10 @@ import {
   X,
   Bell,
   LogIn,
+  Heart,
 } from 'lucide-react'
 import { TopBrandPortals, MARKETPLACE_PORTAL_CONTENT } from './TopBrandPortals'
+import { useWishlist } from '../context/WishlistContext'
 
 const CATEGORY_DATA = {
   Phone: {
@@ -46,6 +48,7 @@ const CATEGORY_DATA = {
 
 export function LandingNavbar() {
   const navigate = useNavigate()
+  const { wishlistCount } = useWishlist()
   const [location] = useState('Gurgaon')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sellDesktopOpen, setSellDesktopOpen] = useState(false)
@@ -191,6 +194,19 @@ export function LandingNavbar() {
             Login
           </Link>
 
+          <Link
+            to="/wishlist"
+            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            aria-label="Open wishlist"
+          >
+            <Heart size={19} />
+            {wishlistCount > 0 ? (
+              <span className="absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full bg-rose-600 px-1.5 text-center text-[10px] font-black leading-[18px] text-white">
+                {wishlistCount}
+              </span>
+            ) : null}
+          </Link>
+
           <button
             type="button"
             className="md:hidden rounded-xl bg-slate-100 p-2 text-slate-900 hover:bg-rose-50 hover:text-rose-600 transition-colors"
@@ -315,6 +331,7 @@ export function LandingNavbar() {
               { label: 'Home', path: '/' },
               { label: 'Sell Phone', path: '/sell-phone' },
               { label: 'Buy Pre-Owned', path: '/marketplace' },
+                { label: `Wishlist${wishlistCount ? ` (${wishlistCount})` : ''}`, path: '/wishlist' },
               { label: 'Find New Phone', path: '/find-new-phone' },
               { label: 'Repairs', path: '/repair-phone' },
               { label: 'Store Locator', path: '/nearby-stores' },
@@ -397,6 +414,7 @@ export function LandingNavbar() {
                   { label: 'Home', path: '/' },
                   { label: 'Sell Phone', path: '/sell-phone' },
                   { label: 'Buy Pre-Owned', path: '/marketplace' },
+                  { label: `Wishlist${wishlistCount ? ` (${wishlistCount})` : ''}`, path: '/wishlist' },
                   { label: 'Find New Phone', path: '/find-new-phone' },
                   { label: 'Repairs', path: '/repair-phone' },
                   { label: 'Store Locator', path: '/nearby-stores' },

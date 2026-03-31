@@ -1,6 +1,6 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { gBrandLogo } from '../constants/googleImages'
 
 /** Default route used by portal + service pages for a brand hub */
@@ -10,13 +10,16 @@ export function defaultBrandPagePath(brandName) {
 
 /** Phone — layout fixed; swap entries to change content only */
 export const PHONE_BRAND_PORTALS = [
-  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
   { name: 'Samsung', logoUrl: gBrandLogo('samsung.com') },
+  { name: 'OPPO', logoUrl: gBrandLogo('oppo.com') },
+  { name: 'Itel', logoUrl: gBrandLogo('itel-life.com') },
+  { name: 'Nokia', logoUrl: gBrandLogo('nokia.com') },
+  { name: 'Realme', logoUrl: gBrandLogo('realme.com') },
+  { name: 'Apple', logoUrl: gBrandLogo('apple.com') },
   { name: 'Xiaomi', logoUrl: gBrandLogo('mi.com') },
   { name: 'OnePlus', logoUrl: gBrandLogo('oneplus.com') },
+  { name: 'Tecno', logoUrl: gBrandLogo('tecno-mobile.com') },
   { name: 'Vivo', logoUrl: gBrandLogo('vivo.com') },
-  { name: 'OPPO', logoUrl: gBrandLogo('oppo.com') },
-  { name: 'Realme', logoUrl: gBrandLogo('realme.com') },
   { name: 'Google Pixel', logoUrl: gBrandLogo('google.com') },
 ]
 
@@ -104,6 +107,32 @@ export function TopSellingBrands({
   className = '',
 }) {
   const scrollerRef = useRef(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
+
+    const update = () => {
+      const max = el.scrollWidth - el.clientWidth
+      setCanScrollLeft(el.scrollLeft > 2)
+      setCanScrollRight(el.scrollLeft < max - 2)
+    }
+
+    update()
+    el.addEventListener('scroll', update, { passive: true })
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => {
+      el.removeEventListener('scroll', update)
+      ro.disconnect()
+    }
+  }, [])
+
+  const scrollPrev = () => {
+    scrollerRef.current?.scrollBy({ left: -320, behavior: 'smooth' })
+  }
   const scrollNext = () => {
     scrollerRef.current?.scrollBy({ left: 320, behavior: 'smooth' })
   }
@@ -111,34 +140,54 @@ export function TopSellingBrands({
   return (
     <div className={className}>
       <h2 className="text-2xl font-extrabold text-slate-900">{title}</h2>
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-4 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={scrollPrev}
+          disabled={!canScrollLeft}
+          aria-label="Scroll to previous brands"
+          className={[
+            'hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition md:inline-flex',
+            canScrollLeft
+              ? 'border-slate-300 text-slate-700 hover:border-slate-400'
+              : 'cursor-not-allowed border-slate-200 text-slate-300 opacity-70',
+          ].join(' ')}
+        >
+          <ChevronLeft className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </button>
         <div
           ref={scrollerRef}
-          className="flex flex-1 gap-4 overflow-x-auto pb-2 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex flex-1 gap-5 overflow-x-auto pb-2 scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {brands.map((brand) => (
             <Link
               key={brand.name}
               to={getHref(brand)}
-              className="group min-w-[138px] shrink-0 rounded-xl border border-slate-200 bg-white p-4 text-center shadow-sm transition hover:-translate-y-1 hover:border-slate-300 hover:shadow-md"
+              className="group flex min-w-[90px] shrink-0 flex-col items-center text-center"
             >
-              <div className="flex h-16 items-center justify-center rounded-lg bg-gradient-to-br from-slate-50 to-blue-50/80 px-2">
+              <div className="flex h-[64px] w-[64px] items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-md">
                 <img
                   src={brand.logoUrl}
                   alt={brand.name}
                   loading="lazy"
-                  className="h-8 w-full object-contain mix-blend-multiply"
+                  className="h-8 w-10 object-contain"
                 />
               </div>
-              <p className="mt-3 text-sm font-semibold text-slate-800">{brand.name}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-700">{brand.name}</p>
             </Link>
           ))}
         </div>
         <button
           type="button"
           onClick={scrollNext}
+          disabled={!canScrollRight}
           aria-label="Scroll to more brands"
-          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 shadow-sm transition hover:border-slate-400 md:inline-flex"
+          className={[
+            'hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white shadow-sm transition md:inline-flex',
+            canScrollRight
+              ? 'border-slate-300 text-slate-700 hover:border-slate-400'
+              : 'cursor-not-allowed border-slate-200 text-slate-300 opacity-70',
+          ].join(' ')}
         >
           <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden />
         </button>

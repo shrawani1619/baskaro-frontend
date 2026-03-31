@@ -15,7 +15,9 @@ import FindNewPhonePage from './pages/FindNewPhonePage'
 import BuyPreOwnedPage from './pages/BuyPreOwnedPage'
 import NearbyStoresPage from './pages/NearbyStoresPage'
 import { CartProvider } from './context/CartContext'
+import { WishlistProvider } from './context/WishlistContext'
 import CartPage from './pages/CartPage'
+import WishlistPage from './pages/WishlistPage'
 import ProductDetailsPage from './pages/ProductDetailsPage'
 import ViewDetailsPage from './pages/ViewDetailsPage'
 import AboutPage from './pages/AboutPage'
@@ -42,43 +44,46 @@ function NotFoundPage() {
 export default function App() {
   return (
     <CartProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/admin/login" element={<AdminLoginPage />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route
-            path="/*"
-            element={
-              <MainLayout>
-                <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/home" element={<HomePage />} />
-                  <Route path="/brand/:brandName" element={<BrandPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/dashboard" element={<UserDashboard />} />
-                  <Route path="/sell-phone" element={<SellPhonePage />} />
-                  <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
-                  <Route path="/buy-pre-owned" element={<BuyPreOwnedPage />} />
-                  <Route path="/marketplace" element={<BuyPreOwnedPage />} />
-                  <Route path="/repair-phone" element={<RepairPhonePage />} />
-                  <Route path="/find-new-phone" element={<FindNewPhonePage />} />
-                  <Route path="/cart" element={<CartPage />} />
-                  <Route path="/nearby-stores" element={<NearbyStoresPage />} />
-                  <Route path="/product/:id" element={<ProductDetailsPage />} />
-                  <Route path="/store/:storeId" element={<ViewDetailsPage />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/warranty-policy" element={<WarrantyPolicyPage />} />
-                  <Route path="/refer-earn" element={<ReferEarnPage />} />
-                  <Route path="/careers" element={<CareersPage />} />
-                  <Route path="/press-releases" element={<PressReleasesPage />} />
-                  <Route path="/landing" element={<Navigate to="/" replace />} />
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </MainLayout>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+      <WishlistProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route
+              path="/*"
+              element={
+                <MainLayout>
+                  <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<HomePage />} />
+                    <Route path="/brand/:brandName" element={<BrandPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/dashboard" element={<UserDashboard />} />
+                    <Route path="/sell-phone" element={<SellPhonePage />} />
+                    <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
+                    <Route path="/buy-pre-owned" element={<BuyPreOwnedPage />} />
+                    <Route path="/marketplace" element={<BuyPreOwnedPage />} />
+                    <Route path="/repair-phone" element={<RepairPhonePage />} />
+                    <Route path="/find-new-phone" element={<FindNewPhonePage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
+                    <Route path="/nearby-stores" element={<NearbyStoresPage />} />
+                    <Route path="/product/:id" element={<ProductDetailsPage />} />
+                    <Route path="/store/:storeId" element={<ViewDetailsPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/warranty-policy" element={<WarrantyPolicyPage />} />
+                    <Route path="/refer-earn" element={<ReferEarnPage />} />
+                    <Route path="/careers" element={<CareersPage />} />
+                    <Route path="/press-releases" element={<PressReleasesPage />} />
+                    <Route path="/landing" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<NotFoundPage />} />
+                  </Routes>
+                </MainLayout>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </WishlistProvider>
     </CartProvider>
   )
 }
