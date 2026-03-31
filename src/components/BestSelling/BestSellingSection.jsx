@@ -73,11 +73,10 @@ export function BestSellingSection({
 
   return (
     <section className={['w-full pb-8', className].join(' ')}>
-      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-        <div className="rounded-2xl bg-gray-100 p-2 shadow-sm">
-          <div className="rounded-2xl border border-gray-200 bg-white p-6">
-            <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/70 px-4 py-3 backdrop-blur-md sm:px-5">
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-slate-800/10 to-slate-700/10" />
+      <div className="w-full px-2 sm:px-6 lg:px-10 xl:px-16">
+        <div className="rounded-2xl bg-slate-50 p-1 shadow-sm sm:bg-gray-100 sm:p-2">
+          <div className="rounded-2xl border border-gray-200 bg-white p-3 sm:p-6">
+            <div className="relative overflow-hidden rounded-xl border border-slate-100 bg-white px-3 py-2 shadow-sm sm:rounded-2xl sm:px-5 sm:py-3">
               <div className="relative z-10">
                 <SectionHeader
                   title={title}
@@ -90,7 +89,7 @@ export function BestSellingSection({
               </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-4 sm:mt-5">
               <ProductCarousel
                 products={Array.isArray(products) ? products : []}
                 isLoading={isLoading}

@@ -1333,10 +1333,10 @@ export default function LandingPage() {
       />
 
       {/* Promotional Banners */}
-      <section className="w-full py-10">
+      <section className="w-full py-6 sm:py-10">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Link to="/find-new-phone" className="group block overflow-hidden rounded-xl bg-slate-50 relative aspect-[21/9] sm:aspect-auto sm:h-[200px] md:h-[240px] lg:h-[280px]">
+          <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-3 sm:pb-0 sm:snap-none">
+            <Link to="/find-new-phone" className="group relative aspect-[21/9] w-[85%] shrink-0 snap-center overflow-hidden rounded-xl bg-slate-50 transition-all sm:aspect-auto sm:h-[200px] sm:w-full md:h-[240px] lg:h-[280px]">
               <img
                 src={promoVivoBanner}
                 alt="vivo T5x 5G"
@@ -1344,7 +1344,7 @@ export default function LandingPage() {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </Link>
-            <Link to="/find-new-phone" className="group block overflow-hidden rounded-xl bg-slate-50 relative aspect-[21/9] sm:aspect-auto sm:h-[200px] md:h-[240px] lg:h-[280px]">
+            <Link to="/find-new-phone" className="group relative aspect-[21/9] w-[85%] shrink-0 snap-center overflow-hidden rounded-xl bg-slate-50 transition-all sm:aspect-auto sm:h-[200px] sm:w-full md:h-[240px] lg:h-[280px]">
               <img
                 src={promoOppoBanner}
                 alt="OPPO A6 Pro 5G"
@@ -1352,7 +1352,7 @@ export default function LandingPage() {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </Link>
-            <Link to="/find-new-phone" className="group block overflow-hidden rounded-xl bg-slate-50 relative aspect-[21/9] sm:aspect-auto sm:h-[200px] md:h-[240px] lg:h-[280px]">
+            <Link to="/find-new-phone" className="group relative aspect-[21/9] w-[85%] shrink-0 snap-center overflow-hidden rounded-xl bg-slate-50 transition-all sm:aspect-auto sm:h-[200px] sm:w-full md:h-[240px] lg:h-[280px]">
               <img
                 src={promoRedmiBanner}
                 alt="REDMI Note 15 5G"

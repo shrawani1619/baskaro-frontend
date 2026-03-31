@@ -43,7 +43,7 @@ export function SectionHeader({
           disabled={!canPrev}
           aria-label="Previous products"
           className={[
-            'flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 active:scale-95',
+            'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-300 active:scale-95 sm:h-10 sm:w-10',
             canPrev
               ? 'bg-gray-100 text-slate-700 shadow-sm hover:bg-gray-200 hover:shadow-md active:bg-gray-300'
               : 'cursor-not-allowed bg-gray-100 text-slate-300',
@@ -58,7 +58,7 @@ export function SectionHeader({
           disabled={!canNext}
           aria-label="Next products"
           className={[
-            'flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-300 active:scale-95',
+            'flex h-9 w-9 items-center justify-center rounded-lg transition-all duration-300 active:scale-95 sm:h-10 sm:w-10',
             canNext
               ? 'bg-gray-100 text-slate-700 shadow-sm hover:bg-gray-200 hover:shadow-md active:bg-gray-300'
               : 'cursor-not-allowed bg-gray-100 text-slate-300',

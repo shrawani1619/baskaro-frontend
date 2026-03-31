@@ -142,7 +142,7 @@ export function LandingNavbar() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/90">
-      <div className="flex h-20 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-12">
+      <div className="flex h-16 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-12">
         <div className="flex flex-1 items-center justify-start">
           <Link
             to="/"
@@ -152,7 +152,7 @@ export function LandingNavbar() {
             <img
               src="/logo.png"
               alt="BAS karo"
-              className="h-14 w-auto object-contain object-left translate-y-3"
+              className="h-10 w-auto object-contain object-left sm:h-12 md:h-14 transition-all"
             />
           </Link>
         </div>

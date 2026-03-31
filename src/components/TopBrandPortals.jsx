@@ -139,7 +139,7 @@ export function TopSellingBrands({
 
   return (
     <div className={className}>
-      <h2 className="text-2xl font-extrabold text-slate-900">{title}</h2>
+      <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">{title}</h2>
       <div className="mt-4 flex items-center gap-3">
         <button
           type="button"
