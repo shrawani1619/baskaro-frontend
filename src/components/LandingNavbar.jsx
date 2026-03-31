@@ -142,7 +142,7 @@ export function LandingNavbar() {
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/90">
-      <div className="flex h-16 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-12">
+      <div className="flex h-16 w-full items-center justify-between gap-4 px-4 sm:px-6 md:h-20 lg:px-12">
         <div className="flex flex-1 items-center justify-start">
           <Link
             to="/"
@@ -152,12 +152,12 @@ export function LandingNavbar() {
             <img
               src="/logo.png"
               alt="BAS karo"
-              className="h-10 w-auto object-contain object-left sm:h-12 md:h-14 transition-all"
+              className="h-10 w-auto object-contain object-left sm:h-11 md:h-12 lg:h-14 transition-all"
             />
           </Link>
         </div>
 
-        <div className="relative hidden w-full max-w-2xl md:block group">
+        <div className="relative hidden w-full max-w-2xl xl:block group">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-600 transition-colors">
             <Search size={19} strokeWidth={2.5} />
           </div>
@@ -176,45 +176,45 @@ export function LandingNavbar() {
           </div>
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-2 md:gap-4">
+        <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
           <button
             type="button"
-            className="hidden rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors lg:block"
+            className="hidden rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors lg:block"
           >
-            <Bell size={20} />
+            <Bell size={19} />
           </button>
 
           <button
             type="button"
             onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            className="rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors md:hidden"
-            aria-label="Toggle mobile search"
+            className="rounded-xl p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors xl:hidden"
+            aria-label="Toggle search"
           >
-            <Search size={20} />
+            <Search size={19} />
           </button>
 
           <div className="hidden items-center gap-2 sm:flex">
-            <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-bold text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer group">
-              <MapPin size={14} className="text-rose-600 group-hover:scale-110 transition-transform" />
+            <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-1.5 text-[12px] font-bold text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer group">
+              <MapPin size={13} className="text-rose-600 group-hover:scale-110 transition-transform" />
               <span>{location}</span>
             </div>
           </div>
 
           <Link
             to="/login"
-            className="rounded-xl bg-slate-900 px-5 py-2 text-sm font-black text-white shadow-lg shadow-slate-900/10 hover:bg-rose-600 hover:shadow-rose-600/20 transition-all hover:scale-105 active:scale-95"
+            className="rounded-xl bg-slate-900 px-3 py-2 text-[12px] font-black text-white shadow-lg shadow-slate-900/10 hover:bg-rose-600 hover:shadow-rose-600/20 transition-all active:scale-95 sm:px-5 sm:text-sm"
           >
             Login
           </Link>
 
           <Link
             to="/wishlist"
-            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            className="relative rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 sm:p-2.5"
             aria-label="Open wishlist"
           >
-            <Heart size={19} />
+            <Heart size={18} />
             {wishlistCount > 0 ? (
-              <span className="absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full bg-rose-600 px-1.5 text-center text-[10px] font-black leading-[18px] text-white">
+              <span className="absolute -right-1 -top-1 min-w-[16px] rounded-full bg-rose-600 px-1 text-center text-[9px] font-black leading-[16px] text-white">
                 {wishlistCount}
               </span>
             ) : null}
@@ -222,12 +222,12 @@ export function LandingNavbar() {
 
           <Link
             to="/cart"
-            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            className="relative rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 sm:p-2.5"
             aria-label="Open cart"
           >
-            <ShoppingCart size={19} />
+            <ShoppingCart size={18} />
             {cartCount > 0 ? (
-              <span className="absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full bg-slate-900 px-1.5 text-center text-[10px] font-black leading-[18px] text-white">
+              <span className="absolute -right-1 -top-1 min-w-[16px] rounded-full bg-slate-900 px-1 text-center text-[9px] font-black leading-[16px] text-white">
                 {cartCount}
               </span>
             ) : null}
@@ -251,7 +251,7 @@ export function LandingNavbar() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute inset-x-0 top-full z-[110] border-b border-slate-100 bg-white p-4 shadow-xl md:hidden"
+            className="absolute inset-x-0 top-full z-[110] border-b border-slate-100 bg-white p-4 shadow-xl xl:hidden"
           >
             <div className="relative group">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -267,12 +267,12 @@ export function LandingNavbar() {
       </AnimatePresence>
 
       <nav className="w-full border-t border-slate-100 bg-white hidden md:block">
-        <div className="flex w-full items-center justify-center gap-6 px-4 py-2 sm:px-6 lg:px-12">
+        <div className="flex w-full items-center justify-center gap-2 px-4 py-2 sm:px-6 md:gap-3 lg:gap-5 lg:px-6 xl:gap-8 xl:px-12">
           <div className="relative" data-topnav-dropdown="true">
             <button
               type="button"
               className={[
-                'flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-black tracking-tight transition-all',
+                'flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-black tracking-tight transition-all whitespace-nowrap',
                 allDropdownOpen
                   ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
                   : 'text-slate-600 hover:text-rose-600 hover:bg-rose-50',
@@ -374,12 +374,12 @@ export function LandingNavbar() {
             </AnimatePresence>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5 md:gap-1 lg:gap-2">
             {[
               { label: 'Home', path: '/' },
               { label: 'Sell Phone', path: '/sell-phone' },
               { label: 'Buy Pre-Owned', path: '/marketplace' },
-                { label: `Wishlist${wishlistCount ? ` (${wishlistCount})` : ''}`, path: '/wishlist' },
+              { label: `Wishlist${wishlistCount ? ` (${wishlistCount})` : ''}`, path: '/wishlist' },
               { label: 'Find New Phone', path: '/find-new-phone' },
               { label: 'Repairs', path: '/repair-phone' },
               { label: 'Store Locator', path: '/nearby-stores' },
@@ -387,7 +387,7 @@ export function LandingNavbar() {
               <Link
                 key={item.label}
                 to={item.path}
-                className="px-4 py-2 text-[13px] font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all tracking-tight"
+                className="px-2 py-2 text-[13px] font-bold text-slate-600 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all tracking-tight whitespace-nowrap md:px-2.5 lg:px-3"
               >
                 {item.label}
               </Link>
