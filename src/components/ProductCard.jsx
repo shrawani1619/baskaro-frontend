@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Star } from 'lucide-react'
+import { Star, ShoppingCart, Check } from 'lucide-react'
+import { useState } from 'react'
+import { useCart } from '../context/CartContext'
 
 const TAG_STYLES = [
   'bg-amber-50 text-amber-800 ring-amber-100',
@@ -62,6 +64,8 @@ export function ProductCard({
   className = '',
 }) {
   const navigate = useNavigate()
+  const { addToCart } = useCart()
+  const [isAdding, setIsAdding] = useState(false)
   const tags = normalizeTags(tag)
   const badgeDiscount = discountBadgeText(discount)
   const priceDiscountPct = discountPriceLabel(discount)
@@ -134,13 +138,45 @@ export function ProductCard({
 
 
 
-      <div className="mt-auto pt-3">
+      <div className="mt-auto pt-3 flex gap-2">
         <button
           type="button"
           onClick={onCtaClick ?? (() => id && navigate(`/product/${id}`))}
-          className="flex w-full items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50/80 py-2.5 text-xs font-semibold text-slate-600 transition-all duration-300 hover:border-red-600 hover:bg-red-600 hover:text-white group-hover:border-red-200 group-hover:bg-red-50 group-hover:text-red-700 font-inter"
+          className="flex-1 flex items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50/80 py-2.5 text-xs font-bold text-slate-600 transition-all duration-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white"
         >
-          {ctaLabel}
+          View
+        </button>
+        <button
+          type="button"
+          disabled={isAdding}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsAdding(true);
+            addToCart({
+              id: id || title,
+              name: title,
+              price: price,
+              img: image
+            });
+            setTimeout(() => setIsAdding(false), 1500);
+          }}
+          className={`flex-1 flex items-center justify-center gap-1.5 rounded-xl border transition-all duration-300 py-2.5 text-xs font-black uppercase tracking-tight ${
+            isAdding 
+            ? 'bg-green-600 border-green-600 text-white' 
+            : 'border-rose-600 bg-white text-rose-600 hover:bg-rose-600 hover:text-white shadow-sm'
+          }`}
+        >
+          {isAdding ? (
+            <>
+              <Check size={14} strokeWidth={3} />
+              <span>Added</span>
+            </>
+          ) : (
+            <>
+              <ShoppingCart size={14} strokeWidth={2.5} />
+              <span>Add</span>
+            </>
+          )}
         </button>
       </div>
     </article>

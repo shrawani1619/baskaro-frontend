@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ChevronRight, ChevronLeft, ShieldCheck, Heart, Share2, Info, Check, ShoppingBag, PlusCircle } from 'lucide-react'
+import { Star, ChevronRight, ChevronLeft, ShieldCheck, Heart, Share2, Info, Check, ShoppingCart, PlusCircle } from 'lucide-react'
 import { gPhoto } from '../constants/googleImages'
 import { catalog } from '../mock/catalog.js'
+import { useCart } from '../context/CartContext'
 
 // Import premium PNG assets
 import s25Front from '../assets/products/s25_titanium.jpg'
@@ -17,6 +18,9 @@ export default function ProductDetailsPage() {
    const [condition, setCondition] = useState('Superb')
    const [extendedWarranty, setExtendedWarranty] = useState(false)
    const [showAllSpecs, setShowAllSpecs] = useState(false)
+   const [isAdding, setIsAdding] = useState(false)
+   const { addToCart } = useCart()
+   const navigate = useNavigate()
 
    // Demo Product Data
    // In a real app, this would be fetched based on 'id'
@@ -39,6 +43,17 @@ export default function ProductDetailsPage() {
          { id: 'Good', label: 'Good', desc: 'Minor signs of use' },
          { id: 'Superb', label: 'Superb', desc: 'Like new condition' }
       ]
+   }
+
+   const handleAddToCart = () => {
+      setIsAdding(true)
+      addToCart({
+         id: id,
+         name: product.title,
+         price: product.price.toLocaleString('en-IN'),
+         img: product.images[0]
+      })
+      setTimeout(() => setIsAdding(false), 1500)
    }
 
    const showThumbScroll = product.images?.length > 5
@@ -123,11 +138,32 @@ export default function ProductDetailsPage() {
                         </div>
 
                         <div className="grid shrink-0 grid-cols-2 bg-white border-t border-slate-100 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-                           <button type="button" className="flex flex-col items-center justify-center py-3 border-r border-rose-100 bg-rose-50/50 transition-all hover:bg-rose-100/50 group active:scale-95 outline-none">
-                              <span className="text-[13px] font-black text-slate-900 leading-none">Pay with EMI</span>
-                              <span className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest leading-none">from ₹3,658/mo</span>
+                           <button 
+                              type="button" 
+                              onClick={handleAddToCart}
+                              disabled={isAdding}
+                              className={`flex flex-col items-center justify-center py-3 border-r transition-all group active:scale-95 outline-none ${isAdding ? 'bg-green-50 border-green-100' : 'border-rose-100 bg-rose-50/50 hover:bg-rose-100/50'}`}
+                           >
+                              {isAdding ? (
+                                 <>
+                                    <Check className="text-green-600" size={18} />
+                                    <span className="text-[10px] font-bold text-green-600 mt-0.5 uppercase tracking-widest leading-none">Added!</span>
+                                 </>
+                              ) : (
+                                 <>
+                                    <ShoppingCart className="text-rose-600 mb-0.5" size={18} />
+                                    <span className="text-[13px] font-black text-slate-900 leading-none">Add to Cart</span>
+                                 </>
+                              )}
                            </button>
-                           <button type="button" className="py-3 bg-slate-900 text-white font-black text-[14px] uppercase tracking-[0.1em] hover:bg-black active:scale-95 transition-all outline-none">
+                           <button 
+                              type="button" 
+                              onClick={() => {
+                                 handleAddToCart();
+                                 navigate('/cart');
+                              }}
+                              className="py-3 bg-slate-900 text-white font-black text-[14px] uppercase tracking-[0.1em] hover:bg-black active:scale-95 transition-all outline-none"
+                           >
                               Buy Now
                            </button>
                         </div>

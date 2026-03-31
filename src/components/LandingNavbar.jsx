@@ -15,7 +15,9 @@ import {
   Bell,
   LogIn,
   Heart,
+  ShoppingCart,
 } from 'lucide-react'
+import { useCart } from '../context/CartContext'
 import { TopBrandPortals, MARKETPLACE_PORTAL_CONTENT } from './TopBrandPortals'
 import { useWishlist } from '../context/WishlistContext'
 
@@ -49,12 +51,14 @@ const CATEGORY_DATA = {
 export function LandingNavbar() {
   const navigate = useNavigate()
   const { wishlistCount } = useWishlist()
+  const { cartCount } = useCart()
   const [location] = useState('Gurgaon')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sellDesktopOpen, setSellDesktopOpen] = useState(false)
   const [preOwnedDropdownOpen, setPreOwnedDropdownOpen] = useState(false)
   const [allDropdownOpen, setAllDropdownOpen] = useState(false)
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false)
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [mobileAllOpen, setMobileAllOpen] = useState(false)
   const [mobileSellOpen, setMobileSellOpen] = useState(false)
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
@@ -180,6 +184,15 @@ export function LandingNavbar() {
             <Bell size={20} />
           </button>
 
+          <button
+            type="button"
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="rounded-xl p-2.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors md:hidden"
+            aria-label="Toggle mobile search"
+          >
+            <Search size={20} />
+          </button>
+
           <div className="hidden items-center gap-2 sm:flex">
             <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[13px] font-bold text-slate-700 hover:border-rose-200 hover:bg-rose-50 transition-colors cursor-pointer group">
               <MapPin size={14} className="text-rose-600 group-hover:scale-110 transition-transform" />
@@ -207,6 +220,19 @@ export function LandingNavbar() {
             ) : null}
           </Link>
 
+          <Link
+            to="/cart"
+            className="relative rounded-xl border border-slate-200 bg-white p-2.5 text-slate-600 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            aria-label="Open cart"
+          >
+            <ShoppingCart size={19} />
+            {cartCount > 0 ? (
+              <span className="absolute -right-1.5 -top-1.5 min-w-[18px] rounded-full bg-slate-900 px-1.5 text-center text-[10px] font-black leading-[18px] text-white">
+                {cartCount}
+              </span>
+            ) : null}
+          </Link>
+
           <button
             type="button"
             className="md:hidden rounded-xl bg-slate-100 p-2 text-slate-900 hover:bg-rose-50 hover:text-rose-600 transition-colors"
@@ -217,6 +243,28 @@ export function LandingNavbar() {
           </button>
         </div>
       </div>
+
+      {/* Mobile Search Overlay */}
+      <AnimatePresence>
+        {mobileSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute inset-x-0 top-full z-[110] border-b border-slate-100 bg-white p-4 shadow-xl md:hidden"
+          >
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input
+                autoFocus
+                type="search"
+                placeholder="Search phones..."
+                className="w-full rounded-2xl border-2 border-slate-100 bg-slate-50 py-3 pl-11 pr-4 text-sm font-bold outline-none focus:border-rose-500 focus:bg-white transition-all"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <nav className="w-full border-t border-slate-100 bg-white hidden md:block">
         <div className="flex w-full items-center justify-center gap-6 px-4 py-2 sm:px-6 lg:px-12">
@@ -415,6 +463,7 @@ export function LandingNavbar() {
                   { label: 'Sell Phone', path: '/sell-phone' },
                   { label: 'Buy Pre-Owned', path: '/marketplace' },
                   { label: `Wishlist${wishlistCount ? ` (${wishlistCount})` : ''}`, path: '/wishlist' },
+                  { label: `Cart${cartCount ? ` (${cartCount})` : ''}`, path: '/cart' },
                   { label: 'Find New Phone', path: '/find-new-phone' },
                   { label: 'Repairs', path: '/repair-phone' },
                   { label: 'Store Locator', path: '/nearby-stores' },
