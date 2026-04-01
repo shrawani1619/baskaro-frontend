@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { ChevronRight, ChevronLeft } from 'lucide-react'
-import { catalog } from '../mock/catalog.js'
 import { gPhoto } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { FlashDealsSection } from '../components/FlashDealsSection'
 import { ProductCard } from '../components/ProductCard'
 import { PHONE_BRAND_PORTALS, TopSellingBrands } from '../components/TopBrandPortals'
-import { BestSellingSection } from '../components/BestSelling/BestSellingSection'
 import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
 import { ServiceCard } from '../components/ServiceCard'
 
@@ -418,6 +416,270 @@ const SERVICE_THUMBS = {
   'Nearby Stores': NEARBY_STORE_IMAGE_URL,
   'New Accessories': NEW_ACCESSORIES_IMAGE_URL,
   'Buy Smartwatches': BUY_SMARTWATCHES_IMAGE_URL,
+}
+
+// ─── New Branded Phones ─────────────────────────────────────────────────────
+const BRANDED_PHONE_BRANDS = [
+  { id: 'all', label: 'All' },
+  { id: 'apple', label: 'Apple' },
+  { id: 'samsung', label: 'Samsung' },
+  { id: 'oneplus', label: 'OnePlus' },
+  { id: 'xiaomi', label: 'Xiaomi' },
+  { id: 'vivo', label: 'Vivo' },
+  { id: 'oppo', label: 'Oppo' },
+]
+
+const NEW_BRANDED_PHONES = [
+  {
+    id: 'iphone-16-pro',
+    brand: 'apple',
+    name: 'iPhone 16 Pro',
+    subtitle: '256 GB · Desert Titanium',
+    price: '₹1,19,900',
+    originalPrice: '₹1,34,900',
+    discount: 11,
+    badge: 'New Launch',
+    badgeColor: 'bg-violet-600',
+    image: 'https://images.unsplash.com/photo-1603891128711-11b4b03bb138?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=apple.com&sz=128',
+  },
+  {
+    id: 'samsung-s25-ultra',
+    brand: 'samsung',
+    name: 'Samsung Galaxy S25 Ultra',
+    subtitle: '512 GB · Titanium Black',
+    price: '₹1,29,999',
+    originalPrice: '₹1,54,999',
+    discount: 16,
+    badge: 'Trending',
+    badgeColor: 'bg-red-600',
+    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=samsung.com&sz=128',
+  },
+  {
+    id: 'oneplus-13',
+    brand: 'oneplus',
+    name: 'OnePlus 13',
+    subtitle: '256 GB · Midnight Ocean',
+    price: '₹69,999',
+    originalPrice: '₹79,999',
+    discount: 13,
+    badge: 'Best Seller',
+    badgeColor: 'bg-red-500',
+    image: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=oneplus.com&sz=128',
+  },
+  {
+    id: 'xiaomi-15-ultra',
+    brand: 'xiaomi',
+    name: 'Xiaomi 15 Ultra',
+    subtitle: '512 GB · Titanium Silver',
+    price: '₹99,999',
+    originalPrice: '₹1,09,999',
+    discount: 9,
+    badge: 'New',
+    badgeColor: 'bg-orange-500',
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=mi.com&sz=128',
+  },
+  {
+    id: 'vivo-x200-pro',
+    brand: 'vivo',
+    name: 'Vivo X200 Pro',
+    subtitle: '256 GB · Titanium Grey',
+    price: '₹94,999',
+    originalPrice: '₹1,04,999',
+    discount: 10,
+    badge: 'Hot',
+    badgeColor: 'bg-pink-600',
+    image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=vivo.com&sz=128',
+  },
+  {
+    id: 'oppo-find-x8-pro',
+    brand: 'oppo',
+    name: 'OPPO Find X8 Pro',
+    subtitle: '512 GB · Space Black',
+    price: '₹1,09,999',
+    originalPrice: '₹1,19,999',
+    discount: 8,
+    badge: 'Premium',
+    badgeColor: 'bg-blue-600',
+    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=oppo.com&sz=128',
+  },
+  {
+    id: 'iphone-15',
+    brand: 'apple',
+    name: 'iPhone 15',
+    subtitle: '128 GB · Pink',
+    price: '₹72,900',
+    originalPrice: '₹79,900',
+    discount: 9,
+    badge: 'Popular',
+    badgeColor: 'bg-indigo-600',
+    image: 'https://images.unsplash.com/photo-1567581935884-3349723552ca?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=apple.com&sz=128',
+  },
+  {
+    id: 'samsung-a55',
+    brand: 'samsung',
+    name: 'Samsung Galaxy A55 5G',
+    subtitle: '256 GB · Awesome Lilac',
+    price: '₹38,999',
+    originalPrice: '₹44,999',
+    discount: 13,
+    badge: 'Value Pick',
+    badgeColor: 'bg-teal-600',
+    image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?q=80&w=640&auto=format&fit=crop',
+    brandLogo: 'https://www.google.com/s2/favicons?domain=samsung.com&sz=128',
+  },
+]
+
+function BrandedPhonesSection() {
+  const [activeBrand, setActiveBrand] = useState('all')
+  const scrollerRef = useRef(null)
+
+  const filtered = activeBrand === 'all'
+    ? NEW_BRANDED_PHONES
+    : NEW_BRANDED_PHONES.filter((p) => p.brand === activeBrand)
+
+  const scrollCarousel = (dir) => {
+    const el = scrollerRef.current
+    if (!el) return
+    el.scrollBy({ left: Math.min(el.clientWidth * 0.85, 480) * dir, behavior: 'smooth' })
+  }
+
+  return (
+    <section className="w-full py-10 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 border-y border-slate-100">
+      <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
+        {/* Header */}
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">
+              🔥 New Branded Phones
+            </h2>
+            <p className="mt-1 text-xs font-semibold text-slate-500">
+              Latest flagship launches from top brands — all in one place
+            </p>
+          </div>
+          <a
+            href="/find-new-phone"
+            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-extrabold text-slate-700 shadow-sm transition hover:border-red-300 hover:text-red-700 hover:shadow-md"
+          >
+            View All
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </a>
+        </div>
+
+        {/* Brand filter pills */}
+        <div className="mb-5 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          {BRANDED_PHONE_BRANDS.map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => setActiveBrand(b.id)}
+              className={[
+                'shrink-0 rounded-full border px-4 py-1.5 text-xs font-bold transition-all duration-200',
+                activeBrand === b.id
+                  ? 'border-red-600 bg-red-600 text-white shadow-sm shadow-red-200'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-red-300 hover:text-red-700',
+              ].join(' ')}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Carousel */}
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => scrollCarousel(-1)}
+            aria-label="Scroll branded phones left"
+            className="absolute left-0 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:text-red-700 sm:flex"
+          >
+            <ChevronLeft className="h-5 w-5" aria-hidden />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollCarousel(1)}
+            aria-label="Scroll branded phones right"
+            className="absolute right-0 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-700 shadow-md backdrop-blur-sm transition hover:bg-white hover:text-red-700 sm:flex"
+          >
+            <ChevronRight className="h-5 w-5" aria-hidden />
+          </button>
+
+          <div
+            ref={scrollerRef}
+            className="flex gap-4 overflow-x-auto pb-3 pt-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:px-12"
+          >
+            {filtered.map((phone) => (
+              <Link
+                key={phone.id}
+                to="/find-new-phone"
+                className="group relative flex w-[200px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-lg sm:w-[210px]"
+              >
+                {/* Badge */}
+                <span
+                  className={`absolute left-3 top-3 z-10 rounded-full px-2.5 py-1 text-[10px] font-extrabold text-white shadow ${phone.badgeColor}`}
+                >
+                  {phone.badge}
+                </span>
+
+
+                {/* Phone image */}
+                <div className="flex h-48 w-full items-center justify-center bg-gradient-to-b from-slate-100 to-white p-4">
+                  <img
+                    src={phone.image}
+                    alt={phone.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+
+                {/* Info */}
+                <div className="flex flex-1 flex-col p-3">
+                  <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">{phone.subtitle}</p>
+                  <h3 className="mt-0.5 text-sm font-extrabold leading-snug text-slate-900 line-clamp-2">
+                    {phone.name}
+                  </h3>
+
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-base font-extrabold text-slate-900">{phone.price}</span>
+                    {phone.originalPrice && (
+                      <span className="text-xs font-semibold text-slate-400 line-through">{phone.originalPrice}</span>
+                    )}
+                  </div>
+                  {phone.discount && (
+                    <span className="mt-1 inline-flex w-fit rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold text-green-700">
+                      {phone.discount}% off
+                    </span>
+                  )}
+
+                  <button
+                    type="button"
+                    className="mt-3 w-full rounded-xl bg-red-600 py-2 text-xs font-extrabold text-white opacity-0 transition-all duration-200 group-hover:opacity-100 hover:bg-red-700"
+                  >
+                    Buy Now
+                  </button>
+                </div>
+              </Link>
+            ))}
+
+            {/* Empty state when brand filter yields nothing */}
+            {filtered.length === 0 && (
+              <div className="flex h-48 w-full items-center justify-center text-sm font-semibold text-slate-400">
+                No phones found for this brand yet.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 const PRE_OWNED_DEVICES_CAROUSEL = [
@@ -862,38 +1124,6 @@ export default function LandingPage() {
   const [moreOpen, setMoreOpen] = useState(false)
   const [navDropdownOpen, setNavDropdownOpen] = useState(null)
 
-  const topBrands = Object.keys(catalog)
-  const topSellingPhones = useMemo(() => {
-    const items = []
-    for (const [brand, models] of Object.entries(catalog)) {
-      for (const [model, meta] of Object.entries(models)) {
-        items.push({ brand, model, price: meta?.basePrice ?? 0 })
-      }
-    }
-    items.sort((a, b) => (b.price ?? 0) - (a.price ?? 0))
-    return items.slice(0, 6)
-  }, [])
-
-  const bestSellingPhoneCards = useMemo(() => {
-    return topSellingPhones.map((p, idx) => {
-      const base = Number(p.price ?? 0)
-      const original = base ? Math.round(base * 1.18) : null
-      const discount =
-        base && original && original > base
-          ? Math.max(1, Math.round(((original - base) / original) * 100))
-          : null
-      return {
-        id: `${p.brand}-${p.model}`,
-        image: gPhoto((idx + 2) % 6),
-        name: p.model,
-        price: base ? formatINR(base) : '',
-        originalPrice: original ? formatINR(original) : '',
-        discount,
-        href: '/find-new-phone',
-      }
-    })
-  }, [topSellingPhones])
-
   const [heroSlide, setHeroSlide] = useState(0)
   const heroSlideCount = HERO_CAROUSEL_SLIDES.length
   const [storePincode, setStorePincode] = useState('')
@@ -1244,7 +1474,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <BestSellingSection products={bestSellingPhoneCards} />
+      {/* ── New Branded Phones (replaces Best Selling Phones) ── */}
+      <BrandedPhonesSection />
 
       {/* Right-side "More" drawer */}
       {moreOpen && (
