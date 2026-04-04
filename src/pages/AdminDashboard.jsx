@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
     { id: 'users', label: 'User Management', Icon: Users },
-    { id: 'mobile', label: 'Mobile Management', Icon: Smartphone },
+    { id: 'categories', label: 'All Categories', Icon: Package },
     { id: 'pricing', label: 'Condition Pricing', Icon: DollarSign },
     { id: 'orders', label: 'Order Management', Icon: ShoppingCart },
     { id: 'pickups', label: 'Pickup Management', Icon: Truck },
@@ -168,7 +168,7 @@ export default function AdminDashboard() {
             <motion.div key={tab} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               {tab === 'dashboard' && <DashboardView />}
               {tab === 'users' && <UsersManagementView />}
-              {tab === 'mobile' && <MobileManagementView />}
+              {tab === 'categories' && <AllCategoriesView />}
               {tab === 'pricing' && <ConditionPricingView />}
               {tab === 'orders' && <OrdersManagementView />}
               {tab === 'pickups' && <PickupsManagementView />}
@@ -430,58 +430,639 @@ function UsersManagementView() {
 }
 
 // ============================================================================ //
-// 3. MOBILE MANAGEMENT VIEW
+// 3. ALL CATEGORIES MANAGEMENT VIEW
+// 3. ALL CATEGORIES VIEW
 // ============================================================================ //
-function MobileManagementView() {
-  const [activeSegment, setActiveSegment] = useState('Catalog'); // 'Catalog' | 'AddNew'
+function AllCategoriesView() {
+  const [categories, setCategories] = useState([
+     { id: 1, name: 'Smartphones', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=300&auto=format&fit=crop' },
+     { id: 2, name: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=300&auto=format&fit=crop' },
+     { id: 3, name: 'Accessories', image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=300&auto=format&fit=crop' },
+  ]);
+
+  const [brands, setBrands] = useState([
+     { id: 1, catId: 1, name: 'Apple', logo: 'https://www.google.com/s2/favicons?domain=apple.com&sz=128' },
+     { id: 2, catId: 1, name: 'Samsung', logo: 'https://www.google.com/s2/favicons?domain=samsung.com&sz=128' },
+     { id: 3, catId: 2, name: 'Dell', logo: 'https://www.google.com/s2/favicons?domain=dell.com&sz=128' },
+  ]);
+
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+  
+  // NEW: Toggle between category grid and full master catalog
+  const [showCatalog, setShowCatalog] = useState(false);
+
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [newCat, setNewCat] = useState({ name: '' });
+  const [catImagePreview, setCatImagePreview] = useState(null);
+
+  const handleEditCategory = (cat, e) => {
+    e.stopPropagation();
+    setEditingCategory(cat);
+    setNewCat({ name: cat.name });
+    setCatImagePreview(cat.image);
+    setIsAddingCategory(true);
+  };
+
+  const handleDeleteCategory = (id, e) => {
+    e.stopPropagation();
+    if(window.confirm('Are you sure you want to delete this category? All its brands and products will be permanently removed.')){
+      setCategories(categories.filter(c => c.id !== id));
+      if(selectedCategory && selectedCategory.id === id) {
+         setSelectedCategory(null);
+         setSelectedBrand(null);
+      }
+    }
+  };
+
+  const closeCategoryModal = () => {
+    setIsAddingCategory(false);
+    setEditingCategory(null);
+    setNewCat({ name: '' });
+    setCatImagePreview(null);
+  };
+
+  const handleAddCategory = (e) => {
+    e.preventDefault();
+    if (editingCategory) {
+       setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: newCat.name, image: catImagePreview || c.image } : c));
+    } else {
+       const id = Date.now();
+       setCategories([...categories, { id, name: newCat.name, image: catImagePreview || `https://source.unsplash.com/random/400x300/?${newCat.name.toLowerCase()}` }]);
+       setShowCatalog(false);
+    }
+    closeCategoryModal();
+  };
+
+  const handleCatImageChange = (file) => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => setCatImagePreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-2xl font-black text-slate-900">Mobile Management</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">Manage brands, configure pricing, and add new smartphone models.</p>
-        </div>
-        
-        {/* Segment Tabs */}
-        <div className="flex p-1 bg-slate-200/60 rounded-xl border border-slate-200/80">
-          <button 
-             onClick={() => setActiveSegment('Catalog')}
-             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSegment === 'Catalog' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            Manage Catalog
-          </button>
-          <button 
-             onClick={() => setActiveSegment('AddNew')}
-             className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${activeSegment === 'AddNew' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-          >
-            <span className="flex items-center gap-1"><Plus size={16}/> Add New Device</span>
-          </button>
-        </div>
-      </div>
-
-      <AnimatePresence mode="wait">
-        {activeSegment === 'AddNew' ? (
-           <motion.div key="add-new" initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -10}}>
-             <AddNewModelForm onCancel={() => setActiveSegment('Catalog')} />
-           </motion.div>
-        ) : (
-           <motion.div key="catalog" initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} exit={{opacity: 0, y: -10}}>
-             <div className="rounded-3xl border border-slate-200 bg-white shadow-sm p-24 text-center">
-                 <Smartphone size={48} className="mx-auto text-slate-300 mb-4" />
-                 <h3 className="text-xl font-bold text-slate-900 mb-2">Device Catalog Grid</h3>
-                 <p className="text-slate-500 mb-6">Device listing view goes here. Switch to "Add New Device" to see the dynamic form.</p>
-                 <button onClick={() => setActiveSegment('AddNew')} className="bg-red-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm shadow-md hover:bg-red-700">Add First Device</button>
+       {/* Global Catalog Navigation Bar */}
+       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-3xl border border-slate-200 shadow-sm">
+          <div className="flex items-center gap-3">
+             <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-200">
+               <Package size={20} />
              </div>
+             <div>
+               <h2 className="text-xl font-black text-slate-900 leading-tight">Catalog Management</h2>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Configure Categories & Products</p>
+             </div>
+          </div>
+          
+          <div className="flex items-center gap-3">
+             <div className="flex p-1 bg-slate-100/50 rounded-xl border border-slate-200">
+                <button 
+                  type="button"
+                  onClick={() => { 
+                    if (selectedCategory || selectedBrand) {
+                       setSelectedCategory(null); setSelectedBrand(null);
+                       setShowCatalog(true);
+                    } else {
+                       setShowCatalog(!showCatalog); 
+                    }
+                  }}
+                  className={`px-6 py-2 rounded-lg text-sm font-bold shadow-sm border transition-all active:scale-95 cursor-pointer ${showCatalog && !selectedCategory && !selectedBrand ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-blue-100' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-blue-600'}`}
+                >
+                  Manage Catalog
+                </button>
+             </div>
+             
+             {!selectedCategory && !showCatalog && (
+                <button 
+                  onClick={() => setIsAddingCategory(true)}
+                  className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-black transition"
+                >
+                  <Plus size={18} /> Add Category
+                </button>
+             )}
+          </div>
+       </div>
+
+       {selectedBrand ? (
+          <BrandModelsView 
+             category={selectedCategory}
+             brand={selectedBrand}
+             onBack={() => setSelectedBrand(null)}
+          />
+       ) : selectedCategory ? (
+          <CategoryBrandsView 
+             category={selectedCategory} 
+             brands={brands.filter(b => b.catId === selectedCategory.id)}
+             onBack={() => {setSelectedCategory(null); setShowCatalog(false);}}
+             onSelectBrand={(brand) => setSelectedBrand(brand)}
+             onAddBrand={(name, logo) => setBrands([...brands, { id: Date.now(), catId: selectedCategory.id, name, logo }])}
+             onEditBrand={(id, newName, newLogo) => setBrands(brands.map(b => b.id === id ? { ...b, name: newName, logo: newLogo || b.logo } : b))}
+             onDeleteBrand={(id) => {
+               if(window.confirm('Are you sure you want to delete this brand and all its products?')) {
+                 setBrands(brands.filter(b => b.id !== id));
+               }
+             }}
+          />
+       ) : showCatalog ? (
+          <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} className="pt-2">
+             <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                   <div>
+                     <h3 className="text-lg font-black text-slate-900">Master Catalog</h3>
+                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Comprehensive view of all products</p>
+                   </div>
+                   <div className="flex gap-2">
+                     <button onClick={() => setShowCatalog(false)} className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 shadow-sm hover:border-blue-300 hover:text-blue-600 transition-all cursor-pointer">
+                        View as Categories
+                     </button>
+                   </div>
+                </div>
+                <div className="p-12 text-center flex flex-col items-center">
+                   <div className="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4 shadow-inner">
+                     <Package size={32} />
+                   </div>
+                   <h4 className="text-xl font-black text-slate-900 mb-2">Central Master Catalog</h4>
+                   <p className="text-sm font-medium text-slate-500 max-w-md mx-auto mb-6">You are now viewing the unified catalog listing all active products across every category and brand globally.</p>
+                   {/* Dummy Table implementation for the Catalog view */}
+                   <div className="w-full overflow-x-auto text-left border border-slate-200 rounded-2xl">
+                      <table className="w-full">
+                         <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-widest text-slate-500 font-black">
+                            <tr>
+                               <th className="px-6 py-4">Product Name</th>
+                               <th className="px-6 py-4">Category</th>
+                               <th className="px-6 py-4">Brand</th>
+                               <th className="px-6 py-4 text-right">Status</th>
+                            </tr>
+                         </thead>
+                         <tbody className="divide-y divide-slate-100 text-sm font-bold text-slate-700 bg-white">
+                            <tr className="hover:bg-slate-50 transition-colors">
+                               <td className="px-6 py-4">iPhone 15 Pro Max</td>
+                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Smartphones</span></td>
+                               <td className="px-6 py-4">Apple</td>
+                               <td className="px-6 py-4 text-right"><span className="text-green-600 bg-green-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Active</span></td>
+                            </tr>
+                            <tr className="hover:bg-slate-50 transition-colors">
+                               <td className="px-6 py-4">Galaxy S23 Ultra</td>
+                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Smartphones</span></td>
+                               <td className="px-6 py-4">Samsung</td>
+                               <td className="px-6 py-4 text-right"><span className="text-green-600 bg-green-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Active</span></td>
+                            </tr>
+                            <tr className="hover:bg-slate-50 transition-colors">
+                               <td className="px-6 py-4">XPS 15 9520</td>
+                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Laptops</span></td>
+                               <td className="px-6 py-4">Dell</td>
+                               <td className="px-6 py-4 text-right"><span className="text-orange-600 bg-orange-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Draft</span></td>
+                            </tr>
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+             </div>
+          </motion.div>
+       ) : (
+          <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} className="pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {categories.map((cat) => (
+                   <div 
+                     key={cat.id} 
+                     onClick={() => setSelectedCategory(cat)}
+                     className="group relative bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                   >
+                     <div className="aspect-[4/3] w-full bg-slate-100 relative overflow-hidden">
+                       <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                       <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-60"></div>
+                       
+                       {/* Action Icons Overlay */}
+                       <div className="absolute top-4 right-4 flex gap-2 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                          <button 
+                            onClick={(e) => handleEditCategory(cat, e)}
+                            className="h-9 w-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-slate-700 hover:text-blue-600 hover:bg-white transition-all transform hover:scale-110"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={(e) => handleDeleteCategory(cat.id, e)}
+                            className="h-9 w-9 rounded-xl bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-slate-700 hover:text-red-500 hover:bg-white transition-all transform hover:scale-110"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                       </div>
+                     </div>
+                     <div className="p-5 relative">
+                       <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{cat.name}</h3>
+                       <div className="flex items-center justify-between mt-4">
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Inventory: 0 Items</span>
+                         <button className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">View Brands <ChevronRight size={14}/></button>
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+                 
+                 {/* Add New Quick Card */}
+                 <button 
+                   onClick={(e) => { e.stopPropagation(); setIsAddingCategory(true); }}
+                   className="group aspect-[4/3] w-full border-2 border-dashed border-slate-200 rounded-3xl flex flex-col items-center justify-center gap-3 bg-slate-50/50 hover:bg-white hover:border-blue-300 transition-all"
+                 >
+                   <div className="h-12 w-12 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:scale-110 transition-all">
+                     <Plus size={24} />
+                   </div>
+                   <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900">Add New Category</span>
+                 </button>
+              </div>
            </motion.div>
+      )}
+
+      {/* Add Category Modal */}
+      <AnimatePresence>
+        {isAddingCategory && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+            <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.95, y: 20 }}
+               className="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden"
+            >
+              <div className="px-6 py-5 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                    <Package size={18} className="text-blue-600"/> 
+                    {editingCategory ? 'Update Category' : 'Add New Category'}
+                 </h3>
+                 <button onClick={closeCategoryModal} className="text-slate-400 hover:text-slate-600 transition-colors"><Plus size={24} className="rotate-45"/></button>
+              </div>
+              
+              <form onSubmit={handleAddCategory} className="p-6 space-y-6">
+                 <div>
+                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Category Name</label>
+                   <input 
+                     required 
+                     type="text"
+                     placeholder="e.g. Headphones"
+                     value={newCat.name} 
+                     onChange={(e) => setNewCat({ ...newCat, name: e.target.value })}
+                     className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all placeholder:font-medium shadow-sm"
+                   />
+                 </div>
+
+                 <div>
+                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Upload Photo</label>
+                    <div 
+                      className="border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-blue-300 transition-all cursor-pointer group relative overflow-hidden h-40"
+                      onClick={() => document.getElementById('cat-image-upload').click()}
+                    >
+                       <input 
+                         id="cat-image-upload" 
+                         type="file" 
+                         accept="image/*" 
+                         className="hidden" 
+                         onChange={(e) => {
+                           if (e.target.files && e.target.files[0]) {
+                             handleCatImageChange(e.target.files[0]);
+                           }
+                         }} 
+                       />
+                       
+                       {catImagePreview ? (
+                         <>
+                           <img src={catImagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover" />
+                           <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                             <span className="text-white text-xs font-bold">Change Image</span>
+                           </div>
+                         </>
+                       ) : (
+                         <div className="flex flex-col items-center text-slate-400">
+                           <UploadCloud size={32} className="mb-2 group-hover:text-blue-500 transition-colors" />
+                           <span className="text-xs font-bold uppercase tracking-wider">Click to upload</span>
+                         </div>
+                       )}
+                    </div>
+                 </div>
+
+                 <div className="pt-4 flex gap-3">
+                    <button type="button" onClick={closeCategoryModal} className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">Cancel</button>
+                    <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-black transition shadow-lg">
+                       {editingCategory ? 'Save Changes' : 'Add Category'}
+                    </button>
+                  </div>
+              </form>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>
   )
 }
 
-function AddNewModelForm({ onCancel }) {
-  const [imagePreview, setImagePreview] = useState(null);
+// ============================================================================ //
+// 3.1 CATEGORY BRANDS VIEW
+// ============================================================================ //
+function CategoryBrandsView({ category, brands, onBack, onAddBrand, onSelectBrand, onEditBrand, onDeleteBrand }) {
+  const [isAddingBrand, setIsAddingBrand] = useState(false);
+  const [editingBrandId, setEditingBrandId] = useState(null);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [brandImagePreview, setBrandImagePreview] = useState(null);
+
+  const handleOpenEdit = (brand, e) => {
+    e.stopPropagation();
+    setEditingBrandId(brand.id);
+    setNewBrandName(brand.name);
+    setBrandImagePreview(brand.logo);
+    setIsAddingBrand(true);
+  };
+
+  const handleBrandImageChange = (file) => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBrandImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+       {/* Sub-header */}
+       <div className="flex items-center gap-4">
+          <button onClick={onBack} className="h-10 w-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+             <ChevronLeft size={20} />
+          </button>
+          <div className="flex items-baseline gap-2">
+             <h2 className="text-2xl font-black text-slate-900">{category.name}</h2>
+             <span className="text-sm font-bold text-slate-400">/ Brands</span>
+          </div>
+       </div>
+
+       <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden min-h-[400px]">
+          <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+             <div>
+                <h3 className="text-lg font-black text-slate-900">Manage Brands</h3>
+                <p className="text-sm font-bold text-slate-400">Configure vendors and brand details for {category.name}</p>
+             </div>
+             <button onClick={() => setIsAddingBrand(true)} className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-black shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+                <Plus size={16} /> Add Brand
+             </button>
+          </div>
+
+          <div className="p-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+             {brands.map(brand => (
+                <div key={brand.id} onClick={() => onSelectBrand(brand)} className="relative group flex flex-col items-center gap-3 p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
+                   
+                   {/* Action Icons Overlay */}
+                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={(e) => handleOpenEdit(brand, e)}
+                        className="h-7 w-7 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-slate-50 transition-all transform hover:scale-110"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); onDeleteBrand(brand.id); }}
+                        className="h-7 w-7 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-50 transition-all transform hover:scale-110"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                   </div>
+
+                   <div className="h-16 w-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center p-3 group-hover:scale-110 transition-transform">
+                      <img src={brand.logo} alt={brand.name} className="max-w-full max-h-full object-contain" />
+                   </div>
+                   <span className="text-sm font-black text-slate-700 group-hover:text-blue-600">{brand.name}</span>
+                </div>
+             ))}
+
+             <button onClick={() => setIsAddingBrand(true)} className="aspect-square flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-blue-300 transition-all group text-slate-400 gap-2">
+                <Plus size={24} className="group-hover:text-blue-500 transition-colors" />
+                <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-slate-600">New Brand</span>
+             </button>
+          </div>
+
+          {brands.length === 0 && (
+            <div className="py-20 text-center">
+               <Package size={48} className="mx-auto text-slate-200 mb-4" />
+               <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No brands listed in this category</p>
+            </div>
+          )}
+       </div>
+
+       {/* Add Brand Modal */}
+       <AnimatePresence>
+          {isAddingBrand && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-white rounded-3xl w-full max-w-md shadow-2xl p-8">
+                  <h3 className="text-xl font-black text-slate-900 mb-6">{editingBrandId ? 'Edit Brand' : `Add Brand to ${category.name}`}</h3>
+                  <div className="space-y-6">
+                     <div>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Brand Name</label>
+                        <input value={newBrandName} onChange={e => setNewBrandName(e.target.value)} type="text" placeholder="e.g. Realme" className="w-full border border-slate-200 rounded-xl px-4 py-3 font-bold text-slate-700 outline-none focus:border-blue-500" />
+                     </div>
+
+                     <div>
+                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Brand Logo</label>
+                        <div 
+                          className="border-2 border-dashed border-slate-200 rounded-2xl p-4 flex flex-col items-center justify-center bg-slate-50 hover:bg-slate-100 hover:border-blue-300 transition-all cursor-pointer group relative overflow-hidden h-24"
+                          onClick={() => document.getElementById('brand-logo-upload').click()}
+                        >
+                           <input 
+                             id="brand-logo-upload" 
+                             type="file" 
+                             accept="image/*" 
+                             className="hidden" 
+                             onChange={(e) => {
+                               if (e.target.files && e.target.files[0]) {
+                                 handleBrandImageChange(e.target.files[0]);
+                               }
+                             }} 
+                           />
+                           
+                           {brandImagePreview ? (
+                             <>
+                               <img src={brandImagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-contain p-2" />
+                               <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                 <span className="text-white text-xs font-bold">Change Logo</span>
+                               </div>
+                             </>
+                           ) : (
+                             <div className="flex flex-col items-center text-slate-400">
+                               <UploadCloud size={20} className="mb-1 group-hover:text-blue-500 transition-colors" />
+                               <span className="text-[10px] font-bold uppercase tracking-wider">Click to upload logo</span>
+                             </div>
+                           )}
+                        </div>
+                     </div>
+
+                     <div className="pt-2 flex justify-end gap-3">
+                        <button onClick={() => { setIsAddingBrand(false); setEditingBrandId(null); setNewBrandName(''); setBrandImagePreview(null); }} className="px-6 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                        <button 
+                          onClick={() => { 
+                            if (editingBrandId) {
+                               onEditBrand(editingBrandId, newBrandName, brandImagePreview);
+                            } else {
+                               onAddBrand(newBrandName, brandImagePreview || `https://www.google.com/s2/favicons?domain=${newBrandName.toLowerCase()}.com&sz=128`); 
+                            }
+                            setIsAddingBrand(false); 
+                            setEditingBrandId(null);
+                            setNewBrandName(''); 
+                            setBrandImagePreview(null);
+                          }} 
+                          className="px-8 py-3 rounded-xl text-sm font-black bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition"
+                        >
+                          {editingBrandId ? 'Save Changes' : 'Add Brand'}
+                        </button>
+                     </div>
+                  </div>
+               </motion.div>
+            </div>
+          )}
+       </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ============================================================================ //
+// 3.2 BRAND MODELS VIEW
+// ============================================================================ //
+function BrandModelsView({ category, brand, onBack }) {
+  const [activeTab, setActiveTab] = useState('Models'); // 'Models' | 'Add'
+  const [editingModel, setEditingModel] = useState(null);
+  
+  const [models, setModels] = useState([
+     { id: 1, name: 'iPhone 15 Pro', image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=200&auto=format&fit=crop' },
+     { id: 2, name: 'iPhone 15', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d256e?q=80&w=200&auto=format&fit=crop' },
+     { id: 3, name: 'iPhone 14 Pro', image: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?q=80&w=200&auto=format&fit=crop' },
+  ]);
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this model?')) {
+       setModels(models.filter(m => m.id !== id));
+    }
+  };
+
+  const handleEdit = (model) => {
+     setEditingModel(model);
+     setActiveTab('Add');
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+       <div className="flex items-center gap-4">
+          <button onClick={onBack} className="h-10 w-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+             <ChevronLeft size={20} />
+          </button>
+          <div className="flex items-baseline gap-2">
+             <h2 className="text-2xl font-black text-slate-900">{brand.name}</h2>
+             <span className="text-sm font-bold text-slate-400">/ {category.name} Models</span>
+          </div>
+       </div>
+
+       {activeTab === 'Add' ? (
+          <AddNewModelForm 
+            onCancel={() => { setActiveTab('Models'); setEditingModel(null); }} 
+            initialBrand={brand.name} 
+            initialCategory={category.name} 
+            editingModel={editingModel}
+            onSave={(data) => {
+               if (editingModel) {
+                  setModels(models.map(m => m.id === editingModel.id ? { ...m, ...data } : m));
+               } else {
+                  setModels([...models, { id: Date.now(), ...data }]);
+               }
+               setActiveTab('Models');
+               setEditingModel(null);
+            }}
+          />
+       ) : (
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+             <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <div>
+                   <h3 className="text-lg font-black text-slate-900">Registered Models</h3>
+                   <p className="text-sm font-bold text-slate-400">Manage pricing and variants for {brand.name}</p>
+                </div>
+                <button onClick={() => setActiveTab('Add')} className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-black shadow-lg hover:bg-black transition">
+                   <Plus size={16} /> Add New {category.name === 'Smartphones' ? 'Mobile' : 'Product'}
+                </button>
+             </div>
+
+             <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                   <thead>
+                      <tr className="border-b border-slate-200/60 bg-slate-50/50">
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Model Name & Preview</th>
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      {models.map(model => (
+                         <tr key={model.id} className="group border-b border-slate-100 hover:bg-slate-50/40 transition-all">
+                            <td className="px-8 py-5">
+                               <div className="flex items-center gap-5">
+                                  <div className="h-14 w-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex-shrink-0 p-2 overflow-hidden group-hover:border-blue-200 group-hover:scale-105 transition-all">
+                                     <img src={model.image} alt={model.name} className="h-full w-full object-contain" />
+                                  </div>
+                                  <div>
+                                     <span className="block text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{model.name}</span>
+                                     <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Product ID: BSK-MDL-00{model.id}</span>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="px-8 py-5 text-center">
+                               <div className="flex justify-center">
+                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest border border-green-100 shadow-sm shadow-green-100">
+                                     <CheckCircle size={10} /> Active
+                                  </span>
+                               </div>
+                            </td>
+                            <td className="px-8 py-5">
+                               <div className="flex justify-end gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button onClick={() => handleEdit(model)} className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-xs font-black text-slate-600 flex items-center gap-2 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/20 transition-all shadow-sm">
+                                     <Edit2 size={14} /> Edit Details
+                                  </button>
+                                  <button onClick={() => handleDelete(model.id)} className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-500 flex items-center justify-center hover:text-red-600 hover:border-red-100 hover:bg-red-50/20 transition-all shadow-sm">
+                                     <Trash2 size={16} />
+                                  </button>
+                               </div>
+                            </td>
+                         </tr>
+                      ))}
+                      {models.length === 0 && (
+                        <tr>
+                           <td colSpan={3} className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">No models found for this brand</td>
+                        </tr>
+                      )}
+                   </tbody>
+                </table>
+             </div>
+          </div>
+       )}
+    </motion.div>
+  );
+}
+
+function AddNewModelForm({ onCancel, initialBrand, initialCategory, editingModel, onSave }) {
+  const [imagePreview, setImagePreview] = useState(editingModel?.image || null);
+  const [formData, setFormData] = useState({
+    brand: editingModel?.brand || initialBrand || '',
+    modelName: editingModel?.name || '',
+    category: editingModel?.category || initialCategory || ''
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.brand || !formData.modelName) {
+      alert('Please fill in the Brand and Model Name.');
+      return;
+    }
+    
+    onSave({
+      name: formData.modelName,
+      brand: formData.brand,
+      category: formData.category,
+      image: imagePreview || 'https://via.placeholder.com/200'
+    });
+  };
   
   const handleImageChange = (file) => {
     if (file && file.type.startsWith('image/')) {
@@ -496,14 +1077,14 @@ function AddNewModelForm({ onCancel }) {
   return (
     <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
        <div className="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
-          <h3 className="text-lg font-black text-slate-900">Create New Model Listing</h3>
-          <p className="text-sm text-slate-500 mt-1">Fill in the specifications to list a new phone on the marketplace.</p>
+          <h3 className="text-lg font-black text-slate-900">Create New Product Listing</h3>
+          <p className="text-sm text-slate-500 mt-1">Fill in the specifications to list a new item on the marketplace.</p>
        </div>
 
        <div className="p-8 grid gap-10 xl:grid-cols-3">
           {/* Left Column - Image Upload */}
           <div className="xl:col-span-1 space-y-4">
-             <label className="text-sm font-black uppercase text-slate-800 tracking-wider">Device Primary Image <span className="text-red-500">*</span></label>
+             <label className="text-sm font-black uppercase text-slate-800 tracking-wider">Product Primary Image <span className="text-red-500">*</span></label>
              
              <div 
                className="relative border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50/50 hover:bg-slate-50 hover:border-blue-400 transition-colors flex flex-col items-center justify-center h-72 cursor-pointer group overflow-hidden"
@@ -514,10 +1095,10 @@ function AddNewModelForm({ onCancel }) {
                    handleImageChange(e.dataTransfer.files[0]);
                  }
                }}
-               onClick={() => document.getElementById('device-image-upload').click()}
+               onClick={() => document.getElementById('product-image-upload').click()}
              >
                <input 
-                 id="device-image-upload" 
+                 id="product-image-upload" 
                  type="file" 
                  accept="image/*" 
                  className="hidden" 
@@ -536,7 +1117,7 @@ function AddNewModelForm({ onCancel }) {
                        onClick={(e) => {
                          e.stopPropagation();
                          setImagePreview(null);
-                         document.getElementById('device-image-upload').value = '';
+                         document.getElementById('product-image-upload').value = '';
                        }}
                        className="bg-red-600 text-white p-3 px-4 rounded-xl hover:bg-red-700 transition shadow-lg flex items-center gap-2 text-sm font-bold"
                      >
@@ -565,15 +1146,27 @@ function AddNewModelForm({ onCancel }) {
                 <div className="grid grid-cols-2 gap-5">
                    <div>
                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Brand <span className="text-red-500">*</span></label>
-                     <select className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer">
+                     <select 
+                        value={formData.brand}
+                        onChange={(e) => setFormData({...formData, brand: e.target.value})}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all appearance-none cursor-pointer"
+                     >
                         <option value="">Select Brand</option>
                         <option value="Apple">Apple</option>
                         <option value="Samsung">Samsung</option>
+                        <option value="OnePlus">OnePlus</option>
+                        {initialBrand && <option value={initialBrand}>{initialBrand}</option>}
                      </select>
                    </div>
                    <div>
                      <label className="block text-sm font-bold text-slate-700 mb-1.5">Model Name <span className="text-red-500">*</span></label>
-                     <input type="text" placeholder="e.g. iPhone 15 Pro Max" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all" />
+                     <input 
+                        type="text" 
+                        placeholder="e.g. iPhone 15 Pro Max" 
+                        value={formData.modelName}
+                        onChange={(e) => setFormData({...formData, modelName: e.target.value})}
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 transition-all" 
+                     />
                    </div>
                 </div>
              </div>
@@ -661,8 +1254,14 @@ function AddNewModelForm({ onCancel }) {
 
        {/* Footer Actions */}
        <div className="border-t border-slate-200 bg-slate-50 p-6 flex items-center justify-end gap-4">
-          <button onClick={onCancel} className="px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-bold hover:bg-slate-100 transition">Cancel</button>
-          <button className="px-8 py-3 rounded-xl bg-blue-600 text-white text-sm font-black shadow-md shadow-blue-200 hover:bg-blue-700 transition">Publish Device Listing</button>
+          <button type="button" onClick={onCancel} className="px-6 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-bold hover:bg-slate-100 transition">Cancel</button>
+          <button 
+            type="button" 
+            onClick={handleSubmit} 
+            className="px-8 py-3 rounded-xl bg-blue-600 text-white text-sm font-black shadow-md shadow-blue-200 hover:bg-blue-700 transition"
+          >
+            {editingModel ? 'Update Product Details' : 'Publish Product Listing'}
+          </button>
        </div>
     </div>
   )
@@ -1417,8 +2016,8 @@ function InventoryManagementView() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-black text-slate-900">Inventory (Refurbished Phones)</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">Manage refurbished phone stock levels and prices.</p>
+          <h2 className="text-2xl font-black text-slate-900">Inventory</h2>
+          <p className="text-sm font-medium text-slate-500 mt-1">Manage stock levels and prices.</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={() => setIsAddingStock(true)} className="flex items-center justify-center gap-2 bg-slate-900 text-white rounded-xl px-5 py-2.5 text-sm font-black hover:bg-black shadow-md shadow-slate-200 transition">

@@ -1,5 +1,6 @@
 import { LandingNavbar } from './LandingNavbar'
 import { CategoryRibbon } from './CategoryRibbon'
+import { WhatsAppWidget } from './WhatsAppWidget'
 
 /**
  * Wraps page content; add header/footer/sidebar here as the app grows.
@@ -10,6 +11,7 @@ export function MainLayout({ children }) {
       <LandingNavbar />
       <CategoryRibbon />
       {children}
+      <WhatsAppWidget />
       <footer className="border-t border-blue-800/90 bg-gradient-to-b from-blue-900 via-blue-950 to-slate-950 text-blue-100">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
           <div className="grid gap-8 md:grid-cols-4">
