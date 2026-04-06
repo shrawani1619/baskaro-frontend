@@ -1,15 +1,8 @@
+import { useMemo } from 'react'
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
-import { gPhoto } from '../constants/googleImages'
-// Import premium PNG assets
-import s25Front from '../assets/products/s25_titanium.jpg'
-import iphone14Front from '../assets/products/iphone14_purple.jpg'
-import iphone13Blue from '../assets/products/iphone13_blue.jpg'
-import iphone11Purple from '../assets/products/iphone11_purple.jpg'
-import iphone12Red from '../assets/products/iphone12_red.jpg'
-import iphone14Pro from '../assets/products/iphone14_pro.jpg'
+import { useCatalogBrands } from '../hooks/useCatalogBrands'
 
-const BRAND_LIST = ['Apple', 'Xiaomi', 'Samsung', 'Vivo', 'OnePlus', 'OPPO', 'Realme', 'Motorola']
+const BRAND_LIST_FALLBACK = ['Apple', 'Xiaomi', 'Samsung', 'Vivo', 'OnePlus', 'OPPO', 'Realme', 'Motorola']
 
 const HOW_IT_WORKS = [
   {
@@ -38,39 +31,6 @@ const WHY_US = [
   'Valid Purchase Invoice',
 ]
 
-const TOP_PHONES = [
-  {
-    name: 'Apple iPhone 14 (128 GB)',
-    price: '32,430',
-    img: iphone14Front,
-  },
-  {
-    name: 'Samsung Galaxy S25 Edge (12 GB/256 GB)',
-    price: '58,210',
-    img: s25Front,
-  },
-  {
-    name: 'Apple iPhone 13 (128 GB)',
-    price: '29,810',
-    img: iphone13Blue,
-  },
-  {
-    name: 'Apple iPhone 11 (64 GB)',
-    price: '13,580',
-    img: iphone11Purple,
-  },
-  {
-    name: 'Apple iPhone 12 (128 GB)',
-    price: '17,740',
-    img: iphone12Red,
-  },
-  {
-    name: 'Apple iPhone 14 Pro (256 GB)',
-    price: '56,160',
-    img: iphone14Pro,
-  },
-]
-
 const STORIES = [
   'I loved that pickup was from my home and payment was instant. Super convenient.',
   'Local buyers were low-balling. Here I got a fair value in minutes.',
@@ -85,6 +45,12 @@ const FAQS = [
 ]
 
 export default function SellPhonePage() {
+  const { brands: apiBrands, loading: brandsLoading } = useCatalogBrands()
+  const brands = useMemo(() => {
+    if (brandsLoading) return []
+    return apiBrands.length ? apiBrands : BRAND_LIST_FALLBACK
+  }, [brandsLoading, apiBrands])
+
   return (
     <ServicePageLayout
       breadcrumb="Home / Sell Old Mobile Phone"
@@ -93,16 +59,13 @@ export default function SellPhonePage() {
       searchLabel="Search your Mobile Phone to sell"
       searchPlaceholder="Search model name..."
       searchButtonText="Check Price"
-      brands={BRAND_LIST}
+      brands={brands}
+      brandsLoading={brandsLoading}
       howItWorksTitle="How Cashify Works"
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
-      topBrands={PHONE_BRAND_PORTALS}
-      productsSection={{
-        title: 'Top Selling Mobile Phones',
-        items: TOP_PHONES,
-        viewAllHref: '#',
-      }}
+      showHotDeals={false}
+      topBrands={null}
       stories={STORIES}
       faqs={FAQS}
     />

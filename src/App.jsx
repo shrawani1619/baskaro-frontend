@@ -1,3 +1,4 @@
+// Routes: admin uses shared /login (see LoginPage redirectTo), not a separate admin login page.
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { MainLayout } from './components/MainLayout'
 import { Button } from './components/Button'
@@ -8,7 +9,6 @@ import LoginPage from './pages/LoginPage'
 import UserDashboard from './pages/UserDashboard'
 import SellPhonePage from './pages/SellPhonePage'
 import AdminDashboard from './pages/AdminDashboard'
-import AdminLoginPage from './pages/AdminLoginPage'
 import BuyAccessoriesPage from './pages/BuyAccessoriesPage'
 import RepairPhonePage from './pages/RepairPhonePage'
 import FindNewPhonePage from './pages/FindNewPhonePage'
@@ -47,7 +47,6 @@ export default function App() {
       <WishlistProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route
               path="/*"

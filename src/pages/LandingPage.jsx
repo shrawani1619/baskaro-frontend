@@ -5,7 +5,6 @@ import { gPhoto } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { FlashDealsSection } from '../components/FlashDealsSection'
 import { ProductCard } from '../components/ProductCard'
-import { PHONE_BRAND_PORTALS, TopSellingBrands } from '../components/TopBrandPortals'
 import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
 import { ServiceCard } from '../components/ServiceCard'
 
@@ -1327,12 +1326,6 @@ export default function LandingPage() {
       </section>
 
       <FlashDealsSection />
-
-      <section className="w-full py-8 sm:py-10">
-        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
-          <TopSellingBrands brands={PHONE_BRAND_PORTALS} title="Top Selling Brands" />
-        </div>
-      </section>
 
       {/* Services — full-width band */}
       <section className="w-full border-y border-slate-100 bg-slate-50 pt-10 pb-10">

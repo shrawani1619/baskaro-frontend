@@ -1,6 +1,5 @@
-import { useMemo, useState } from 'react'
-import { catalog } from '../mock/catalog.js'
-import { estimateSellingPrice } from '../lib/pricing/estimatePrice.js'
+import { useMemo, useState, useEffect } from 'react'
+import { getCatalogStructure, postPricingEstimate } from '../lib/api/baskaroApi.js'
 
 const SCREEN_OPTIONS = ['Excellent', 'Good', 'Fair', 'Bad / Cracked']
 const BODY_OPTIONS = ['Excellent', 'Good', 'Fair', 'Bad / Scratched']
@@ -24,9 +23,14 @@ export default function HomePage() {
   const brands = useMemo(() => Object.keys(catalog), [])
   const [step, setStep] = useState('select') // select -> estimate -> pickup -> confirm
   const [selectedBrand, setSelectedBrand] = useState(brands[0] ?? 'Apple')
+  useEffect(() => {
+    if (brands.length && !selectedBrand) setSelectedBrand(brands[0])
+    if (brands.length && selectedBrand && !brands.includes(selectedBrand)) setSelectedBrand(brands[0])
+  }, [brands, selectedBrand])
+
   const models = useMemo(
     () => Object.keys(catalog[selectedBrand] ?? {}),
-    [selectedBrand],
+    [catalog, selectedBrand],
   )
 
   const [modelQuery, setModelQuery] = useState('')
@@ -75,9 +79,17 @@ export default function HomePage() {
     { key: 'paid', label: 'Payment completed' },
   ]
 
-  const estimate = useMemo(() => {
-    if (!selectedModel || !selectedRam || !selectedStorage) return null
-    return estimateSellingPrice({
+  const [estimate, setEstimate] = useState(null)
+  const [estimateLoading, setEstimateLoading] = useState(false)
+
+  useEffect(() => {
+    if (!selectedModel || !selectedRam || !selectedStorage) {
+      setEstimate(null)
+      return
+    }
+    let cancelled = false
+    setEstimateLoading(true)
+    postPricingEstimate({
       brand: selectedBrand,
       model: selectedModel,
       ram: selectedRam,
@@ -87,6 +99,16 @@ export default function HomePage() {
       batteryHealth,
       accessories,
     })
+      .then((r) => {
+        if (!cancelled) setEstimate(r && typeof r === 'object' ? r : null)
+      })
+      .catch(() => {
+        if (!cancelled) setEstimate(null)
+      })
+      .finally(() => {
+        if (!cancelled) setEstimateLoading(false)
+      })
+    return () => { cancelled = true }
   }, [
     selectedBrand,
     selectedModel,
@@ -140,11 +162,22 @@ export default function HomePage() {
           Home / Sell Old Mobile Phone / {selectedBrand}
         </p>
 
+        {catalogErr && (
+          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+            {catalogErr}
+          </div>
+        )}
+        {catalogLoading && (
+          <p className="mb-4 text-sm text-slate-500">Loading catalog…</p>
+        )}
         {step === 'select' && (
           <>
             <h1 className="mb-4 text-3xl font-extrabold text-slate-900">
               Sell Old Mobile Phone
             </h1>
+            {!catalogLoading && !brands.length && !catalogErr && (
+              <p className="mb-4 text-sm text-slate-600">No devices in catalog yet. Add brands and models in the admin panel.</p>
+            )}
             <div className="mb-4 grid gap-3 md:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-bold">Select Brand</label>
@@ -152,6 +185,7 @@ export default function HomePage() {
                   className={inputClass}
                   value={selectedBrand}
                   onChange={(e) => resetToSelect(e.target.value)}
+                  disabled={!brands.length}
                 >
                   {brands.map((b) => (
                     <option key={b} value={b}>
@@ -278,13 +312,13 @@ export default function HomePage() {
               <aside className="rounded-xl border bg-white p-4">
                 <h3 className="text-base font-bold">Estimated Price</h3>
                 <p className="mt-2 text-3xl font-extrabold text-slate-900">
-                  ₹{estimate?.finalPrice ? formatMoney(estimate.finalPrice) : '0'}
+                  {estimateLoading ? '…' : `₹${estimate?.finalPrice ? formatMoney(estimate.finalPrice) : '0'}`}
                 </p>
                 <p className="mt-2 text-sm text-slate-600">
-                  Base: ₹{estimate?.breakdown?.basePrice ? formatMoney(estimate.breakdown.basePrice) : '0'}
+                  Base: ₹{estimate?.breakdown?.basePrice != null ? formatMoney(estimate.breakdown.basePrice) : '0'}
                 </p>
                 <p className="text-sm text-slate-600">
-                  Deduction: {estimate ? Math.round(estimate.breakdown.totalDeductionPct * 100) : 0}%
+                  Deduction: {estimate?.breakdown?.totalDeductionPct != null ? Math.round(estimate.breakdown.totalDeductionPct * 100) : 0}%
                 </p>
               </aside>
             </div>

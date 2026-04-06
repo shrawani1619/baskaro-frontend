@@ -2,9 +2,13 @@ import React from 'react'
 import { motion } from 'framer-motion'
 
 export function WhatsAppWidget() {
+  const raw = import.meta.env.VITE_WHATSAPP_PHONE
+  const digits = raw ? String(raw).replace(/\D/g, '') : ''
+  if (!digits) return null
+  const wa = digits.startsWith('91') ? digits : `91${digits}`
   return (
     <motion.a
-      href="https://wa.me/919876543210" // Default/dummy number, adjust if needed
+      href={`https://wa.me/${wa}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-lg shadow-green-500/30 transition-all hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-500/50"

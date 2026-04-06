@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -7,9 +7,17 @@ import {
   ArrowLeft, ArrowRight, RefreshCw, Phone, CreditCard,
   Truck, ShieldCheck, BadgeCheck, AlertCircle, Copy, X
 } from 'lucide-react'
-import { catalog } from '../mock/catalog.js'
-import { estimateSellingPrice } from '../lib/pricing/estimatePrice.js'
-import { getUser, logout as performLogout, setUser } from '../lib/auth.js'
+import * as api from '../lib/api/baskaroApi.js'
+import {
+  getUser,
+  logout as performLogout,
+  updateSessionUser,
+} from '../lib/auth.js'
+import {
+  apiOrderStatusToLabel,
+  mapConditionGrade,
+  pickupSlotToApi,
+} from '../lib/orderHelpers.js'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const SCREEN_OPTIONS  = ['Excellent', 'Good', 'Fair', 'Bad / Cracked']
@@ -79,17 +87,17 @@ function DashboardShell({ user, navigate }) {
   ]
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-['Outfit']">
-      {/* Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-slate-200 bg-white shadow-sm shrink-0">
-        <div className="flex h-16 items-center border-b border-slate-100 px-6">
+    <div className="flex h-full min-h-0 flex-1 items-stretch bg-slate-50 font-['Outfit']">
+      {/* Sidebar: full height of dashboard row; main scrolls independently */}
+      <aside className="hidden min-h-0 w-64 shrink-0 border-r border-slate-200 bg-white shadow-sm md:flex md:h-full md:flex-col md:overflow-hidden">
+        <div className="flex h-16 shrink-0 items-center border-b border-slate-100 px-6">
           <Link to="/">
             <img src="/logo.png" alt="BAS karo" className="h-8 w-auto object-contain"
               onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='block' }} />
             <span style={{display:'none'}} className="text-xl font-black text-slate-900">BAS<span className="text-red-600">karo</span></span>
           </Link>
         </div>
-        <div className="mx-4 mt-5 rounded-2xl bg-rose-50 px-4 py-3">
+        <div className="mx-4 mt-5 shrink-0 rounded-2xl bg-rose-50 px-4 py-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-600 text-sm font-black text-white">
               {(user.name || user.phone || 'U')[0].toUpperCase()}
@@ -100,7 +108,7 @@ function DashboardShell({ user, navigate }) {
             </div>
           </div>
         </div>
-        <nav className="mt-6 flex-1 px-3 space-y-1">
+        <nav className="mt-6 min-h-0 flex-1 space-y-1 overflow-y-auto px-3 scrollbar-hide">
           {tabs.map(({ id, Icon, label }) => (
             <button key={id} onClick={() => setTab(id)}
               className={['flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all',
@@ -111,7 +119,7 @@ function DashboardShell({ user, navigate }) {
             </button>
           ))}
         </nav>
-        <div className="border-t border-slate-100 p-4">
+        <div className="shrink-0 border-t border-slate-100 p-4">
           <button onClick={logout} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-500 hover:bg-red-50 hover:text-red-600 transition-all">
             <LogOut size={16} /> Sign out
           </button>
@@ -119,8 +127,8 @@ function DashboardShell({ user, navigate }) {
       </aside>
 
       {/* Main */}
-      <div className="flex flex-1 flex-col min-w-0">
-        <main className="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <main className="min-h-0 flex-1 overflow-y-auto scrollbar-hide p-4 sm:p-6 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
               {tab === 'overview' && <OverviewTab user={user} setTab={setTab} />}
@@ -152,13 +160,24 @@ function DashboardShell({ user, navigate }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function OverviewTab({ user, setTab }) {
   const navigate = useNavigate();
-  const orders = useMemo(() => JSON.parse(localStorage.getItem('baskaro_orders') || '[]'), []);
-  const activeOrders = orders.filter(o => o.status !== 'Payment Completed');
-  
-  // Calculate total earnings across all completed orders
+  const [orders, setOrders] = useState([])
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await api.getOrderManagementList({ page: 1, limit: 30 })
+        if (!cancelled) setOrders(res.items || [])
+      } catch {
+        if (!cancelled) setOrders([])
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+  const activeOrders = orders.filter(o => o.status !== 'COMPLETED' && o.status !== 'CANCELLED')
+
   const totalEarned = orders
-    .filter(o => o.status === 'Payment Completed')
-    .reduce((sum, o) => sum + (o.estimate || 0), 0);
+    .filter(o => o.status === 'COMPLETED')
+    .reduce((sum, o) => sum + (o.finalPrice || 0), 0)
     
   return (
     <div className="max-w-5xl space-y-6">
@@ -229,27 +248,29 @@ function OverviewTab({ user, setTab }) {
           <h2 className="text-lg font-black text-slate-900 mb-4 px-1">Active Sell Requests</h2>
           <div className="space-y-4">
             {activeOrders.slice(0, 3).map(o => {
-              const statusCfg = ORDER_STATUSES.find(s => s.key === o.status) || ORDER_STATUSES[0]
+              const label = apiOrderStatusToLabel(o.status)
+              const statusCfg = ORDER_STATUSES.find(s => s.key === label) || ORDER_STATUSES[0]
+              const oid = o._id || o.id
               return (
-                <button key={o.id} onClick={() => setTab('orders')} className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm transition hover:shadow-md hover:border-rose-300 group">
+                <button key={oid} onClick={() => setTab('orders')} className="w-full flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-6 py-5 shadow-sm transition hover:shadow-md hover:border-rose-300 group">
                   <div className="flex items-center gap-4 text-left">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 font-black text-slate-700 text-2xl group-hover:bg-rose-50 transition-colors">
                       {o.brand?.[0]}
                     </div>
                     <div>
-                      <p className="font-black text-slate-900 text-lg group-hover:text-rose-600 transition-colors">{o.brand} {o.model}</p>
+                      <p className="font-black text-slate-900 text-lg group-hover:text-rose-600 transition-colors">{o.brand} {o.modelName}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ID: {o.id}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ID: {String(oid).slice(-8)}</span>
                         <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-black ${statusCfg.bg} ${statusCfg.color}`}>
                           <span className={`h-1 w-1 rounded-full ${statusCfg.fill}`} />
-                          {o.status}
+                          {label}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="text-right flex items-center gap-4">
                     <div>
-                      <p className="text-xl font-black text-slate-900">₹{fmt(o.estimate)}</p>
+                      <p className="text-xl font-black text-slate-900">₹{fmt(o.finalPrice || 0)}</p>
                       {o.pickupDate && <p className="text-xs font-bold text-slate-500 mt-1 flex items-center justify-end gap-1"><Calendar size={12}/> {o.pickupDate}</p>}
                     </div>
                     <ChevronRight size={18} className="text-slate-300 group-hover:text-rose-600 transition-colors" />
@@ -269,10 +290,14 @@ function OverviewTab({ user, setTab }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function SellTab({ onViewOrders }) {
   const [step, setStep] = useState(1)
-  const brands = useMemo(() => Object.keys(catalog), [])
+  const [brandsList, setBrandsList] = useState([])
+  const [modelsList, setModelsList] = useState([])
+  const [brandId, setBrandId] = useState('')
   const [brand, setBrand] = useState('')
   const [modelQuery, setModelQuery] = useState('')
+  const [modelId, setModelId] = useState('')
   const [model, setModel] = useState('')
+  const [modelDoc, setModelDoc] = useState(null)
   const [ram, setRam] = useState('')
   const [storage, setStorage] = useState('')
   const [screen, setScreen] = useState('Good')
@@ -284,54 +309,199 @@ function SellTab({ onViewOrders }) {
   const [selectedAddr, setSelectedAddr] = useState(null)
   const [payMethod, setPayMethod] = useState('UPI')
   const [confirmedOrder, setConfirmedOrder] = useState(null)
+  const [estimate, setEstimate] = useState(null)
+  const [addresses, setAddresses] = useState([])
+  const [submitting, setSubmitting] = useState(false)
 
-  const addresses = useMemo(() => JSON.parse(localStorage.getItem('baskaro_addresses') || '[]'), [step])
-  const models = useMemo(() => {
-    const all = Object.keys(catalog[brand] ?? {})
-    return modelQuery.trim() ? all.filter(m => m.toLowerCase().includes(modelQuery.toLowerCase())) : all
-  }, [brand, modelQuery])
-  const variants = useMemo(() => catalog[brand]?.[model]?.variants ?? [], [brand, model])
-  const ramOptions = useMemo(() => [...new Set(variants.map(v => v.ram))], [variants])
-  const storageOptions = useMemo(() => [...new Set(variants.filter(v => v.ram === ram).map(v => v.storage))], [variants, ram])
-  const estimate = useMemo(() => {
-    if (!brand || !model || !ram || !storage) return null
-    return estimateSellingPrice({ brand, model, ram, storage, screenCondition: screen, bodyCondition: body, batteryHealth: battery, accessories })
+  useEffect(() => {
+    let c = false
+    ;(async () => {
+      try {
+        const res = await api.getMobileBrands({ page: 1, limit: 200, active: true })
+        if (!c) setBrandsList(res.items || [])
+      } catch {
+        if (!c) setBrandsList([])
+      }
+    })()
+    return () => { c = true }
+  }, [])
+
+  useEffect(() => {
+    if (step !== 6) return
+    let c = false
+    ;(async () => {
+      try {
+        const list = await api.getAddresses()
+        if (!c && Array.isArray(list)) setAddresses(list)
+      } catch {
+        if (!c) setAddresses([])
+      }
+    })()
+    return () => { c = true }
+  }, [step])
+
+  useEffect(() => {
+    if (!brand || !model || !ram || !storage) {
+      setEstimate(null)
+      return
+    }
+    let c = false
+    ;(async () => {
+      try {
+        const res = await api.postPricingEstimate({
+          brand,
+          model,
+          ram,
+          storage,
+          screenCondition: screen,
+          bodyCondition: body,
+          batteryHealth: battery,
+          accessories,
+        })
+        if (!c) setEstimate(res?.finalPrice ? res : null)
+      } catch {
+        if (!c) setEstimate(null)
+      }
+    })()
+    return () => { c = true }
   }, [brand, model, ram, storage, screen, body, battery, accessories])
+
+  const models = useMemo(() => {
+    const all = modelsList.map((m) => m.modelName)
+    const uniq = [...new Set(all)]
+    return modelQuery.trim()
+      ? uniq.filter((m) => m.toLowerCase().includes(modelQuery.toLowerCase()))
+      : uniq
+  }, [modelsList, modelQuery])
+
+  const variants = useMemo(() => modelDoc?.storageVariants ?? [], [modelDoc])
+  const ramOptions = useMemo(() => [...new Set(variants.map((v) => v.ram))], [variants])
+  const storageOptions = useMemo(
+    () => [...new Set(variants.filter((v) => v.ram === ram).map((v) => v.label))],
+    [variants, ram],
+  )
 
   const timeSlots = ['9:00 AM – 12:00 PM', '12:00 PM – 3:00 PM', '3:00 PM – 6:00 PM']
   const stepLabels = ['', 'Select Brand', 'Select Model', 'Select Variant', 'Rate Condition', 'Price Estimate', 'Schedule Pickup', 'Confirmed']
 
-  function selectBrand(b) { setBrand(b); setModel(''); setModelQuery(''); setRam(''); setStorage(''); setStep(2) }
-  function selectModel(m) {
-    setModel(m)
-    const first = catalog[brand]?.[m]?.variants?.[0]
-    setRam(first?.ram || ''); setStorage(first?.storage || ''); setStep(3)
-  }
-  function reset() {
-    setBrand(''); setModel(''); setRam(''); setStorage(''); setModelQuery('')
-    setScreen('Good'); setBody('Good'); setBattery('80% - 89%'); setAccessories('Original charger only')
-    setPickupDate(''); setPickupTime(''); setSelectedAddr(null); setConfirmedOrder(null); setStep(1)
-  }
-  function submitOrder() {
-    const order = {
-      id: 'ORD-' + Math.random().toString(36).slice(2, 8).toUpperCase(),
-      brand, model, ram, storage,
-      estimate: estimate?.finalPrice,
-      basePrice: estimate?.breakdown?.basePrice,
-      deductionPct: estimate?.breakdown?.totalDeductionPct,
-      screen, body, battery, accessories,
-      pickupDate, pickupTime,
-      address: selectedAddr,
-      payMethod,
-      status: 'Request Submitted',
-      statusHistory: [{ status: 'Request Submitted', at: new Date().toISOString() }],
-      createdAt: new Date().toISOString(),
-      paymentDetails: null,
+  async function selectBrand(b) {
+    setBrandId(b._id)
+    setBrand(b.name)
+    setModel('')
+    setModelId('')
+    setModelDoc(null)
+    setModelQuery('')
+    setRam('')
+    setStorage('')
+    try {
+      const res = await api.getMobileModels({ brandId: b._id, page: 1, limit: 500, active: true })
+      setModelsList(res.items || [])
+    } catch {
+      setModelsList([])
     }
-    const existing = JSON.parse(localStorage.getItem('baskaro_orders') || '[]')
-    localStorage.setItem('baskaro_orders', JSON.stringify([order, ...existing]))
-    setConfirmedOrder(order)
-    setStep(7)
+    setStep(2)
+  }
+
+  async function selectModel(modelName) {
+    const row = modelsList.find((x) => x.modelName === modelName)
+    if (!row) return
+    setModelId(row._id)
+    setModel(row.modelName)
+    try {
+      const detail = await api.getMobileModel(row._id)
+      setModelDoc(detail)
+      const first = detail.storageVariants?.[0]
+      setRam(first?.ram || '')
+      setStorage(first?.label || '')
+    } catch {
+      setModelDoc(null)
+    }
+    setStep(3)
+  }
+
+  function reset() {
+    setBrandId('')
+    setBrand('')
+    setModelId('')
+    setModel('')
+    setModelDoc(null)
+    setModelsList([])
+    setRam('')
+    setStorage('')
+    setModelQuery('')
+    setScreen('Good')
+    setBody('Good')
+    setBattery('80% - 89%')
+    setAccessories('Original charger only')
+    setPickupDate('')
+    setPickupTime('')
+    setSelectedAddr(null)
+    setConfirmedOrder(null)
+    setStep(1)
+  }
+
+  async function submitOrder() {
+    if (!brandId || !modelId || !selectedAddr || estimate == null || estimate.finalPrice == null) return
+    setSubmitting(true)
+    try {
+      const created = await api.postOrderManagement({
+        brandId,
+        modelId,
+        brand,
+        modelName: model,
+        storage,
+        ram,
+        condition: mapConditionGrade(screen, body),
+        screenCondition: screen,
+        bodyCondition: body,
+        batteryHealth: battery,
+        accessories,
+        basePrice: estimate?.breakdown?.basePrice ?? estimate?.finalPrice ?? 0,
+        calculatedPrice: estimate?.finalPrice ?? 0,
+        finalPrice: estimate?.finalPrice ?? 0,
+        deductions: { screen: 0, battery: 0, camera: 0, faceId: 0 },
+        pickupDate,
+        pickupTime: pickupSlotToApi(pickupTime),
+        address: {
+          label: selectedAddr.label || 'Home',
+          line1: selectedAddr.line1,
+          city: selectedAddr.city,
+          state: selectedAddr.state || '',
+          pincode: selectedAddr.pincode,
+        },
+        payMethod: payMethod === 'Bank Transfer' ? 'BANK' : 'UPI',
+      })
+      const st = apiOrderStatusToLabel(created.status)
+      const order = {
+        id: created._id,
+        brand,
+        model,
+        ram,
+        storage,
+        estimate: created.finalPrice,
+        screen,
+        body,
+        battery,
+        accessories,
+        pickupDate,
+        pickupTime,
+        address: selectedAddr,
+        payMethod,
+        status: st,
+        statusHistory: (created.statusHistory || []).map((h) => ({
+          status: apiOrderStatusToLabel(h.status),
+          at: typeof h.at === 'string' ? h.at : new Date(h.at).toISOString(),
+        })),
+        createdAt: created.createdAt || new Date().toISOString(),
+        paymentDetails: null,
+      }
+      setConfirmedOrder(order)
+      setStep(7)
+    } catch (e) {
+      alert(e.message || 'Could not create order')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -358,12 +528,12 @@ function SellTab({ onViewOrders }) {
       {/* Step 1: Brand */}
       {step === 1 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-          {brands.map(b => (
-            <button key={b} onClick={() => selectBrand(b)}
+          {brandsList.map((b) => (
+            <button key={b._id} type="button" onClick={() => selectBrand(b)}
               className="group flex flex-col items-center gap-3 rounded-2xl border-2 border-slate-100 bg-white p-4 transition-all hover:-translate-y-1 hover:border-red-300 hover:shadow-lg hover:shadow-red-100"
             >
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-slate-50 text-2xl font-black text-slate-700 group-hover:bg-red-50 group-hover:text-red-600 transition-all">{b[0]}</div>
-              <span className="text-sm font-black text-slate-800 group-hover:text-red-700">{b}</span>
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-slate-50 text-2xl font-black text-slate-700 group-hover:bg-red-50 group-hover:text-red-600 transition-all">{String(b.name || '?')[0]}</div>
+              <span className="text-sm font-black text-slate-800 group-hover:text-red-700">{b.name}</span>
             </button>
           ))}
         </div>
@@ -389,7 +559,7 @@ function SellTab({ onViewOrders }) {
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="mb-4 text-sm font-bold text-slate-500">{brand} {model}</p>
           <div className="grid gap-4 sm:grid-cols-2">
-            <div><Label>RAM</Label><DSelect value={ram} onChange={v => { setRam(v); setStorage(variants.find(x => x.ram === v)?.storage || '') }} options={ramOptions} placeholder="Select RAM" /></div>
+            <div><Label>RAM</Label><DSelect value={ram} onChange={v => { setRam(v); setStorage(variants.find(x => x.ram === v)?.label || '') }} options={ramOptions} placeholder="Select RAM" /></div>
             <div><Label>Storage</Label><DSelect value={storage} onChange={setStorage} options={storageOptions} placeholder="Select Storage" /></div>
           </div>
           <button disabled={!ram || !storage} onClick={() => setStep(4)}
@@ -437,7 +607,7 @@ function SellTab({ onViewOrders }) {
               
               <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8 }} className="w-full">
                 <p className="mt-4 text-[11px] font-semibold text-rose-200/80 uppercase tracking-widest">
-                  Base: ₹{estimate ? fmt(estimate.breakdown.basePrice) : 0} <span className="mx-2 opacity-30">|</span> -{estimate ? Math.round(estimate.breakdown.totalDeductionPct * 100) : 0}% deduction
+                  Base: ₹{estimate ? fmt(estimate.breakdown?.basePrice ?? 0) : 0} <span className="mx-2 opacity-30">|</span> -{estimate ? Math.round((estimate.breakdown?.totalDeductionPct ?? 0) * 100) : 0}% deduction
                 </p>
               </motion.div>
             </div>
@@ -491,20 +661,20 @@ function SellTab({ onViewOrders }) {
               <Label>Pickup Address</Label>
               {addresses.length === 0 ? (
                 // Inline quick-add when no address is saved
-                <InlineAddressForm onSaved={a => setSelectedAddr(a)} />
+                <InlineAddressForm onSaved={a => { setSelectedAddr(a); setAddresses((prev) => [...prev, a]) }} />
               ) : (
                 <div className="mt-1 space-y-2">
                   {addresses.map((a, i) => (
-                    <button key={i} onClick={() => setSelectedAddr(a)}
+                    <button key={a._id || i} type="button" onClick={() => setSelectedAddr(a)}
                       className={['w-full rounded-xl border-2 px-4 py-3 text-left text-sm transition-all',
-                        selectedAddr === a ? 'border-rose-500 bg-rose-50' : 'border-slate-200 hover:border-rose-300'].join(' ')}
+                        (selectedAddr?._id && a._id ? selectedAddr._id === a._id : selectedAddr === a) ? 'border-rose-500 bg-rose-50' : 'border-slate-200 hover:border-rose-300'].join(' ')}
                     >
                       <div className="font-black text-slate-900">{a.label}</div>
                       <div className="mt-0.5 font-semibold text-slate-500">{a.line1}, {a.city} – {a.pincode}</div>
                     </button>
                   ))}
                   {/* Allow adding another address inline too */}
-                  {!selectedAddr && (
+                  {!selectedAddr && addresses.length > 0 && (
                     <p className="text-xs font-semibold text-slate-400 px-1">👆 Select an address above to continue.</p>
                   )}
                 </div>
@@ -523,9 +693,9 @@ function SellTab({ onViewOrders }) {
               <p className="mt-2 text-[11px] font-semibold text-slate-400">Payment is released only after device condition is verified at pickup.</p>
             </div>
           </div>
-          <button disabled={!pickupDate || !pickupTime} onClick={submitOrder}
+          <button type="button" disabled={!pickupDate || !pickupTime || !selectedAddr || submitting} onClick={submitOrder}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3.5 text-sm font-black text-white shadow-md shadow-red-200 transition-all hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
-          ><CheckCircle size={16} /> Confirm Sell Request</button>
+          ><CheckCircle size={16} /> {submitting ? 'Submitting…' : 'Confirm Sell Request'}</button>
         </div>
       )}
 
@@ -545,15 +715,25 @@ function InlineAddressForm({ onSaved }) {
   const [pincode, setPincode] = useState('')
   const [label, setLabel] = useState('Home')
   const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  function save() {
+  async function save() {
     if (!line1 || !city || !pincode) return
-    const addr = { label, line1, city, state: '', pincode }
-    // persist to addresses list too
-    const existing = JSON.parse(localStorage.getItem('baskaro_addresses') || '[]')
-    localStorage.setItem('baskaro_addresses', JSON.stringify([...existing, addr]))
-    setSaved(true)
-    onSaved(addr)
+    setSaving(true)
+    try {
+      const res = await api.postAddress({ label, line1, city, state: '', pincode })
+      if (res.error) {
+        alert(res.error)
+        return
+      }
+      const addr = res.address || { label, line1, city, state: '', pincode }
+      setSaved(true)
+      onSaved(addr)
+    } catch (e) {
+      alert(e.message || 'Could not save address')
+    } finally {
+      setSaving(false)
+    }
   }
 
   if (saved) {
@@ -595,10 +775,10 @@ function InlineAddressForm({ onSaved }) {
           />
         </div>
       </div>
-      <button onClick={save} disabled={!line1 || !city || !pincode}
+      <button type="button" onClick={save} disabled={!line1 || !city || !pincode || saving}
         className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 py-2.5 text-sm font-black text-white shadow-md hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
-        <CheckCircle size={14} /> Save &amp; Use This Address
+        <CheckCircle size={14} /> {saving ? 'Saving…' : 'Save & Use This Address'}
       </button>
     </div>
   )
@@ -697,23 +877,65 @@ function StatusTimeline({ currentStatus, history = [] }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // MY ORDERS TAB
 // ─────────────────────────────────────────────────────────────────────────────
+function mapApiOrderToCard(o) {
+  const st = apiOrderStatusToLabel(o.status)
+  const progressIdx =
+    { PLACED: 0, PICKUP_SCHEDULED: 1, VERIFIED: 2, PRICE_FINALIZED: 2, COMPLETED: 3, CANCELLED: 0 }[o.status] ?? 0
+  return {
+    id: o._id,
+    apiStatus: o.status,
+    progressIdx,
+    brand: o.brand,
+    model: o.modelName,
+    ram: o.ram,
+    storage: o.storage,
+    estimate: o.finalPrice,
+    pickupDate: o.pickupDate,
+    pickupTime: o.pickupTime,
+    payMethod: o.payMethod === 'BANK' ? 'Bank Transfer' : 'UPI',
+    address: o.address,
+    screen: o.screenCondition,
+    body: o.bodyCondition,
+    battery: o.batteryHealth,
+    accessories: o.accessories,
+    createdAt: o.createdAt,
+    statusHistory: (o.statusHistory || []).map((h) => ({
+      status: apiOrderStatusToLabel(h.status),
+      at: typeof h.at === 'string' ? h.at : new Date(h.at).toISOString(),
+    })),
+    status: st,
+    paymentDetails: o.paymentDetails,
+  }
+}
+
 function OrdersTab() {
-  const [orders, setOrders] = useState(() => JSON.parse(localStorage.getItem('baskaro_orders') || '[]'))
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
   const [expandedId, setExpandedId] = useState(null)
   const [payingId, setPayingId] = useState(null)
 
-  function refreshOrders() {
-    setOrders(JSON.parse(localStorage.getItem('baskaro_orders') || '[]'))
+  async function refreshOrders() {
+    setLoading(true)
+    try {
+      const res = await api.getOrderManagementList({ page: 1, limit: 50 })
+      setOrders((res.items || []).map(mapApiOrderToCard))
+    } catch {
+      setOrders([])
+    } finally {
+      setLoading(false)
+    }
   }
 
-  function updateOrderStatus(id, newStatus, paymentDetails) {
-    const updated = orders.map(o => {
-      if (o.id !== id) return o
-      const history = [...(o.statusHistory || []), { status: newStatus, at: new Date().toISOString() }]
-      return { ...o, status: newStatus, statusHistory: history, ...(paymentDetails ? { paymentDetails } : {}) }
-    })
-    setOrders(updated)
-    localStorage.setItem('baskaro_orders', JSON.stringify(updated))
+  useEffect(() => {
+    refreshOrders()
+  }, [])
+
+  if (loading && orders.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center text-sm font-semibold text-slate-500">
+        Loading orders…
+      </div>
+    )
   }
 
   if (orders.length === 0) {
@@ -733,12 +955,13 @@ function OrdersTab() {
         <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-black text-rose-700">{orders.length} order{orders.length !== 1 ? 's' : ''}</span>
       </div>
       <div className="space-y-4">
-        {orders.map(o => (
+        {orders.map((o) => (
           <OrderCard
-            key={o.id} order={o}
+            key={o.id}
+            order={o}
             expanded={expandedId === o.id}
             onToggle={() => setExpandedId(expandedId === o.id ? null : o.id)}
-            onUpdateStatus={updateOrderStatus}
+            onRefresh={refreshOrders}
             payingId={payingId}
             setPayingId={setPayingId}
           />
@@ -749,9 +972,9 @@ function OrdersTab() {
 }
 
 // ─── Single Order Card ────────────────────────────────────────────────────────
-function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPayingId }) {
+function OrderCard({ order, expanded, onToggle, onRefresh, payingId, setPayingId }) {
   const statusCfg = ORDER_STATUSES.find(s => s.key === order.status) || ORDER_STATUSES[0]
-  const currentIdx = ORDER_STATUSES.findIndex(s => s.key === order.status)
+  const currentIdx = typeof order.progressIdx === 'number' ? order.progressIdx : ORDER_STATUSES.findIndex(s => s.key === order.status)
   const isPaying = payingId === order.id
   const [upiId, setUpiId] = useState('')
   const [bankAcc, setBankAcc] = useState('')
@@ -759,24 +982,27 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
   const [payLoading, setPayLoading] = useState(false)
   const [payDone, setPayDone] = useState(false)
 
-  function initiatePayment(e) {
+  async function initiatePayment(e) {
     e.preventDefault()
     if (order.payMethod === 'UPI' && !upiId) return
     if (order.payMethod === 'Bank Transfer' && (!bankAcc || !ifsc)) return
     setPayLoading(true)
-    setTimeout(() => {
-      setPayLoading(false); setPayDone(true)
-      const details = order.payMethod === 'UPI' ? { upiId } : { accountNo: bankAcc, ifsc }
-      onUpdateStatus(order.id, 'Payment Completed', details)
-      setTimeout(() => { setPayingId(null); setPayDone(false) }, 1500)
-    }, 1800)
-  }
-
-  // Demo: simulate status advance
-  function advanceStatus() {
-    const nextIdx = Math.min(currentIdx + 1, ORDER_STATUSES.length - 1)
-    if (nextIdx === currentIdx) return
-    onUpdateStatus(order.id, ORDER_STATUSES[nextIdx].key, null)
+    try {
+      await api.postPaymentInitiate({
+        orderId: order.id,
+        method: order.payMethod === 'Bank Transfer' ? 'BANK' : 'UPI',
+      })
+      setPayDone(true)
+      setTimeout(() => {
+        setPayingId(null)
+        setPayDone(false)
+        onRefresh?.()
+      }, 1500)
+    } catch (err) {
+      alert(err.message || 'Could not initiate payment')
+    } finally {
+      setPayLoading(false)
+    }
   }
 
   return (
@@ -789,7 +1015,7 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
               <p className="text-base font-black text-slate-900">{order.brand} {order.model}</p>
               <span className="text-xs font-semibold text-slate-400">{order.ram}/{order.storage}</span>
             </div>
-            <p className="mt-0.5 text-xs font-semibold text-slate-400">Order {order.id} · {fmtDate(order.createdAt)}</p>
+            <p className="mt-0.5 text-xs font-semibold text-slate-400">Order {String(order.id).slice(-8)} · {fmtDate(order.createdAt)}</p>
           </div>
           <div className="flex shrink-0 flex-col items-end gap-2">
             <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-black ${statusCfg.bg} ${statusCfg.color}`}>
@@ -848,8 +1074,8 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
                 </div>
               </div>
 
-              {/* ── Payment Section (shows when Device Received) ── */}
-              {order.status === 'Device Received' && !order.paymentDetails && (
+              {/* ── Payment Section (when price finalized — backend allows initiate) ── */}
+              {order.apiStatus === 'PRICE_FINALIZED' && !order.paymentDetails && (
                 <div className="rounded-xl border-2 border-orange-200 bg-orange-50 p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <CreditCard size={16} className="text-orange-600" />
@@ -906,7 +1132,7 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
               )}
 
               {/* Payment complete receipt */}
-              {order.status === 'Payment Completed' && order.paymentDetails && (
+              {order.apiStatus === 'COMPLETED' && order.paymentDetails && (
                 <div className="rounded-xl border border-green-200 bg-green-50 p-4">
                   <div className="flex items-center gap-2 mb-2"><BadgeCheck size={16} className="text-green-600"/><p className="text-sm font-black text-green-800">Payment Completed!</p></div>
                   <div className="text-xs font-semibold text-green-700 space-y-1">
@@ -917,14 +1143,6 @@ function OrderCard({ order, expanded, onToggle, onUpdateStatus, payingId, setPay
                 </div>
               )}
 
-              {/* Demo: advance status button (hidden in production) */}
-              {order.status !== 'Payment Completed' && (
-                <button onClick={advanceStatus}
-                  className="w-full rounded-xl border-2 border-dashed border-slate-200 py-2 text-xs font-bold text-slate-400 hover:border-rose-300 hover:text-rose-500 transition-all"
-                >
-                  🔧 Demo: Advance to next status
-                </button>
-              )}
             </div>
           </motion.div>
         )}
@@ -941,9 +1159,21 @@ function ProfileTab({ user }) {
   const [email, setEmail] = useState(user.email || '')
   const [phone, setPhone] = useState(user.phone || '')
   const [saved, setSaved] = useState(false)
-  function save(e) {
-    e.preventDefault(); setUser({ ...user, name, email, phone })
-    setSaved(true); setTimeout(() => setSaved(false), 2500)
+  async function save(e) {
+    e.preventDefault()
+    try {
+      const res = await api.patchMe({ name, email, phone })
+      if (res.error) {
+        alert(res.error)
+        return
+      }
+      if (res.user) updateSessionUser(res.user)
+      else updateSessionUser({ name, email, phone })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    } catch (err) {
+      alert(err.message || 'Could not save profile')
+    }
   }
   return (
     <div className="max-w-lg">
@@ -984,18 +1214,52 @@ function ProfileTab({ user }) {
 // ADDRESSES TAB
 // ─────────────────────────────────────────────────────────────────────────────
 function AddressTab() {
-  const [addresses, setAddresses] = useState(() => JSON.parse(localStorage.getItem('baskaro_addresses') || '[]'))
+  const [addresses, setAddresses] = useState([])
+  const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState({ label: 'Home', line1: '', city: '', state: '', pincode: '' })
-  function save() {
-    if (!form.line1 || !form.city || !form.pincode) return
-    const next = [...addresses, form]
-    setAddresses(next); localStorage.setItem('baskaro_addresses', JSON.stringify(next))
-    setAdding(false); setForm({ label: 'Home', line1: '', city: '', state: '', pincode: '' })
+
+  async function loadAddresses() {
+    setLoading(true)
+    try {
+      const list = await api.getAddresses()
+      setAddresses(Array.isArray(list) ? list : [])
+    } catch {
+      setAddresses([])
+    } finally {
+      setLoading(false)
+    }
   }
-  function remove(idx) {
-    const next = addresses.filter((_, i) => i !== idx)
-    setAddresses(next); localStorage.setItem('baskaro_addresses', JSON.stringify(next))
+
+  useEffect(() => {
+    loadAddresses()
+  }, [])
+
+  async function save() {
+    if (!form.line1 || !form.city || !form.pincode) return
+    try {
+      const res = await api.postAddress(form)
+      if (res.error) {
+        alert(res.error)
+        return
+      }
+      setAdding(false)
+      setForm({ label: 'Home', line1: '', city: '', state: '', pincode: '' })
+      await loadAddresses()
+    } catch (e) {
+      alert(e.message || 'Could not save')
+    }
+  }
+
+  async function remove(addr) {
+    const id = addr._id || addr.id
+    if (!id) return
+    try {
+      await api.deleteAddress(id)
+      await loadAddresses()
+    } catch (e) {
+      alert(e.message || 'Could not delete')
+    }
   }
   return (
     <div className="max-w-lg">
@@ -1025,7 +1289,9 @@ function AddressTab() {
           </motion.div>
         )}
       </AnimatePresence>
-      {addresses.length === 0 && !adding ? (
+      {loading ? (
+        <p className="text-sm font-semibold text-slate-500">Loading addresses…</p>
+      ) : addresses.length === 0 && !adding ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 py-14 text-center">
           <MapPin size={36} className="mb-3 text-slate-300" />
           <p className="text-sm font-black text-slate-500">No addresses saved</p>
@@ -1033,14 +1299,14 @@ function AddressTab() {
         </div>
       ) : (
         <div className="space-y-3">
-          {addresses.map((a, i) => (
-            <div key={i} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          {addresses.map((a) => (
+            <div key={a._id || a.id} className="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-rose-600"><Home size={18} /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-black text-slate-900">{a.label}</p>
                 <p className="text-xs font-semibold text-slate-500 mt-0.5">{a.line1}, {a.city} {a.state && `(${a.state})`} – {a.pincode}</p>
               </div>
-              <button onClick={() => remove(i)} className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 size={15} /></button>
+              <button type="button" onClick={() => remove(a)} className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 size={15} /></button>
             </div>
           ))}
         </div>

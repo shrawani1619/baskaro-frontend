@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  Smartphone,
-  Wrench,
-  Recycle,
   Search,
-  Store,
-  PlusCircle,
   ChevronRight,
   MapPin,
   Menu,
@@ -18,68 +13,38 @@ import {
   ShoppingCart,
 } from 'lucide-react'
 import { useCart } from '../context/CartContext'
-import { TopBrandPortals, MARKETPLACE_PORTAL_CONTENT } from './TopBrandPortals'
 import { useWishlist } from '../context/WishlistContext'
-
-const CATEGORY_DATA = {
-  Phone: {
-    icon: <Smartphone size={18} />,
-    description: 'Sell phones, brands & models',
-  },
-  More: {
-    icon: <PlusCircle size={18} />,
-    description: 'Laptops, tablets & more',
-  },
-  Repair: {
-    icon: <Wrench size={18} />,
-    description: 'Screen, battery repair',
-  },
-  Recycle: {
-    icon: <Recycle size={18} />,
-    description: 'Eco-friendly disposal',
-  },
-  'Find New Phone': {
-    icon: <Search size={18} />,
-    description: 'New arrivals & comparison',
-  },
-  'Cashify Store': {
-    icon: <Store size={18} />,
-    description: 'Locate nearby store',
-  },
-}
+import { getToken, getUser, isAdminUser } from '../lib/auth.js'
 
 export function LandingNavbar() {
-  const navigate = useNavigate()
   const { wishlistCount } = useWishlist()
   const { cartCount } = useCart()
   const [location] = useState('Gurgaon')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sellDesktopOpen, setSellDesktopOpen] = useState(false)
   const [preOwnedDropdownOpen, setPreOwnedDropdownOpen] = useState(false)
-  const [allDropdownOpen, setAllDropdownOpen] = useState(false)
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
-  const [mobileAllOpen, setMobileAllOpen] = useState(false)
   const [mobileSellOpen, setMobileSellOpen] = useState(false)
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false)
-  const [allSellSubOpen, setAllSellSubOpen] = useState(false)
-  const [mobileAllSellSubOpen, setMobileAllSellSubOpen] = useState(false)
-  const [allSellCategory, setAllSellCategory] = useState('Phone')
+
+  const token = getToken()
+  const user = getUser()
+  const loggedIn = Boolean(token && user)
+  const accountHref = loggedIn ? (isAdminUser(user) ? '/admin' : '/dashboard') : '/login'
+  const accountLabel = loggedIn ? (isAdminUser(user) ? 'Admin' : 'Account') : 'Login'
 
   useEffect(() => {
     if (
-      !allDropdownOpen &&
       !moreDropdownOpen &&
       !sellDesktopOpen &&
       !mobileMenuOpen &&
-      !mobileAllOpen &&
       !mobileSellOpen &&
-      !mobileMoreOpen &&
-      !mobileAllSellSubOpen
+      !mobileMoreOpen
     )
       return
 
-    const isMobileModalOpen = mobileMenuOpen || mobileAllOpen || mobileSellOpen || mobileMoreOpen || mobileAllSellSubOpen
+    const isMobileModalOpen = mobileMenuOpen || mobileSellOpen || mobileMoreOpen
 
     let prevBodyOverflow = ''
     let prevHtmlOverflow = ''
@@ -93,12 +58,8 @@ export function LandingNavbar() {
 
     const onKeyDown = (e) => {
       if (e.key === 'Escape') {
-        setAllDropdownOpen(false)
         setMoreDropdownOpen(false)
-        setAllSellSubOpen(false)
-        setMobileAllSellSubOpen(false)
         setMobileMenuOpen(false)
-        setMobileAllOpen(false)
         setMobileSellOpen(false)
         setMobileMoreOpen(false)
         setSellDesktopOpen(false)
@@ -109,10 +70,7 @@ export function LandingNavbar() {
     const onPointerDown = (e) => {
       if (!(e.target instanceof Element)) return
       if (e.target.closest('[data-topnav-dropdown="true"]')) return
-      setAllDropdownOpen(false)
       setMoreDropdownOpen(false)
-      setAllSellSubOpen(false)
-      setMobileAllSellSubOpen(false)
       setSellDesktopOpen(false)
       setPreOwnedDropdownOpen(false)
     }
@@ -128,17 +86,7 @@ export function LandingNavbar() {
         document.documentElement.style.overflow = prevHtmlOverflow
       }
     }
-  }, [
-    allDropdownOpen,
-    moreDropdownOpen,
-    sellDesktopOpen,
-    preOwnedDropdownOpen,
-    mobileMenuOpen,
-    mobileAllOpen,
-    mobileSellOpen,
-    mobileMoreOpen,
-    mobileAllSellSubOpen,
-  ])
+  }, [moreDropdownOpen, sellDesktopOpen, preOwnedDropdownOpen, mobileMenuOpen, mobileSellOpen, mobileMoreOpen])
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b border-white/10 bg-white/95 shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-white/90">
@@ -268,112 +216,6 @@ export function LandingNavbar() {
 
       <nav className="w-full border-t border-slate-100 bg-white hidden md:block">
         <div className="flex w-full items-center justify-center gap-2 px-4 py-2 sm:px-6 md:gap-3 lg:gap-5 lg:px-6 xl:gap-8 xl:px-12">
-          <div className="relative" data-topnav-dropdown="true">
-            <button
-              type="button"
-              className={[
-                'flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-black tracking-tight transition-all whitespace-nowrap',
-                allDropdownOpen
-                  ? 'bg-rose-600 text-white shadow-md shadow-rose-600/20'
-                  : 'text-slate-600 hover:text-rose-600 hover:bg-rose-50',
-              ].join(' ')}
-              onClick={() => {
-                setAllDropdownOpen(!allDropdownOpen)
-                setAllSellSubOpen(true)
-                setSellDesktopOpen(false)
-                setPreOwnedDropdownOpen(false)
-                setMoreDropdownOpen(false)
-              }}
-            >
-              <span>ALL CATEGORIES</span>
-              <ChevronRight
-                size={14}
-                className={['transition-transform', allDropdownOpen ? 'rotate-90' : ''].join(' ')}
-              />
-            </button>
-
-            <AnimatePresence>
-              {allDropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
-                  className="absolute left-0 top-full z-[120] mt-3 w-[680px] overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]"
-                >
-                  <div className="flex h-[460px]">
-                    <div className="w-[200px] bg-slate-50/50 border-r border-slate-100 p-6 flex flex-col gap-2">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Marketplace</h4>
-                      {Object.entries(CATEGORY_DATA).map(([label]) => {
-                        const active = allSellCategory === label
-                        return (
-                          <button
-                            key={label}
-                            type="button"
-                            onClick={() => setAllSellCategory(label)}
-                            className={[
-                              'flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 text-[13px] font-bold tracking-tight',
-                              active
-                                ? 'bg-white text-rose-600 shadow-sm ring-1 ring-slate-100'
-                                : 'text-slate-600 hover:text-rose-600 hover:bg-white/50',
-                            ].join(' ')}
-                          >
-                            <span>{label}</span>
-                            <ChevronRight size={12} className={active ? 'translate-x-0.5' : 'opacity-0'} />
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <div className="flex-1 bg-white p-8 overflow-y-auto custom-scrollbar">
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={allSellCategory}
-                          initial={{ opacity: 0, x: 10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.15 }}
-                          className="h-full"
-                        >
-                          {MARKETPLACE_PORTAL_CONTENT[allSellCategory] ? (
-                            <TopBrandPortals
-                              brands={MARKETPLACE_PORTAL_CONTENT[allSellCategory].brands}
-                              trendingItems={MARKETPLACE_PORTAL_CONTENT[allSellCategory].trendingItems}
-                              onBrandClick={(brand) => {
-                                setAllDropdownOpen(false)
-                                navigate(`/brand/${encodeURIComponent(brand.name)}`)
-                              }}
-                              onViewAllClick={() => {
-                                setAllDropdownOpen(false)
-                                navigate('/marketplace')
-                              }}
-                            />
-                          ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                              <div className="h-16 w-16 rounded-3xl bg-slate-50 flex items-center justify-center text-slate-300 mb-6">
-                                {CATEGORY_DATA[allSellCategory]?.icon}
-                              </div>
-                              <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">Expert {allSellCategory} Services</h4>
-                              <p className="text-[13px] font-medium text-slate-400 mt-3 max-w-[240px] leading-relaxed">
-                                Our premium {allSellCategory.toLowerCase()} portal is currently being optimized for elite valuations.
-                              </p>
-                              <button
-                                type="button"
-                                className="mt-8 rounded-xl bg-slate-900 px-6 py-2.5 text-[11px] font-black text-white uppercase tracking-widest hover:bg-rose-600 transition-all shadow-lg active:scale-95"
-                              >
-                                Notify Me
-                              </button>
-                            </div>
-                          )}
-                        </motion.div>
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div className="flex items-center gap-0.5 md:gap-1 lg:gap-2">
             {[
               { label: 'Home', path: '/' },
@@ -504,12 +346,12 @@ export function LandingNavbar() {
 
             <div className="border-t bg-slate-50/50 p-6">
               <Link
-                to="/login"
+                to={accountHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 text-sm font-black text-white shadow-xl hover:bg-rose-600 transition-all active:scale-95"
               >
                 <LogIn size={18} />
-                Login / Register
+                {loggedIn ? accountLabel : 'Login / Register'}
               </Link>
             </div>
           </motion.div>

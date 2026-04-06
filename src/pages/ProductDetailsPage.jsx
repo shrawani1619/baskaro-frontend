@@ -1,19 +1,34 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ChevronRight, ChevronLeft, ShieldCheck, Heart, Share2, Info, Check, ShoppingCart, PlusCircle } from 'lucide-react'
-import { gPhoto } from '../constants/googleImages'
-import { catalog } from '../mock/catalog.js'
 import { useCart } from '../context/CartContext'
+import { getMobileModel } from '../lib/api/baskaroApi.js'
 
-// Import premium PNG assets
-import s25Front from '../assets/products/s25_titanium.jpg'
-import s25Back from '../assets/products/s25_back.png'
-import s25Perspective from '../assets/products/s25_inner.png'
-import iphone14Purple from '../assets/products/iphone14_purple.jpg'
+const CONDITION_GRADES = [
+   { id: 'Fair', label: 'Fair', desc: 'Noticeable signs of use' },
+   { id: 'Good', label: 'Good', desc: 'Minor signs of use' },
+   { id: 'Superb', label: 'Superb', desc: 'Like new condition' },
+]
+
+function specGroupsFromModel(model) {
+   const spec = model?.specifications || {}
+   const pairs = [
+      { k: 'Display', v: spec.display },
+      { k: 'Processor', v: spec.processor },
+      { k: 'Camera', v: spec.camera },
+      { k: 'Battery', v: spec.battery },
+      { k: 'OS', v: spec.os },
+   ].filter((x) => x.v && String(x.v).trim())
+   if (!pairs.length) return []
+   return [{ label: 'Specifications', specs: pairs }]
+}
 
 export default function ProductDetailsPage() {
    const { id } = useParams()
+   const [model, setModel] = useState(null)
+   const [loadErr, setLoadErr] = useState('')
+   const [loading, setLoading] = useState(true)
    const [selectedImg, setSelectedImg] = useState(0)
    const [condition, setCondition] = useState('Superb')
    const [extendedWarranty, setExtendedWarranty] = useState(false)
@@ -22,27 +37,62 @@ export default function ProductDetailsPage() {
    const { addToCart } = useCart()
    const navigate = useNavigate()
 
-   // Demo Product Data
-   // In a real app, this would be fetched based on 'id'
-   const product = {
-      title: 'Samsung Galaxy S25 Edge - Pre-Owned',
-      brand: 'Samsung',
-      model: 'Galaxy S25 Edge',
-      specs: ' Titanium Jetblack',
-      ram: '12 GB RAM',
-      storage: '256 GB',
-      rating: 4.8,
-      reviews: 6,
-      price: 57099,
-      originalPrice: 113799,
-      discount: 50,
-      emi: 3658,
-      images: [s25Front, s25Back, s25Perspective, gPhoto(0)],
-      conditionGrades: [
-         { id: 'Fair', label: 'Fair', desc: 'Noticeable signs of use' },
-         { id: 'Good', label: 'Good', desc: 'Minor signs of use' },
-         { id: 'Superb', label: 'Superb', desc: 'Like new condition' }
-      ]
+   useEffect(() => {
+      let cancelled = false
+      setLoading(true)
+      setLoadErr('')
+      ;(async () => {
+         try {
+            const m = await getMobileModel(id)
+            if (!cancelled) setModel(m)
+         } catch (e) {
+            if (!cancelled) setLoadErr(e.message || 'Product not found')
+         } finally {
+            if (!cancelled) setLoading(false)
+         }
+      })()
+      return () => { cancelled = true }
+   }, [id])
+
+   const product = useMemo(() => {
+      if (!model) return null
+      const brandName = model.brandId?.name || '—'
+      const v0 = model.storageVariants?.[0]
+      const images = model.image ? [model.image] : ['/logo.png']
+      const price = Number(model.basePrice) || 0
+      return {
+         title: `${brandName} ${model.modelName} - Pre-Owned`,
+         brand: brandName,
+         model: model.modelName,
+         specs: model.specifications?.display || '—',
+         ram: v0?.ram || '—',
+         storage: v0?.label || '—',
+         rating: 0,
+         reviews: 0,
+         price,
+         originalPrice: 0,
+         discount: 0,
+         emi: price > 0 ? Math.max(1, Math.round(price / 24)) : 0,
+         images,
+         conditionGrades: CONDITION_GRADES,
+         specGroups: specGroupsFromModel(model),
+      }
+   }, [model])
+
+   if (loading) {
+      return (
+         <div className="min-h-screen bg-white flex items-center justify-center font-['Inter']">
+            <p className="text-slate-600 font-semibold">Loading product…</p>
+         </div>
+      )
+   }
+   if (loadErr || !product) {
+      return (
+         <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 font-['Inter'] px-4">
+            <p className="text-slate-800 font-bold text-center">{loadErr || 'Product not found'}</p>
+            <Link to="/marketplace" className="text-red-600 font-bold hover:underline">Back to marketplace</Link>
+         </div>
+      )
    }
 
    const handleAddToCart = () => {
@@ -210,12 +260,7 @@ export default function ProductDetailsPage() {
                            >
                               <div className="p-6 md:p-8 border-t border-slate-100">
                                  <div className="grid gap-x-6 gap-y-6 md:grid-cols-2">
-                                    {[
-                                       { label: 'General', specs: [{ k: 'Model', v: 'Samsung Galaxy S25 Edge' }, { k: 'Launched', v: 'Jan 2025' }, { k: 'OS', v: 'Android 15' }] },
-                                       { label: 'Performance', specs: [{ k: 'Processor', v: 'Snapdragon 8 Gen 4' }, { k: 'RAM', v: '12 GB' }, { k: 'Graphics', v: 'Adreno 850' }] },
-                                       { label: 'Display', specs: [{ k: 'Size', v: '6.8 inch' }, { k: 'Type', v: 'Dynamic AMOLED' }, { k: 'Refresh Rate', v: '120 Hz' }] },
-                                       { label: 'Camera', specs: [{ k: 'Main', v: '200 MP Quad' }, { k: 'Selfie', v: '32 MP' }, { k: 'Video', v: '8K @ 30fps' }] },
-                                    ].map((group, i) => (
+                                    {(product.specGroups?.length ? product.specGroups : [{ label: 'Specifications', specs: [{ k: 'Model', v: product.model }] }]).map((group, i) => (
                                        <div key={i} className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
                                           <div className="flex items-center gap-2 mb-3">
                                              <div className="h-1 w-6 bg-red-600 rounded-full" />
@@ -259,29 +304,28 @@ export default function ProductDetailsPage() {
                         BASKARO Warranty, {condition}, {product.ram} / {product.storage}, {product.specs}
                      </p>
 
+                     {(product.rating > 0 || product.reviews > 0) && (
                      <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1.5 bg-green-600 text-white px-2.5 py-1 rounded text-sm font-bold shadow-sm">
                            {product.rating} <Star size={14} fill="currentColor" />
                         </div>
-                        <button className="text-[13px] font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
+                        <button type="button" className="text-[13px] font-bold text-blue-600 hover:text-blue-700 hover:underline transition-colors">
                            {product.reviews} reviews
                         </button>
                      </div>
+                     )}
                   </div>
 
                   {/* Pricing Row */}
                   <div className="border-y border-slate-100 py-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-150 fill-mode-both">
                      <div className="flex items-end gap-3 mb-2 flex-wrap">
                         <span className="text-4xl font-black text-slate-900 tracking-tighter">₹{formatPrice(product.price)}</span>
-                        <span className="text-[17px] font-bold text-slate-400 line-through mb-1">₹{formatPrice(product.originalPrice)}</span>
-                        <span className="text-2xl font-black text-rose-600 mb-0.5">-{product.discount}%</span>
-                     </div>
-
-                     <div className="flex items-center gap-2 mb-6">
-                        <div className="bg-slate-900 text-white px-3 py-1.5 rounded-xl text-[13px] font-black flex items-center gap-2 group cursor-pointer hover:bg-black transition-colors">
-                           <span>Get it for <span className="text-green-400">₹56,499</span> with <span className="text-amber-400">GOLD</span></span>
-                           <Info size={14} className="text-slate-500 group-hover:text-amber-400 transition-colors" />
-                        </div>
+                        {product.originalPrice > 0 && product.discount > 0 && (
+                           <>
+                              <span className="text-[17px] font-bold text-slate-400 line-through mb-1">₹{formatPrice(product.originalPrice)}</span>
+                              <span className="text-2xl font-black text-rose-600 mb-0.5">-{product.discount}%</span>
+                           </>
+                        )}
                      </div>
 
                      <div className="flex items-center gap-2 text-[15px] font-bold text-slate-900">

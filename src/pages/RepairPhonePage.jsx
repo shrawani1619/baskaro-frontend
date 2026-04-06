@@ -1,8 +1,8 @@
+import { useMemo } from 'react'
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
-import { gPhoto } from '../constants/googleImages'
+import { useCatalogBrands } from '../hooks/useCatalogBrands'
 
-const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'OPPO', 'Realme', 'Motorola']
+const BRANDS_FALLBACK = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'OPPO', 'Realme', 'Motorola']
 
 const HOW_IT_WORKS = [
   {
@@ -31,15 +31,6 @@ const WHY_US = [
   'Data-safe handling',
 ]
 
-const REPAIR_ITEMS = [
-  { name: 'Screen replacement', price: '2,499', img: gPhoto(0) },
-  { name: 'Battery replacement', price: '1,899', img: gPhoto(1) },
-  { name: 'Charging port repair', price: '999', img: gPhoto(2) },
-  { name: 'Camera module fix', price: '1,499', img: gPhoto(3) },
-  { name: 'Water damage assessment', price: '499', img: gPhoto(4) },
-  { name: 'Software & diagnostics', price: '399', img: gPhoto(5) },
-]
-
 const STORIES = [
   'Screen was fixed same day — looks brand new and touch works perfectly.',
   'Battery swap gave my old phone another year. Fair price.',
@@ -54,6 +45,12 @@ const FAQS = [
 ]
 
 export default function RepairPhonePage() {
+  const { brands: apiBrands, loading: brandsLoading } = useCatalogBrands()
+  const brands = useMemo(() => {
+    if (brandsLoading) return []
+    return apiBrands.length ? apiBrands : BRANDS_FALLBACK
+  }, [brandsLoading, apiBrands])
+
   return (
     <ServicePageLayout
       breadcrumb="Home / Repair Phone"
@@ -62,18 +59,14 @@ export default function RepairPhonePage() {
       searchLabel="Find repair for your phone"
       searchPlaceholder="Search model or issue..."
       searchButtonText="Get quote"
-      brands={BRANDS}
+      brands={brands}
+      brandsLoading={brandsLoading}
       howItWorksTitle="How repair works"
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
+      showHotDeals={false}
       hotDealsTitle="Repair offers"
-      topBrands={PHONE_BRAND_PORTALS}
-      productsSection={{
-        title: 'Common services',
-        priceLabel: 'Starts at',
-        items: REPAIR_ITEMS,
-        viewAllHref: '#',
-      }}
+      topBrands={null}
       stories={STORIES}
       faqs={FAQS}
       downloadBannerSubtitle="Book repair | Sell old phone | Shop accessories"

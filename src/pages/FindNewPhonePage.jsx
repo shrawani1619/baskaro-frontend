@@ -1,15 +1,8 @@
+import { useMemo } from 'react'
 import { ServicePageLayout } from '../components/ServicePageLayout'
-import { PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
-import { gPhoto } from '../constants/googleImages'
-import { useCart } from '../context/CartContext'
+import { useCatalogBrands } from '../hooks/useCatalogBrands'
 
-// Import premium PNG assets
-import s25Front from '../assets/products/s25_titanium.jpg'
-import s25Back from '../assets/products/s25_back.png'
-import s25Perspective from '../assets/products/s25_inner.png'
-import iphone14Front from '../assets/products/iphone14_purple.jpg'
-
-const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Vivo', 'Xiaomi', 'OPPO', 'Realme', 'Motorola']
+const BRANDS_FALLBACK = ['Apple', 'Samsung', 'OnePlus', 'Vivo', 'Xiaomi', 'OPPO', 'Realme', 'Motorola']
 
 const HOW_IT_WORKS = [
   {
@@ -38,15 +31,6 @@ const WHY_US = [
   'Verified sellers',
 ]
 
-const PHONES = [
-  { id: 'app-14-128', name: 'Apple iPhone 14 (128 GB) — Pre-Owned', price: '42,990', img: iphone14Front },
-  { id: 'sam-fla-256', name: 'Samsung Galaxy S25 Edge — Pre-Owned', price: '48,499', img: s25Front },
-  { id: 'sam-fla-back', name: 'Samsung Galaxy S25 Edge (12/256 GB)', price: '56,499', img: s25Perspective },
-  { id: 'one-fla', name: 'OnePlus flagship', price: '35,999', img: gPhoto(2) },
-  { id: 'viv-v-ser', name: 'Vivo V-series', price: '28,999', img: gPhoto(3) },
-  { id: 'xia-fla', name: 'Xiaomi flagship', price: '31,499', img: gPhoto(4) },
-]
-
 const STORIES = [
   'Got a pre-owned iPhone in excellent condition — saved a lot vs retail.',
   'Comparison tool made it easy to choose between two Samsung models.',
@@ -61,7 +45,11 @@ const FAQS = [
 ]
 
 export default function FindNewPhonePage() {
-  const { addToCart } = useCart()
+  const { brands: apiBrands, loading: brandsLoading } = useCatalogBrands()
+  const brands = useMemo(() => {
+    if (brandsLoading) return []
+    return apiBrands.length ? apiBrands : BRANDS_FALLBACK
+  }, [brandsLoading, apiBrands])
 
   return (
     <ServicePageLayout
@@ -71,23 +59,17 @@ export default function FindNewPhonePage() {
       searchLabel="Search phones by model or brand"
       searchPlaceholder="e.g. iPhone 15, Galaxy S24..."
       searchButtonText="Search"
-      brands={BRANDS}
+      brands={brands}
+      brandsLoading={brandsLoading}
       howItWorksTitle="How buying works"
       howItWorks={HOW_IT_WORKS}
       whyUs={WHY_US}
+      showHotDeals={false}
       hotDealsTitle="Phone deals"
-      topBrands={PHONE_BRAND_PORTALS}
-      productsSection={{
-        title: 'Trending phones',
-        priceLabel: 'From',
-        items: PHONES,
-        viewAllHref: '#',
-      }}
+      topBrands={null}
       stories={STORIES}
       faqs={FAQS}
       downloadBannerSubtitle="Find phones | Sell old device | Book repair"
-      productButtonLabel="Add to Cart"
-      onProductClick={(p) => addToCart(p)}
     />
   )
 }

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import {
   ArrowLeft, ArrowRight, Phone, Mail, Shield,
-  CheckCircle, RefreshCw, Eye, EyeOff, Lock
+  CheckCircle, RefreshCw, Eye, EyeOff, Copy,
 } from 'lucide-react'
-import { setUser } from '../lib/auth.js'
+import { setSession, isAdminUser } from '../lib/auth.js'
+import * as api from '../lib/api/baskaroApi.js'
 
 // ─── OTP Input ─────────────────────────────────────────────────────────────
 function OtpInput({ value, onChange, disabled }) {
@@ -95,15 +96,23 @@ const METHODS = [
 // ─── Main LoginPage ─────────────────────────────────────────────────────────
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const redirectTo = location.state?.redirectTo
   const [method, setMethod] = useState('phone') // 'phone' | 'email' | 'google'
 
-  function onSuccess(userData) {
-    setUser(userData)
-    setTimeout(() => navigate('/dashboard'), 1600)
+  function onSuccess(session) {
+    setSession(session)
+    const user = session.user
+    const target = isAdminUser(user)
+      ? '/admin'
+      : redirectTo && redirectTo !== '/admin'
+        ? redirectTo
+        : '/dashboard'
+    setTimeout(() => navigate(target, { replace: true }), 1600)
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-50 font-['Outfit']">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden bg-slate-50 font-['Outfit']">
       {/* Background blobs */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-48 -right-32 h-[520px] w-[520px] rounded-full bg-blue-100 blur-[100px]" />
@@ -129,11 +138,11 @@ export default function LoginPage() {
       {/* Top gradient bar */}
       <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-600 via-red-500 to-blue-600" />
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-20">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-6 sm:py-10">
         <div className="w-full max-w-sm">
 
           {/* Logo */}
-          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 text-center">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-5 text-center sm:mb-6">
             <Link to="/">
               <img src="/logo.png" alt="BAS karo" className="mx-auto h-10 w-auto object-contain"
                 onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block' }} />
@@ -178,14 +187,14 @@ export default function LoginPage() {
               <AnimatePresence mode="wait">
                 {method === 'phone'  && <PhoneFlow  key="phone"  onSuccess={onSuccess} />}
                 {method === 'email'  && <EmailFlow  key="email"  onSuccess={onSuccess} />}
-                {method === 'google' && <GoogleFlow key="google" onSuccess={onSuccess} />}
+                {method === 'google' && <GoogleFlow key="google" />}
               </AnimatePresence>
             </div>
           </motion.div>
 
           {/* Trust strip */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-            className="mt-8 flex justify-center gap-6"
+            className="mt-5 flex justify-center gap-4 sm:mt-6 sm:gap-6"
           >
             {[['🔒','Secure Login'],['✅','1 Cr+ Users'],['⚡','Instant OTP']].map(([icon, label]) => (
               <div key={label} className="flex items-center gap-1.5">
@@ -201,6 +210,43 @@ export default function LoginPage() {
   )
 }
 
+// ─── Dev OTP hint: compact strip when API returns `otp` (local/demo). Does not block the form. ───
+function DevOtpHint({ code, onAutofill }) {
+  const [copied, setCopied] = useState(false)
+  if (!code) return null
+  function copy() {
+    navigator.clipboard?.writeText(String(code)).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+        Dev — code not sent by SMS
+      </p>
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <span className="font-mono text-xl font-black tracking-[0.2em] text-slate-900">{code}</span>
+        <button
+          type="button"
+          onClick={copy}
+          className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-bold text-slate-600 hover:bg-slate-100"
+        >
+          <Copy size={12} /> {copied ? 'Copied' : 'Copy'}
+        </button>
+        <button
+          type="button"
+          onClick={onAutofill}
+          className="text-[11px] font-black uppercase tracking-wide text-red-600 hover:text-red-700"
+        >
+          Autofill
+        </button>
+      </div>
+      <p className="mt-1 text-[11px] text-slate-500">Enter the code below, or use Autofill.</p>
+    </div>
+  )
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // PHONE FLOW  (2-step OTP)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -211,6 +257,7 @@ function PhoneFlow({ onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [timer, setTimer] = useState(0)
+  const [devOtpCode, setDevOtpCode] = useState('')
   const timerRef = useRef(null)
 
   useEffect(() => () => clearInterval(timerRef.current), [])
@@ -220,24 +267,67 @@ function PhoneFlow({ onSuccess }) {
     timerRef.current = setInterval(() => setTimer(t => { if (t <= 1) { clearInterval(timerRef.current); return 0 } return t - 1 }), 1000)
   }
 
-  function sendOtp(e) {
+  function applyOtpCode(code) {
+    const digits = String(code).replace(/\D/g, '').slice(0, 6).split('')
+    const next = Array(6).fill('')
+    digits.forEach((d, i) => { if (i < 6) next[i] = d })
+    setOtp(next)
+  }
+
+  async function requestOtpAndMaybeShowModal() {
+    const digits = phone.replace(/\D/g, '')
+    const res = await api.requestOtp({ phone: digits })
+    if (res.error) return { error: res.error }
+    if (res.otp) setDevOtpCode(String(res.otp))
+    return {}
+  }
+
+  async function sendOtp(e) {
     e.preventDefault(); setError('')
     if (phone.replace(/\D/g, '').length !== 10) { setError('Enter a valid 10-digit number.'); return }
     setLoading(true)
-    setTimeout(() => { setLoading(false); setStep('otp'); startTimer() }, 1200)
+    try {
+      const err = (await requestOtpAndMaybeShowModal()).error
+      if (err) { setError(err); setLoading(false); return }
+      setLoading(false); setStep('otp'); startTimer()
+    } catch (err) {
+      setError(err.message || 'Could not send OTP.')
+      setLoading(false)
+    }
   }
 
-  function verifyOtp(e) {
+  async function resendOtp() {
+    setError('')
+    setLoading(true)
+    try {
+      const err = (await requestOtpAndMaybeShowModal()).error
+      if (err) { setError(err); setLoading(false); return }
+      setLoading(false)
+      setOtp(Array(6).fill(''))
+      startTimer()
+    } catch (err) {
+      setError(err.message || 'Could not resend OTP.')
+      setLoading(false)
+    }
+  }
+
+  async function verifyOtp(e) {
     e.preventDefault(); setError('')
     const code = otp.join('')
     if (code.length !== 6) { setError('Enter the full 6-digit OTP.'); return }
     setLoading(true)
-    setTimeout(() => {
+    try {
+      const digits = phone.replace(/\D/g, '')
+      const res = await api.verifyOtp({ phone: digits, otp: code })
+      if (res.error) { setError(res.error); setLoading(false); return }
       setLoading(false)
-      if (code === '000000') { setError('Incorrect OTP. Try again.'); return }
       setStep('success')
-      onSuccess({ phone, name: '', email: '' })
-    }, 1200)
+      onSuccess({ token: res.token, user: res.user })
+    } catch (err) {
+      const detail = err.body?.error || err.message || 'Verification failed.'
+      setError(typeof detail === 'string' ? detail : 'Verification failed.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -281,7 +371,7 @@ function PhoneFlow({ onSuccess }) {
 
       {step === 'otp' && (
         <>
-          <button onClick={() => { setStep('phone'); setOtp(Array(6).fill('')); setError('') }}
+          <button onClick={() => { setStep('phone'); setOtp(Array(6).fill('')); setError(''); setDevOtpCode('') }}
             className="mb-4 flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-blue-600 transition-colors"
           >
             <ArrowLeft size={13} /> Change number
@@ -292,6 +382,11 @@ function PhoneFlow({ onSuccess }) {
           </div>
           <h2 className="mt-1.5 text-xl font-black text-slate-900">Verify OTP</h2>
           <p className="mt-1 text-sm text-slate-500">Sent to <span className="font-bold text-slate-800">+91 {phone}</span></p>
+          {devOtpCode && (
+            <div className="mt-4">
+              <DevOtpHint code={devOtpCode} onAutofill={() => applyOtpCode(devOtpCode)} />
+            </div>
+          )}
           <form onSubmit={verifyOtp} className="mt-6 space-y-5">
             <OtpInput value={otp} onChange={setOtp} disabled={loading} />
             <ErrorMsg msg={error} />
@@ -301,9 +396,9 @@ function PhoneFlow({ onSuccess }) {
             <div className="text-center">
               {timer > 0
                 ? <p className="text-xs text-slate-400">Resend OTP in <span className="font-black text-slate-700">{timer}s</span></p>
-                : <button type="button" onClick={() => { setOtp(Array(6).fill('')); setError(''); startTimer() }}
-                    className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
-                  >Didn't receive it? Resend OTP</button>
+                : <button type="button" disabled={loading} onClick={resendOtp}
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+                  >Didn&apos;t receive it? Resend OTP</button>
               }
             </div>
           </form>
@@ -327,17 +422,33 @@ function EmailFlow({ onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault(); setError('')
     if (!email.includes('@')) { setError('Enter a valid email address.'); return }
     if (mode !== 'forgot' && password.length < 6) { setError('Password must be at least 6 characters.'); return }
     if (mode === 'register' && !name.trim()) { setError('Please enter your name.'); return }
+    if (mode === 'forgot') {
+      setLoading(true)
+      setTimeout(() => { setLoading(false); setMode('success') }, 600)
+      return
+    }
     setLoading(true)
-    setTimeout(() => {
+    try {
+      if (mode === 'register') {
+        const res = await api.registerEmail({ name, email, phone: '', password })
+        if (res.error) { setError(res.error); setLoading(false); return }
+        setLoading(false)
+        onSuccess({ token: res.token, user: res.user })
+        return
+      }
+      const res = await api.loginEmail({ email, password })
+      if (res.error) { setError(res.error); setLoading(false); return }
       setLoading(false)
-      if (mode === 'forgot') { setMode('success'); return }
-      onSuccess({ email, name: name || email.split('@')[0], phone: '' })
-    }, 1300)
+      onSuccess({ token: res.token, user: res.user })
+    } catch (err) {
+      setError(err.message || 'Something went wrong.')
+      setLoading(false)
+    }
   }
 
   if (mode === 'success') {
@@ -450,25 +561,22 @@ function EmailFlow({ onSuccess }) {
 // ─────────────────────────────────────────────────────────────────────────────
 // GOOGLE FLOW
 // ─────────────────────────────────────────────────────────────────────────────
-function GoogleFlow({ onSuccess }) {
+function GoogleFlow() {
   const [loading, setLoading] = useState(false)
-  const [done, setDone] = useState(false)
+  const [error, setError] = useState('')
 
   function handleGoogle() {
     setLoading(true)
-    // Simulated Google OAuth redirect — replace with real Firebase/Auth0 SDK
+    setError('')
     setTimeout(() => {
-      setLoading(false); setDone(true)
-      onSuccess({ email: 'user@gmail.com', name: 'Google User', phone: '' })
-    }, 1800)
+      setLoading(false)
+      setError('Google sign-in is not configured for this backend. Use phone or email.')
+    }, 400)
   }
 
   return (
     <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.2 }}>
-      {done
-        ? <SuccessState />
-        : (
-          <div className="flex flex-col items-center py-4">
+      <div className="flex flex-col items-center py-4">
             <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 shadow-sm">
               <GoogleIcon size={36} active />
             </div>
@@ -477,7 +585,7 @@ function GoogleFlow({ onSuccess }) {
               Sign in instantly using your Google account. No password needed.
             </p>
 
-            <button onClick={handleGoogle} disabled={loading}
+            <button type="button" onClick={handleGoogle} disabled={loading}
               className="mt-7 flex w-full items-center justify-center gap-3 rounded-2xl border-2 border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:border-blue-300 hover:bg-blue-50 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading
@@ -485,6 +593,7 @@ function GoogleFlow({ onSuccess }) {
                 : <><GoogleIcon size={20} active /> Sign in with Google</>
               }
             </button>
+            {error && <p className="mt-4 text-center text-xs font-bold text-red-500">{error}</p>}
 
             <div className="mt-6 flex w-full items-center gap-3">
               <div className="h-px flex-1 bg-slate-100" />
@@ -495,8 +604,6 @@ function GoogleFlow({ onSuccess }) {
               Switch to the <span className="font-bold text-blue-600">Phone</span> or <span className="font-bold text-blue-600">Email</span> tab above.
             </p>
           </div>
-        )
-      }
     </motion.div>
   )
 }

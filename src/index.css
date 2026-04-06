@@ -12,6 +12,17 @@
   }
 }
 
+/* Hide scrollbars but keep scrolling (keyboard / wheel / touch still work) */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @keyframes major-brands-marquee {
   from {
     transform: translate3d(0, 0, 0);

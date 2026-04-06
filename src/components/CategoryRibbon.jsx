@@ -1,72 +1,124 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Smartphone,
+  Watch,
+  Tv,
+  Wind,
+  Laptop,
+  Sparkles,
+  Headphones,
+  Tablet,
+  Gift,
+  Cpu,
+} from 'lucide-react'
+import { useRibbonCategories } from '../hooks/useRibbonCategories.js'
 
-const CATEGORIES = [
-  {
-    id: 'smartphones',
-    label: 'Smartphones',
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=200&auto=format&fit=crop',
-    path: '/sell-phone',
-  },
-  {
-    id: 'smartwatches',
-    label: 'Smart Watches',
-    image: 'https://images.unsplash.com/photo-1508685096489-7cf683ba3f2b?q=80&w=200&auto=format&fit=crop',
-    path: '/buy-accessories',
-  },
-  {
-    id: 'smart-tvs',
-    label: 'Smart TVs',
-    image: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'air-conditioner',
-    label: 'Air Conditioner',
-    image: 'https://images.unsplash.com/photo-1585338107529-13afc5f02586?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'laptops',
-    label: 'Laptops',
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'personal-care',
-    label: 'Personal Care',
-    image: 'https://images.unsplash.com/photo-1522338140262-f46f5912018a?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'accessories',
-    label: 'Accessories',
-    image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=200&auto=format&fit=crop',
-    path: '/buy-accessories',
-  },
-  {
-    id: 'tablets',
-    label: 'Tablets',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'gift-cards',
-    label: 'Gift cards',
-    image: 'https://images.unsplash.com/photo-1549463591-147604d0c24c?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
-  {
-    id: 'smart-gadgets',
-    label: 'Smart gadgets',
-    image: 'https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=200&auto=format&fit=crop',
-    path: '/marketplace',
-  },
+const ICON_MAP = {
+  smartphone: Smartphone,
+  watch: Watch,
+  tv: Tv,
+  wind: Wind,
+  laptop: Laptop,
+  sparkles: Sparkles,
+  headphones: Headphones,
+  tablet: Tablet,
+  gift: Gift,
+  cpu: Cpu,
+}
+
+/** Used only when GET /api/ribbon-categories fails or returns no rows */
+const RIBBON_FALLBACK = [
+  { _id: 'fb-phone', label: 'Smartphones', iconKey: 'smartphone', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-watch', label: 'Smart Watches', iconKey: 'watch', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-tv', label: 'Smart TVs', iconKey: 'tv', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-ac', label: 'Air Conditioner', iconKey: 'wind', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1585338447937-7082f8fc763d?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-laptop', label: 'Laptops', iconKey: 'laptop', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-care', label: 'Personal Care', iconKey: 'sparkles', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-acc', label: 'Accessories', iconKey: 'headphones', path: '/buy-accessories', imageUrl: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-tab', label: 'Tablets', iconKey: 'tablet', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-gift', label: 'Gift cards', iconKey: 'gift', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?q=80&w=300&auto=format&fit=crop' },
+  { _id: 'fb-gadget', label: 'Smart gadgets', iconKey: 'cpu', path: '/marketplace', imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=300&auto=format&fit=crop' },
 ]
 
-export function CategoryRibbon() {
+const FALLBACK_IMG_BY_ICON = Object.fromEntries(RIBBON_FALLBACK.map((x) => [x.iconKey, x.imageUrl]))
+
+function normalizePath(p) {
+  if (!p || typeof p !== 'string') return '/marketplace'
+  const t = p.trim()
+  if (!t) return '/marketplace'
+  return t.startsWith('/') ? t : `/${t}`
+}
+
+function normalizeDoc(doc, index) {
+  let imageUrl = typeof doc.imageUrl === 'string' && doc.imageUrl.trim() ? doc.imageUrl.trim() : ''
+  const iconKey = doc.iconKey || 'smartphone'
+  if (!imageUrl && FALLBACK_IMG_BY_ICON[iconKey]) {
+    imageUrl = FALLBACK_IMG_BY_ICON[iconKey]
+  }
+  return {
+    _id: doc._id ?? doc.id ?? `cat-${index}`,
+    label: doc.label || 'Category',
+    iconKey,
+    path: normalizePath(doc.path),
+    imageUrl,
+  }
+}
+
+function RibbonCategoryLink({ cat }) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const Icon = ICON_MAP[cat.iconKey] ?? Smartphone
+  const imageUrl = cat.imageUrl
+  const showImg = Boolean(imageUrl) && !imgFailed
+
+  return (
+    <Link
+      to={cat.path}
+      className="group flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
+    >
+      <div className="relative">
+        <div className="h-14 w-14 overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-slate-200/80 transition-all duration-300 group-hover:shadow-md sm:h-[4.5rem] sm:w-[4.5rem] lg:h-20 lg:w-20">
+          {showImg ? (
+            <img
+              src={imageUrl}
+              alt={cat.label}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              onError={() => setImgFailed(true)}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center p-2">
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-slate-50 to-slate-100 ring-1 ring-slate-200/80 transition-transform duration-300 group-hover:scale-105 group-hover:from-rose-50/80 group-hover:to-slate-50">
+                <Icon
+                  className="h-[42%] w-[42%] text-slate-700 transition-colors group-hover:text-rose-600 sm:h-[44%] sm:w-[44%]"
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="absolute inset-0 -z-10 rounded-full bg-blue-600/0 blur-lg transition-all duration-500 group-hover:bg-blue-600/5" />
+      </div>
+      <span className="whitespace-nowrap text-center text-[10.5px] font-black tracking-tight text-slate-500 transition-colors duration-300 group-hover:text-slate-900 sm:text-[12px] lg:text-[13px]">
+        {cat.label}
+      </span>
+    </Link>
+  )
+}
+
+/**
+ * @param {{ variant?: 'bar' | 'embedded' }} props
+ */
+export function CategoryRibbon({ variant = 'bar' }) {
   const scrollRef = useRef(null)
+  const { categories: apiRows, loading, error, fromApi } = useRibbonCategories()
+
+  const apiNormalized = fromApi ? apiRows.map((d, i) => normalizeDoc(d, i)) : []
+  const fallbackNormalized = RIBBON_FALLBACK.map((x, i) => normalizeDoc(x, i))
+  const ribbonCategories = fromApi && apiNormalized.length > 0 ? apiNormalized : fallbackNormalized
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -78,16 +130,29 @@ export function CategoryRibbon() {
     }
   }
 
+  const displayList = loading
+    ? Array.from({ length: 10 }).map((_, i) => ({ _id: `sk-${i}`, label: '', iconKey: 'smartphone', path: '/', imageUrl: '' }))
+    : ribbonCategories
+
+  const outer =
+    variant === 'embedded'
+      ? 'relative w-full rounded-2xl border border-slate-100 bg-[#f1f3f6] py-4 shadow-sm sm:py-5'
+      : 'relative w-full border-b border-slate-100 bg-[#f1f3f6] py-3.5 sm:py-5'
+
   return (
-    <section className="relative w-full border-b border-slate-100 bg-[#f1f3f6] py-3.5 sm:py-5">
-      <div className="w-full px-4 sm:px-8 lg:px-20">
+    <section className={outer} aria-label="Shop by category">
+      {error && (
+        <span className="sr-only">
+          Category list could not be loaded from the server. Showing default categories.
+        </span>
+      )}
+      <div className={variant === 'embedded' ? 'w-full px-2 sm:px-4' : 'w-full px-4 sm:px-8 lg:px-20'}>
         <div className="group relative">
-          {/* Scroll Buttons */}
           <button
             type="button"
             onClick={() => scroll('left')}
-            className="absolute -left-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-800 opacity-0 shadow-lg ring-1 ring-slate-200 transition-all hover:scale-105 group-hover:opacity-100 sm:h-10 sm:w-10 lg:-left-10"
-            aria-label="Scroll left"
+            className="absolute -left-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-800 opacity-0 shadow-lg ring-1 ring-slate-200 transition-all hover:scale-105 group-hover:opacity-100 sm:h-10 sm:w-10 lg:-left-4"
+            aria-label="Scroll categories left"
           >
             <ChevronLeft size={20} />
           </button>
@@ -95,49 +160,28 @@ export function CategoryRibbon() {
           <button
             type="button"
             onClick={() => scroll('right')}
-            className="absolute -right-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-800 opacity-0 shadow-lg ring-1 ring-slate-200 transition-all hover:scale-105 group-hover:opacity-100 sm:h-10 sm:w-10 lg:-right-10"
-            aria-label="Scroll right"
+            className="absolute -right-2 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 text-slate-800 opacity-0 shadow-lg ring-1 ring-slate-200 transition-all hover:scale-105 group-hover:opacity-100 sm:h-10 sm:w-10 lg:-right-4"
+            aria-label="Scroll categories right"
           >
             <ChevronRight size={20} />
           </button>
 
-          {/* Categories Container */}
           <div
             ref={scrollRef}
             className="flex items-center gap-6 overflow-x-auto pb-1 scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:gap-10 md:justify-center lg:gap-14"
           >
-            {CATEGORIES.map((cat) => (
-              <Link
-                key={cat.id}
-                to={cat.path}
-                className="group flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
-              >
-                <div className="relative">
-                  {/* Circular Wrapper */}
-                  <div className="h-14 w-14 overflow-hidden rounded-full bg-white shadow-sm transition-all duration-300 group-hover:shadow-md sm:h-18 sm:w-18 lg:h-20 lg:w-20">
-                    {/* The image itself */}
-                    <div className="h-full w-full p-2">
-                       <div className="h-full w-full rounded-full overflow-hidden bg-white">
-                        <img
-                          src={cat.image}
-                          alt=""
-                          className="h-full w-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
-                          loading="lazy"
-                        />
-                       </div>
-                    </div>
+            {loading
+              ? displayList.map((_, i) => (
+                  <div
+                    key={`ribbon-skel-${i}`}
+                    className="flex flex-col items-center gap-2"
+                    aria-hidden
+                  >
+                    <div className="h-14 w-14 animate-pulse rounded-full bg-slate-200/90 sm:h-[4.5rem] sm:w-[4.5rem] lg:h-20 lg:w-20" />
+                    <div className="h-3 w-16 animate-pulse rounded bg-slate-200/90 sm:w-20" />
                   </div>
-                  
-                  {/* Subtle Glow Effect */}
-                  <div className="absolute inset-0 -z-10 rounded-full bg-blue-600/0 blur-lg transition-all duration-500 group-hover:bg-blue-600/5" />
-                </div>
-                
-                {/* Category Label */}
-                <span className="whitespace-nowrap text-center text-[10.5px] font-black tracking-tight text-slate-500 transition-colors duration-300 group-hover:text-slate-900 sm:text-[12px] lg:text-[13px]">
-                  {cat.label}
-                </span>
-              </Link>
-            ))}
+                ))
+              : displayList.map((cat) => <RibbonCategoryLink key={String(cat._id)} cat={cat} />)}
           </div>
         </div>
       </div>

@@ -15,25 +15,9 @@ import {
 import { jsPDF } from "jspdf"
 import autoTable from "jspdf-autotable"
 import * as XLSX from "xlsx"
-
-// Mock Data for Charts
-const dailySalesData = [
-  { name: 'Mon', sales: 4000 }, { name: 'Tue', sales: 3000 },
-  { name: 'Wed', sales: 2000 }, { name: 'Thu', sales: 2780 },
-  { name: 'Fri', sales: 1890 }, { name: 'Sat', sales: 2390 },
-  { name: 'Sun', sales: 3490 },
-]
-
-const monthlyRevenueData = [
-  { name: 'Jan', rev: 400000 }, { name: 'Feb', rev: 300000 },
-  { name: 'Mar', rev: 250000 }, { name: 'Apr', rev: 278000 },
-  { name: 'May', rev: 189000 }, { name: 'Jun', rev: 239000 },
-]
-
-const topBrandsData = [
-  { name: 'Apple', value: 45 }, { name: 'Samsung', value: 30 },
-  { name: 'OnePlus', value: 15 }, { name: 'Other', value: 10 },
-]
+import * as api from '../lib/api/baskaroApi.js'
+import { logout, getToken, isAdminUser } from '../lib/auth.js'
+import { ADMIN_PIPELINE, apiStatusToAdminLabel } from '../lib/orderHelpers.js'
 
 const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b'];
 
@@ -59,22 +43,28 @@ export default function AdminDashboard() {
   ]
 
   useEffect(() => {
-    // For demo/development purpose, bypassing strict check if not set
-    if (localStorage.getItem('baskaro_admin_auth') === 'false') {
-      navigate('/admin/login', { replace: true })
+    if (!getToken() || !isAdminUser()) {
+      navigate('/login', { replace: true, state: { redirectTo: '/admin' } })
     }
   }, [navigate])
 
   const handleLogout = () => {
-    localStorage.removeItem('baskaro_admin_auth')
+    logout()
     navigate('/')
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-['Outfit'] text-slate-900">
-      {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300 ${sidebarCollapsed ? 'w-20' : 'w-64'} max-md:${isMobileMenuOpen ? 'translate-x-0 w-64' : '-translate-x-full'} md:relative`}>
-        <div className="flex h-16 items-center justify-between border-b border-slate-100 px-6">
+    <div className="flex h-dvh max-h-dvh min-h-0 flex-row items-stretch overflow-hidden bg-slate-50 font-['Outfit'] text-slate-900">
+      {/* Sidebar: full height on desktop; drawer on mobile */}
+      <aside
+        className={[
+          'z-50 flex flex-col border-r border-slate-200 bg-white transition-all duration-300',
+          sidebarCollapsed ? 'w-20' : 'w-64',
+          'fixed inset-y-0 left-0 md:static md:h-full md:min-h-0 md:shrink-0 md:overflow-hidden',
+          isMobileMenuOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full',
+        ].join(' ')}
+      >
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-100 px-6">
           {(!sidebarCollapsed || isMobileMenuOpen) && (
             <Link to="/admin" className="flex items-center gap-2">
               <img src="/logo.png" alt="BASKARO Admin" className="h-8 w-auto object-contain" />
@@ -85,7 +75,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-6 scrollbar-hide">
+        <nav className="min-h-0 flex-1 space-y-1.5 overflow-y-auto px-3 py-6 scrollbar-hide">
           {navItems.map(({ id, label, Icon }, index) => {
             const isActive = tab === id;
             if (index === 4 || index === 8) {
@@ -123,7 +113,7 @@ export default function AdminDashboard() {
           })}
         </nav>
 
-        <div className="border-t border-slate-100 p-4">
+        <div className="shrink-0 border-t border-slate-100 p-4">
           <button onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors">
             <LogOut size={sidebarCollapsed && !isMobileMenuOpen ? 24 : 20} className={sidebarCollapsed && !isMobileMenuOpen ? 'mx-auto' : ''} />
             {(!sidebarCollapsed || isMobileMenuOpen) && <span>Logout</span>}
@@ -137,8 +127,8 @@ export default function AdminDashboard() {
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col min-w-0">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-white/80 px-4 sm:px-8 backdrop-blur-md border-b border-slate-200">
+      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white/80 px-4 backdrop-blur-md sm:px-8">
           <div className="flex items-center gap-4">
             <button className="md:hidden text-slate-600 rounded-lg p-1.5 hover:bg-slate-100" onClick={() => setIsMobileMenuOpen(true)}>
               <Menu size={24} />
@@ -163,7 +153,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8">
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 scrollbar-hide sm:p-8">
           <AnimatePresence mode="wait">
             <motion.div key={tab} initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
               {tab === 'dashboard' && <DashboardView />}
@@ -190,15 +180,76 @@ export default function AdminDashboard() {
 // 1. DASHBOARD VIEW
 // ============================================================================ //
 function DashboardView() {
-  const kpis = [
-    { label: 'Total Users', value: '12,543', icon: Users, color: 'text-blue-600', iconBg: 'bg-blue-100', trend: '+12.5%', trendUp: true },
-    { label: 'Total Orders', value: '1,280', icon: ShoppingCart, color: 'text-orange-600', iconBg: 'bg-orange-100', trend: '+8.2%', trendUp: true },
-    { label: 'Pending Pickups', value: '45', icon: Truck, color: 'text-red-500', iconBg: 'bg-red-100', trend: '-2.1%', trendUp: false },
-    { label: 'Total Revenue', value: '₹4.2M', icon: DollarSign, color: 'text-green-600', iconBg: 'bg-green-100', trend: '+15.3%', trendUp: true },
-  ]
+  const [stats, setStats] = useState(null)
+  const [daily, setDaily] = useState([])
+  const [monthly, setMonthly] = useState([])
+  const [topPhones, setTopPhones] = useState([])
+  const [loadErr, setLoadErr] = useState('')
+
+  useEffect(() => {
+    let c = false
+    ;(async () => {
+      try {
+        const [s, d, m, t] = await Promise.all([
+          api.dashboardStats(),
+          api.dashboardDailySales(7),
+          api.dashboardMonthlyRevenue(6),
+          api.dashboardTopSellingPhones(8),
+        ])
+        if (!c) {
+          setStats(s)
+          setDaily(Array.isArray(d) ? d : [])
+          setMonthly(Array.isArray(m) ? m : [])
+          setTopPhones(Array.isArray(t) ? t : [])
+          setLoadErr('')
+        }
+      } catch (e) {
+        if (!c) setLoadErr(e.message || 'Failed to load dashboard')
+      }
+    })()
+    return () => { c = true }
+  }, [])
+
+  const dailyChart = (daily.length ? daily : []).map((row, i) => ({
+    name: row.date ? String(row.date).slice(5) : row.name || `D${i}`,
+    sales: row.orders ?? row.sales ?? 0,
+  }))
+
+  const monthlyChart = (monthly.length ? monthly : []).map((row, i) => ({
+    name: row.month ? String(row.month).slice(5) : row.name || `M${i}`,
+    rev: row.revenue ?? row.rev ?? 0,
+  }))
+
+  const pieData = topPhones.length
+    ? topPhones.map((p) => ({
+        name: `${p.brand || ''} ${p.modelName || ''}`.trim() || 'Device',
+        value: Math.max(1, Number(p.salesCount) || 1),
+      }))
+    : []
+
+  const pieTotal = pieData.reduce((s, x) => s + x.value, 0)
+
+  const kpis = stats
+    ? [
+        { label: 'Total Users', value: String(stats.totalUsers ?? 0), icon: Users, color: 'text-blue-600', iconBg: 'bg-blue-100', trend: '—', trendUp: true },
+        { label: 'Total Orders', value: String(stats.totalOrders ?? 0), icon: ShoppingCart, color: 'text-orange-600', iconBg: 'bg-orange-100', trend: '—', trendUp: true },
+        { label: 'Pending / Active', value: String(stats.pendingOrders ?? 0), icon: Truck, color: 'text-red-500', iconBg: 'bg-red-100', trend: '—', trendUp: false },
+        { label: 'Total Revenue', value: `₹${Number(stats.totalRevenue || 0).toLocaleString('en-IN')}`, icon: DollarSign, color: 'text-green-600', iconBg: 'bg-green-100', trend: '—', trendUp: true },
+      ]
+    : [
+        { label: 'Total Users', value: '…', icon: Users, color: 'text-blue-600', iconBg: 'bg-blue-100', trend: '—', trendUp: true },
+        { label: 'Total Orders', value: '…', icon: ShoppingCart, color: 'text-orange-600', iconBg: 'bg-orange-100', trend: '—', trendUp: true },
+        { label: 'Pending / Active', value: '…', icon: Truck, color: 'text-red-500', iconBg: 'bg-red-100', trend: '—', trendUp: false },
+        { label: 'Total Revenue', value: '…', icon: DollarSign, color: 'text-green-600', iconBg: 'bg-green-100', trend: '—', trendUp: true },
+      ]
 
   return (
     <div className="space-y-8">
+      {loadErr && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+          {loadErr}
+        </div>
+      )}
       {/* KPI Cards */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((kpi, i) => (
@@ -208,7 +259,7 @@ function DashboardView() {
                 <kpi.icon size={24} strokeWidth={2.5} />
               </div>
               <span className={`inline-flex items-center text-xs font-black px-2.5 py-1 rounded-full ${kpi.trendUp ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {kpi.trendUp ? '↗' : '↘'} {kpi.trend}
+                {kpi.trend}
               </span>
             </div>
             <div className="mt-5">
@@ -221,18 +272,20 @@ function DashboardView() {
 
       {/* Charts Section */}
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Daily Sales Chart */}
         <div className="lg:col-span-2 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-black text-slate-900">Daily Order Volume</h3>
-              <p className="text-sm font-medium text-slate-500">Last 7 days performance</p>
+              <h3 className="text-lg font-black text-slate-900">Daily order volume</h3>
+              <p className="text-sm font-medium text-slate-500">From API (completed orders)</p>
             </div>
-            <button className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 transition"><Download size={16}/> Export</button>
+            <button type="button" className="flex items-center gap-2 rounded-xl bg-slate-50 px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-100 transition"><Download size={16}/> Export</button>
           </div>
           <div className="h-[300px] w-full">
+            {dailyChart.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-400">No order data for this period</div>
+            ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={dailySalesData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+              <LineChart data={dailyChart} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} dx={-10} />
@@ -240,62 +293,71 @@ function DashboardView() {
                 <Line type="monotone" dataKey="sales" name="Orders" stroke="#dc2626" strokeWidth={4} dot={{r: 4, strokeWidth: 2, fill: '#fff', stroke: '#dc2626'}} activeDot={{r: 6, fill: '#dc2626', stroke: '#fff', strokeWidth: 3}} />
               </LineChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        {/* Top Brands Chart */}
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col">
           <div className="mb-2">
-            <h3 className="text-lg font-black text-slate-900">Top Brands</h3>
-            <p className="text-sm font-medium text-slate-500">Market share by listings</p>
+            <h3 className="text-lg font-black text-slate-900">Top devices</h3>
+            <p className="text-sm font-medium text-slate-500">By completed orders</p>
           </div>
           <div className="flex-1 flex flex-col justify-center relative min-h-[250px]">
+            {pieData.length === 0 ? (
+              <div className="flex h-[250px] items-center justify-center text-sm font-semibold text-slate-400">No device sales yet</div>
+            ) : (
+            <>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie data={topBrandsData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={4} dataKey="value" stroke="none">
-                  {topBrandsData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={4} dataKey="value" stroke="none">
+                  {pieData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center flex-col pointer-events-none">
-                <span className="text-3xl font-black text-slate-900">850</span>
+                <span className="text-3xl font-black text-slate-900">{pieTotal}</span>
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total</span>
             </div>
+            </>
+            )}
           </div>
-          <div className="grid grid-cols-2 gap-3 mt-4">
-             {topBrandsData.map((item, i) => (
+          <div className="grid grid-cols-1 gap-3 mt-4 max-h-40 overflow-y-auto">
+             {pieData.slice(0, 6).map((item, i) => (
                 <div key={i} className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{backgroundColor: COLORS[i % COLORS.length]}}></div>
-                  <span className="text-sm font-bold text-slate-700">{item.name}</span>
-                  <span className="text-sm font-black text-slate-900 ml-auto">{item.value}%</span>
+                  <div className="w-3 h-3 rounded-full shrink-0" style={{backgroundColor: COLORS[i % COLORS.length]}}></div>
+                  <span className="text-sm font-bold text-slate-700 truncate">{item.name}</span>
+                  <span className="text-sm font-black text-slate-900 ml-auto shrink-0">{item.value}</span>
                 </div>
              ))}
           </div>
         </div>
 
-        {/* Monthly Revenue Bar Chart */}
         <div className="lg:col-span-3 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="mb-8 flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-black text-slate-900">Monthly Revenue Forecast</h3>
+              <h3 className="text-lg font-black text-slate-900">Monthly revenue</h3>
               <p className="text-sm font-medium text-slate-500">In Indian Rupees (₹)</p>
             </div>
           </div>
           <div className="h-[300px] w-full">
+            {monthlyChart.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-sm font-semibold text-slate-400">No revenue data yet</div>
+            ) : (
             <ResponsiveContainer width="100%" height="100%">
-              <ReBarChart data={monthlyRevenueData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }} barSize={36}>
+              <ReBarChart data={monthlyChart} margin={{ top: 5, right: 10, left: 10, bottom: 0 }} barSize={36}>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 13, fontWeight: 600}} dx={-10} tickFormatter={(val) => `₹${val/1000}k`} />
-                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} formatter={(val) => `₹${val.toLocaleString()}`}/>
+                <Tooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} formatter={(val) => `₹${Number(val).toLocaleString('en-IN')}`}/>
                 <Bar dataKey="rev" name="Revenue" fill="#2563eb" radius={[6, 6, 0, 0]}>
-                   {monthlyRevenueData.map((entry, index) => (
-                     <Cell key={`cell-${index}`} fill={index === monthlyRevenueData.length - 1 ? '#2563eb' : '#93c5fd'} />
+                   {monthlyChart.map((entry, index) => (
+                     <Cell key={`cell-${index}`} fill={index === monthlyChart.length - 1 ? '#2563eb' : '#93c5fd'} />
                    ))}
                 </Bar>
               </ReBarChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
@@ -307,49 +369,104 @@ function DashboardView() {
 // 2. USER MANAGEMENT VIEW
 // ============================================================================ //
 function UsersManagementView() {
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const users = [
-    { id: 'USR001', name: 'Ravi Kumar', email: 'ravi.k@example.com', phone: '+91 9876543210', orders: 12, status: 'Active', joined: '12 Jan, 2025' },
-    { id: 'USR002', name: 'Priya Sharma', email: 'priya.s@example.com', phone: '+91 9123456780', orders: 5, status: 'Active', joined: '15 Feb, 2025' },
-    { id: 'USR003', name: 'Amit Singh', email: 'amit.singh@example.com', phone: '+91 9988776655', orders: 0, status: 'Blocked', joined: '20 Mar, 2025' },
-    { id: 'USR004', name: 'Neha Gupta', email: 'neha.g@example.com', phone: '+91 9876500000', orders: 2, status: 'Active', joined: '02 Apr, 2025' },
-    { id: 'USR005', name: 'Rahul Patel', email: 'rahul.p@example.com', phone: '+91 9999988888', orders: 8, status: 'Active', joined: '10 Apr, 2025' },
-  ];
+  const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [data, setData] = useState({ items: [], pagination: {} })
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState('')
+  const [busyId, setBusyId] = useState(null)
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 400)
+    return () => clearTimeout(t)
+  }, [searchTerm])
+
+  useEffect(() => {
+    setPage(1)
+  }, [debouncedSearch])
+
+  const load = async (p = page) => {
+    setLoading(true)
+    try {
+      const res = await api.getUsers({ page: p, limit: 10, search: debouncedSearch, status: '' })
+      setData(res || { items: [], pagination: {} })
+      setErr('')
+    } catch (e) {
+      setErr(e.message || 'Failed to load users')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load(page)
+  }, [page, debouncedSearch])
+
+  const users = data.items || []
+  const pagination = data.pagination || {}
+  const total = pagination.total ?? 0
+  const totalPages = pagination.totalPages ?? 1
+
+  async function onBlockToggle(user) {
+    const id = user._id || user.id
+    setBusyId(id)
+    try {
+      if (user.status === 'BLOCKED') await api.unblockUser(id)
+      else await api.blockUser(id)
+      await load(page)
+    } catch (e) {
+      setErr(e.message || 'Action failed')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function onDelete(user) {
+    const id = user._id || user.id
+    if (!confirm('Delete this user?')) return
+    setBusyId(id)
+    try {
+      await api.deleteUser(id)
+      await load(page)
+    } catch (e) {
+      setErr(e.message || 'Delete failed')
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-900">User Management</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">Manage platform users, view history, and handle blocks.</p>
+          <p className="text-sm font-medium text-slate-500 mt-1">Data from <code className="text-xs">GET /api/users</code></p>
         </div>
-        <button className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-200 hover:bg-blue-700 transition">
+        <button type="button" className="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-200 hover:bg-blue-700 transition">
           <Download size={18} /> Export CSV
         </button>
       </div>
 
+      {err && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{err}</div>}
+
       <div className="rounded-3xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col">
-        {/* Table Toolbar */}
         <div className="border-b border-slate-100 p-5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/50">
           <div className="relative w-full sm:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search by name, email or phone..." 
+            <input
+              type="text"
+              placeholder="Search by name, email or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" 
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-11 pr-4 text-sm font-medium outline-none transition-all placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
             />
           </div>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button className="flex flex-1 sm:flex-none justify-center items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
-              <Filter size={16} /> Filter by Status
-            </button>
+          <div className="flex items-center gap-3 w-full sm:w-auto text-sm text-slate-500 font-medium">
+            {loading ? 'Loading…' : `${total} users`}
           </div>
         </div>
 
-        {/* User Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm whitespace-nowrap">
             <thead className="bg-slate-50 border-b border-slate-200">
@@ -362,66 +479,69 @@ function UsersManagementView() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {users.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase())).map((user, idx) => (
-                <tr key={idx} className="hover:bg-slate-50/80 transition-colors group">
-                  <td className="px-6 py-4">
-                     <div className="flex items-center gap-3">
-                         <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-black text-slate-600">
-                           {user.name.charAt(0)}
-                         </div>
-                         <div>
-                           <div className="font-black text-slate-900 text-base">{user.name}</div>
-                           <div className="text-xs font-bold text-slate-400 mt-0.5.">ID: {user.id} • Joined {user.joined}</div>
-                         </div>
-                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                     <div className="font-semibold text-slate-700">{user.email}</div>
-                     <div className="text-xs font-medium text-slate-500 mt-1">{user.phone}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                     <span className="inline-flex items-center justify-center min-w-[32px] h-8 rounded-lg bg-blue-50 text-blue-700 font-black text-sm border border-blue-100">
-                       {user.orders}
-                     </span>
-                  </td>
-                  <td className="px-6 py-4">
-                     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${user.status === 'Active' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-green-600' : 'bg-red-600'}`}></span>
-                        {user.status}
-                     </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition" title="View Profile">
-                        <MoreVertical size={18} />
-                      </button>
-                      {user.status === 'Active' ? (
-                        <button className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition" title="Block User">
-                          <Ban size={18} />
+              {users.map((user) => {
+                const id = user._id || user.id
+                const label = user.name || user.email || user.phone || 'User'
+                const joined = user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
+                const active = user.status !== 'BLOCKED'
+                return (
+                  <tr key={id} className="hover:bg-slate-50/80 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center font-black text-slate-600">
+                          {String(label).charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-black text-slate-900 text-base">{label}</div>
+                          <div className="text-xs font-bold text-slate-400 mt-0.5">ID: {id} • Joined {joined}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-semibold text-slate-700">{user.email || '—'}</div>
+                      <div className="text-xs font-medium text-slate-500 mt-1">{user.phone ? `+91 ${user.phone}` : '—'}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center justify-center min-w-[32px] h-8 rounded-lg bg-blue-50 text-blue-700 font-black text-sm border border-blue-100">
+                        {user.totalOrders ?? 0}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border ${active ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${active ? 'bg-green-600' : 'bg-red-600'}`}></span>
+                        {active ? 'Active' : 'Blocked'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition" title="View Profile">
+                          <MoreVertical size={18} />
                         </button>
-                      ) : (
-                        <button className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-green-50 hover:border-green-200 hover:text-green-600 transition" title="Unblock User">
-                           <CheckCircle size={18} />
+                        {active ? (
+                          <button type="button" disabled={busyId === id} onClick={() => onBlockToggle(user)} className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition" title="Block User">
+                            <Ban size={18} />
+                          </button>
+                        ) : (
+                          <button type="button" disabled={busyId === id} onClick={() => onBlockToggle(user)} className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-green-50 hover:border-green-200 hover:text-green-600 transition" title="Unblock User">
+                            <CheckCircle size={18} />
+                          </button>
+                        )}
+                        <button type="button" disabled={busyId === id} onClick={() => onDelete(user)} className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition" title="Delete Account">
+                          <Trash2 size={18} />
                         </button>
-                      )}
-                      <button className="h-9 w-9 rounded-xl border border-slate-200 bg-white flex items-center justify-center text-slate-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition" title="Delete Account">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
-        {/* Pagination mock */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-sm text-slate-500 font-medium">
-          <span>Showing 1 to 5 of 12,543 entries</span>
+        <div className="p-4 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500 font-medium">
+          <span>Page {pagination.page ?? page} of {totalPages} ({total} total)</span>
           <div className="flex gap-1">
-             <button className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-50">Prev</button>
-             <button className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold">1</button>
-             <button className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">2</button>
-             <button className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100">Next</button>
+            <button type="button" disabled={page <= 1 || loading} onClick={() => { const p = Math.max(1, page - 1); setPage(p); load(p); }} className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-50">Prev</button>
+            <button type="button" disabled={page >= totalPages || loading} onClick={() => { const p = Math.min(totalPages, page + 1); setPage(p); load(p); }} className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 disabled:opacity-50">Next</button>
           </div>
         </div>
       </div>
@@ -433,46 +553,138 @@ function UsersManagementView() {
 // 3. ALL CATEGORIES MANAGEMENT VIEW
 // 3. ALL CATEGORIES VIEW
 // ============================================================================ //
-function AllCategoriesView() {
-  const [categories, setCategories] = useState([
-     { id: 1, name: 'Smartphones', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=300&auto=format&fit=crop' },
-     { id: 2, name: 'Laptops', image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=300&auto=format&fit=crop' },
-     { id: 3, name: 'Accessories', image: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=300&auto=format&fit=crop' },
-  ]);
+/** Matches backend RibbonCategory.iconKey enum; default hero when imageUrl is empty */
+const RIBBON_ICON_OPTIONS = [
+  { value: 'smartphone', label: 'Smartphones', defaultImage: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=300&auto=format&fit=crop' },
+  { value: 'watch', label: 'Smart Watches', defaultImage: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300&auto=format&fit=crop' },
+  { value: 'tv', label: 'Smart TVs', defaultImage: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=300&auto=format&fit=crop' },
+  { value: 'wind', label: 'Air Conditioner', defaultImage: 'https://images.unsplash.com/photo-1585338447937-7082f8fc763d?q=80&w=300&auto=format&fit=crop' },
+  { value: 'laptop', label: 'Laptops', defaultImage: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=300&auto=format&fit=crop' },
+  { value: 'sparkles', label: 'Personal Care', defaultImage: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?q=80&w=300&auto=format&fit=crop' },
+  { value: 'headphones', label: 'Accessories', defaultImage: 'https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=300&auto=format&fit=crop' },
+  { value: 'tablet', label: 'Tablets', defaultImage: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=300&auto=format&fit=crop' },
+  { value: 'gift', label: 'Gift cards', defaultImage: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?q=80&w=300&auto=format&fit=crop' },
+  { value: 'cpu', label: 'Smart gadgets', defaultImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=300&auto=format&fit=crop' },
+]
 
-  const [brands, setBrands] = useState([
-     { id: 1, catId: 1, name: 'Apple', logo: 'https://www.google.com/s2/favicons?domain=apple.com&sz=128' },
-     { id: 2, catId: 1, name: 'Samsung', logo: 'https://www.google.com/s2/favicons?domain=samsung.com&sz=128' },
-     { id: 3, catId: 2, name: 'Dell', logo: 'https://www.google.com/s2/favicons?domain=dell.com&sz=128' },
-  ]);
+function mapRibbonDocToCard(doc) {
+  const opt = RIBBON_ICON_OPTIONS.find((o) => o.value === doc.iconKey)
+  const fallback = RIBBON_ICON_OPTIONS[0].defaultImage
+  return {
+    id: doc._id,
+    name: doc.label,
+    image: (doc.imageUrl && String(doc.imageUrl).trim()) || opt?.defaultImage || fallback,
+    iconKey: doc.iconKey,
+    path: doc.path,
+    isActive: doc.isActive !== false,
+  }
+}
+
+async function refreshRibbonCategories(setCategories, setLoadErr) {
+  const data = await api.getRibbonCategoriesAdmin()
+  const list = Array.isArray(data) ? data : []
+  setCategories(list.map(mapRibbonDocToCard))
+  setLoadErr('')
+}
+
+function slugifyBrandName(name) {
+  const s = String(name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+  return s || 'brand'
+}
+
+function AllCategoriesView() {
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState('');
+  const [categorySaving, setCategorySaving] = useState(false);
+  const [brandsLoading, setBrandsLoading] = useState(false);
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
-  
-  // NEW: Toggle between category grid and full master catalog
-  const [showCatalog, setShowCatalog] = useState(false);
 
   const [isAddingCategory, setIsAddingCategory] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  /** Form fields only; API still requires `iconKey` — default for new rows, unchanged on edit (from `editingCategory`). */
   const [newCat, setNewCat] = useState({ name: '' });
+  const defaultRibbonIconKey = 'smartphone'
   const [catImagePreview, setCatImagePreview] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        setCategoriesLoading(true)
+        await refreshRibbonCategories(setCategories, setCategoriesError)
+      } catch (e) {
+        if (!cancelled) setCategoriesError(e.message || 'Failed to load categories')
+      } finally {
+        if (!cancelled) setCategoriesLoading(false)
+      }
+    })()
+    return () => { cancelled = true }
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCategory?.id) return
+    let cancelled = false
+    const catId = selectedCategory.id
+    ;(async () => {
+      setBrandsLoading(true)
+      try {
+        const data = await api.getMobileBrands({
+          ribbonCategoryId: catId,
+          page: 1,
+          limit: 200,
+          active: true,
+        })
+        const items = data?.items ?? []
+        if (cancelled) return
+        setBrands((prev) => {
+          const rest = prev.filter((b) => b.catId !== catId)
+          const mapped = items.map((doc) => ({
+            id: doc._id,
+            catId,
+            name: doc.name,
+            logo: doc.imageUrl || '',
+          }))
+          return [...rest, ...mapped]
+        })
+      } catch (e) {
+        if (!cancelled) window.alert(e.message || 'Failed to load brands')
+      } finally {
+        if (!cancelled) setBrandsLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [selectedCategory?.id])
 
   const handleEditCategory = (cat, e) => {
     e.stopPropagation();
     setEditingCategory(cat);
     setNewCat({ name: cat.name });
-    setCatImagePreview(cat.image);
+    setCatImagePreview(cat.image || null);
     setIsAddingCategory(true);
   };
 
-  const handleDeleteCategory = (id, e) => {
+  const handleDeleteCategory = async (id, e) => {
     e.stopPropagation();
-    if(window.confirm('Are you sure you want to delete this category? All its brands and products will be permanently removed.')){
-      setCategories(categories.filter(c => c.id !== id));
-      if(selectedCategory && selectedCategory.id === id) {
-         setSelectedCategory(null);
-         setSelectedBrand(null);
+    if (!window.confirm('Are you sure you want to delete this category? This removes it from the homepage ribbon.')) return
+    try {
+      await api.deleteRibbonCategory(id)
+      await refreshRibbonCategories(setCategories, setCategoriesError)
+      if (selectedCategory && selectedCategory.id === id) {
+        setSelectedCategory(null)
+        setSelectedBrand(null)
       }
+    } catch (err) {
+      window.alert(err.message || 'Failed to delete category')
     }
   };
 
@@ -483,16 +695,35 @@ function AllCategoriesView() {
     setCatImagePreview(null);
   };
 
-  const handleAddCategory = (e) => {
+  const handleAddCategory = async (e) => {
     e.preventDefault();
-    if (editingCategory) {
-       setCategories(categories.map(c => c.id === editingCategory.id ? { ...c, name: newCat.name, image: catImagePreview || c.image } : c));
-    } else {
-       const id = Date.now();
-       setCategories([...categories, { id, name: newCat.name, image: catImagePreview || `https://source.unsplash.com/random/400x300/?${newCat.name.toLowerCase()}` }]);
-       setShowCatalog(false);
+    const label = newCat.name.trim();
+    if (!label) return;
+    setCategorySaving(true);
+    try {
+      const imagePayload = catImagePreview && String(catImagePreview).trim() ? String(catImagePreview).trim() : undefined;
+      if (editingCategory) {
+        await api.patchRibbonCategory(editingCategory.id, {
+          label,
+          iconKey: editingCategory.iconKey || defaultRibbonIconKey,
+          ...(imagePayload !== undefined ? { imageUrl: imagePayload } : {}),
+        });
+      } else {
+        await api.postRibbonCategory({
+          label,
+          iconKey: defaultRibbonIconKey,
+          path: '/marketplace',
+          sortOrder: categories.length,
+          ...(imagePayload ? { imageUrl: imagePayload } : {}),
+        });
+      }
+      await refreshRibbonCategories(setCategories, setCategoriesError);
+      closeCategoryModal();
+    } catch (err) {
+      window.alert(err.message || 'Could not save category');
+    } finally {
+      setCategorySaving(false);
     }
-    closeCategoryModal();
   };
 
   const handleCatImageChange = (file) => {
@@ -518,24 +749,7 @@ function AllCategoriesView() {
           </div>
           
           <div className="flex items-center gap-3">
-             <div className="flex p-1 bg-slate-100/50 rounded-xl border border-slate-200">
-                <button 
-                  type="button"
-                  onClick={() => { 
-                    if (selectedCategory || selectedBrand) {
-                       setSelectedCategory(null); setSelectedBrand(null);
-                       setShowCatalog(true);
-                    } else {
-                       setShowCatalog(!showCatalog); 
-                    }
-                  }}
-                  className={`px-6 py-2 rounded-lg text-sm font-bold shadow-sm border transition-all active:scale-95 cursor-pointer ${showCatalog && !selectedCategory && !selectedBrand ? 'bg-blue-50 text-blue-700 border-blue-200 shadow-blue-100' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-blue-600'}`}
-                >
-                  Manage Catalog
-                </button>
-             </div>
-             
-             {!selectedCategory && !showCatalog && (
+             {!selectedCategory && (
                 <button 
                   onClick={() => setIsAddingCategory(true)}
                   className="flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-black transition"
@@ -556,75 +770,77 @@ function AllCategoriesView() {
           <CategoryBrandsView 
              category={selectedCategory} 
              brands={brands.filter(b => b.catId === selectedCategory.id)}
-             onBack={() => {setSelectedCategory(null); setShowCatalog(false);}}
+             brandsLoading={brandsLoading}
+             onBack={() => setSelectedCategory(null)}
              onSelectBrand={(brand) => setSelectedBrand(brand)}
-             onAddBrand={(name, logo) => setBrands([...brands, { id: Date.now(), catId: selectedCategory.id, name, logo }])}
-             onEditBrand={(id, newName, newLogo) => setBrands(brands.map(b => b.id === id ? { ...b, name: newName, logo: newLogo || b.logo } : b))}
-             onDeleteBrand={(id) => {
-               if(window.confirm('Are you sure you want to delete this brand and all its products?')) {
-                 setBrands(brands.filter(b => b.id !== id));
-               }
+             onAddBrand={async (name, logo) => {
+               const trimmed = String(name || '').trim()
+               if (!trimmed) throw new Error('Brand name is required')
+               const slug = slugifyBrandName(trimmed)
+               const created = await api.postMobileBrand({
+                 name: trimmed,
+                 slug,
+                 ribbonCategoryId: selectedCategory.id,
+                 sortOrder: brands.filter((b) => b.catId === selectedCategory.id).length,
+                 active: true,
+                 ...(logo ? { imageUrl: logo } : {}),
+               })
+               const id = created._id ?? created.id
+               setBrands((prev) => [
+                 ...prev,
+                 {
+                   id,
+                   catId: selectedCategory.id,
+                   name: created.name ?? trimmed,
+                   logo: created.imageUrl || logo || '',
+                 },
+               ])
+             }}
+             onEditBrand={async (id, newName, newLogo) => {
+               const trimmed = String(newName || '').trim()
+               if (!trimmed) throw new Error('Brand name is required')
+               const slug = slugifyBrandName(trimmed)
+               const updated = await api.patchMobileBrand(id, {
+                 name: trimmed,
+                 slug,
+                 ...(newLogo !== undefined ? { imageUrl: newLogo || '' } : {}),
+               })
+               setBrands((prev) =>
+                 prev.map((b) =>
+                   b.id === id
+                     ? {
+                         ...b,
+                         name: updated.name ?? trimmed,
+                         logo: updated.imageUrl !== undefined ? updated.imageUrl || '' : b.logo,
+                       }
+                     : b,
+                 ),
+               )
+             }}
+             onDeleteBrand={async (id) => {
+               if (!window.confirm('Are you sure you want to delete this brand? Models linked to it must be removed first.')) return
+               await api.deleteMobileBrand(id)
+               setBrands((prev) => prev.filter((b) => b.id !== id))
              }}
           />
-       ) : showCatalog ? (
-          <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} className="pt-2">
-             <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
-                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                   <div>
-                     <h3 className="text-lg font-black text-slate-900">Master Catalog</h3>
-                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Comprehensive view of all products</p>
-                   </div>
-                   <div className="flex gap-2">
-                     <button onClick={() => setShowCatalog(false)} className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 shadow-sm hover:border-blue-300 hover:text-blue-600 transition-all cursor-pointer">
-                        View as Categories
-                     </button>
-                   </div>
-                </div>
-                <div className="p-12 text-center flex flex-col items-center">
-                   <div className="h-20 w-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mb-4 shadow-inner">
-                     <Package size={32} />
-                   </div>
-                   <h4 className="text-xl font-black text-slate-900 mb-2">Central Master Catalog</h4>
-                   <p className="text-sm font-medium text-slate-500 max-w-md mx-auto mb-6">You are now viewing the unified catalog listing all active products across every category and brand globally.</p>
-                   {/* Dummy Table implementation for the Catalog view */}
-                   <div className="w-full overflow-x-auto text-left border border-slate-200 rounded-2xl">
-                      <table className="w-full">
-                         <thead className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-widest text-slate-500 font-black">
-                            <tr>
-                               <th className="px-6 py-4">Product Name</th>
-                               <th className="px-6 py-4">Category</th>
-                               <th className="px-6 py-4">Brand</th>
-                               <th className="px-6 py-4 text-right">Status</th>
-                            </tr>
-                         </thead>
-                         <tbody className="divide-y divide-slate-100 text-sm font-bold text-slate-700 bg-white">
-                            <tr className="hover:bg-slate-50 transition-colors">
-                               <td className="px-6 py-4">iPhone 15 Pro Max</td>
-                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Smartphones</span></td>
-                               <td className="px-6 py-4">Apple</td>
-                               <td className="px-6 py-4 text-right"><span className="text-green-600 bg-green-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Active</span></td>
-                            </tr>
-                            <tr className="hover:bg-slate-50 transition-colors">
-                               <td className="px-6 py-4">Galaxy S23 Ultra</td>
-                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Smartphones</span></td>
-                               <td className="px-6 py-4">Samsung</td>
-                               <td className="px-6 py-4 text-right"><span className="text-green-600 bg-green-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Active</span></td>
-                            </tr>
-                            <tr className="hover:bg-slate-50 transition-colors">
-                               <td className="px-6 py-4">XPS 15 9520</td>
-                               <td className="px-6 py-4"><span className="px-2.5 py-1 rounded-md bg-slate-100 text-[10px] uppercase tracking-wider">Laptops</span></td>
-                               <td className="px-6 py-4">Dell</td>
-                               <td className="px-6 py-4 text-right"><span className="text-orange-600 bg-orange-50 px-2 py-1 flex items-center justify-center rounded-lg max-w-max ml-auto">Draft</span></td>
-                            </tr>
-                         </tbody>
-                      </table>
-                   </div>
-                </div>
-             </div>
-          </motion.div>
        ) : (
           <motion.div initial={{opacity: 0, y: 10}} animate={{opacity: 1, y: 0}} className="pt-2">
+              {categoriesError && (
+                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-800">
+                  {categoriesError}
+                </div>
+              )}
+              {categoriesLoading ? (
+                <div className="flex min-h-[240px] items-center justify-center rounded-3xl border border-slate-200 bg-white text-sm font-bold text-slate-500">
+                  Loading categories…
+                </div>
+              ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {categories.length === 0 && (
+                   <div className="col-span-full rounded-3xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-10 text-center">
+                     <p className="text-sm font-bold text-slate-600">No categories yet. Add one with the button above or the card below.</p>
+                   </div>
+                 )}
                  {categories.map((cat) => (
                    <div 
                      key={cat.id} 
@@ -653,9 +869,14 @@ function AllCategoriesView() {
                      </div>
                      <div className="p-5 relative">
                        <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{cat.name}</h3>
-                       <div className="flex items-center justify-between mt-4">
-                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Inventory: 0 Items</span>
-                         <button className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1">View Brands <ChevronRight size={14}/></button>
+                       <div className="flex items-center justify-between gap-2 mt-4">
+                         <span className="text-[10px] font-bold text-slate-500 truncate max-w-[55%]" title={cat.path}>{cat.path || '—'}</span>
+                         <span className={`text-[10px] font-black uppercase tracking-wider shrink-0 ${cat.isActive !== false ? 'text-emerald-600' : 'text-slate-400'}`}>
+                           {cat.isActive !== false ? 'Active' : 'Inactive'}
+                         </span>
+                       </div>
+                       <div className="mt-3 flex justify-end">
+                         <span className="text-xs font-bold text-blue-600 flex items-center gap-1 pointer-events-none">View Brands <ChevronRight size={14}/></span>
                        </div>
                      </div>
                    </div>
@@ -672,6 +893,7 @@ function AllCategoriesView() {
                    <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900">Add New Category</span>
                  </button>
               </div>
+              )}
            </motion.div>
       )}
 
@@ -741,9 +963,9 @@ function AllCategoriesView() {
                  </div>
 
                  <div className="pt-4 flex gap-3">
-                    <button type="button" onClick={closeCategoryModal} className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">Cancel</button>
-                    <button type="submit" className="flex-1 px-4 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-black transition shadow-lg">
-                       {editingCategory ? 'Save Changes' : 'Add Category'}
+                    <button type="button" disabled={categorySaving} onClick={closeCategoryModal} className="flex-1 px-4 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition disabled:opacity-50">Cancel</button>
+                    <button type="submit" disabled={categorySaving} className="flex-1 px-4 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-black transition shadow-lg disabled:opacity-60">
+                       {categorySaving ? 'Saving…' : editingCategory ? 'Save Changes' : 'Add Category'}
                     </button>
                   </div>
               </form>
@@ -758,11 +980,12 @@ function AllCategoriesView() {
 // ============================================================================ //
 // 3.1 CATEGORY BRANDS VIEW
 // ============================================================================ //
-function CategoryBrandsView({ category, brands, onBack, onAddBrand, onSelectBrand, onEditBrand, onDeleteBrand }) {
+function CategoryBrandsView({ category, brands, brandsLoading = false, onBack, onAddBrand, onSelectBrand, onEditBrand, onDeleteBrand }) {
   const [isAddingBrand, setIsAddingBrand] = useState(false);
   const [editingBrandId, setEditingBrandId] = useState(null);
   const [newBrandName, setNewBrandName] = useState('');
   const [brandImagePreview, setBrandImagePreview] = useState(null);
+  const [brandSaving, setBrandSaving] = useState(false);
 
   const handleOpenEdit = (brand, e) => {
     e.stopPropagation();
@@ -807,7 +1030,12 @@ function CategoryBrandsView({ category, brands, onBack, onAddBrand, onSelectBran
           </div>
 
           <div className="p-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-             {brands.map(brand => (
+             {brandsLoading && (
+               <div className="col-span-full py-12 text-center text-sm font-bold text-slate-500">
+                 Loading brands…
+               </div>
+             )}
+             {!brandsLoading && brands.map(brand => (
                 <div key={brand.id} onClick={() => onSelectBrand(brand)} className="relative group flex flex-col items-center gap-3 p-6 rounded-2xl border border-slate-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all cursor-pointer">
                    
                    {/* Action Icons Overlay */}
@@ -819,27 +1047,41 @@ function CategoryBrandsView({ category, brands, onBack, onAddBrand, onSelectBran
                         <Edit2 size={12} />
                       </button>
                       <button 
-                        onClick={(e) => { e.stopPropagation(); onDeleteBrand(brand.id); }}
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation()
+                          try {
+                            await onDeleteBrand(brand.id)
+                          } catch (err) {
+                            window.alert(err.message || 'Could not delete brand')
+                          }
+                        }}
                         className="h-7 w-7 rounded-lg bg-white shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-slate-50 transition-all transform hover:scale-110"
                       >
                         <Trash2 size={12} />
                       </button>
                    </div>
 
-                   <div className="h-16 w-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center p-3 group-hover:scale-110 transition-transform">
-                      <img src={brand.logo} alt={brand.name} className="max-w-full max-h-full object-contain" />
+                   <div className="h-16 w-16 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center p-3 group-hover:scale-110 transition-transform text-slate-400">
+                      {brand.logo ? (
+                        <img src={brand.logo} alt={brand.name} className="max-w-full max-h-full object-contain" />
+                      ) : (
+                        <Package size={28} strokeWidth={1.5} />
+                      )}
                    </div>
                    <span className="text-sm font-black text-slate-700 group-hover:text-blue-600">{brand.name}</span>
                 </div>
              ))}
 
-             <button onClick={() => setIsAddingBrand(true)} className="aspect-square flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-blue-300 transition-all group text-slate-400 gap-2">
+             {!brandsLoading && (
+             <button type="button" onClick={() => setIsAddingBrand(true)} className="aspect-square flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-blue-300 transition-all group text-slate-400 gap-2">
                 <Plus size={24} className="group-hover:text-blue-500 transition-colors" />
                 <span className="text-[10px] font-black uppercase tracking-widest group-hover:text-slate-600">New Brand</span>
              </button>
+             )}
           </div>
 
-          {brands.length === 0 && (
+          {!brandsLoading && brands.length === 0 && (
             <div className="py-20 text-center">
                <Package size={48} className="mx-auto text-slate-200 mb-4" />
                <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No brands listed in this category</p>
@@ -894,22 +1136,36 @@ function CategoryBrandsView({ category, brands, onBack, onAddBrand, onSelectBran
                      </div>
 
                      <div className="pt-2 flex justify-end gap-3">
-                        <button onClick={() => { setIsAddingBrand(false); setEditingBrandId(null); setNewBrandName(''); setBrandImagePreview(null); }} className="px-6 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                        <button type="button" disabled={brandSaving} onClick={() => { setIsAddingBrand(false); setEditingBrandId(null); setNewBrandName(''); setBrandImagePreview(null); }} className="px-6 py-3 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition disabled:opacity-50">Cancel</button>
                         <button 
-                          onClick={() => { 
-                            if (editingBrandId) {
-                               onEditBrand(editingBrandId, newBrandName, brandImagePreview);
-                            } else {
-                               onAddBrand(newBrandName, brandImagePreview || `https://www.google.com/s2/favicons?domain=${newBrandName.toLowerCase()}.com&sz=128`); 
+                          type="button"
+                          disabled={brandSaving}
+                          onClick={async () => {
+                            const name = newBrandName.trim()
+                            if (!name) {
+                              window.alert('Please enter a brand name')
+                              return
                             }
-                            setIsAddingBrand(false); 
-                            setEditingBrandId(null);
-                            setNewBrandName(''); 
-                            setBrandImagePreview(null);
+                            setBrandSaving(true)
+                            try {
+                              if (editingBrandId) {
+                                await onEditBrand(editingBrandId, name, brandImagePreview ?? '')
+                              } else {
+                                await onAddBrand(name, brandImagePreview || '')
+                              }
+                              setIsAddingBrand(false)
+                              setEditingBrandId(null)
+                              setNewBrandName('')
+                              setBrandImagePreview(null)
+                            } catch (err) {
+                              window.alert(err.message || 'Could not save brand')
+                            } finally {
+                              setBrandSaving(false)
+                            }
                           }} 
-                          className="px-8 py-3 rounded-xl text-sm font-black bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition"
+                          className="px-8 py-3 rounded-xl text-sm font-black bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-200 transition disabled:opacity-60"
                         >
-                          {editingBrandId ? 'Save Changes' : 'Add Brand'}
+                          {brandSaving ? 'Saving…' : editingBrandId ? 'Save Changes' : 'Add Brand'}
                         </button>
                      </div>
                   </div>
@@ -928,11 +1184,7 @@ function BrandModelsView({ category, brand, onBack }) {
   const [activeTab, setActiveTab] = useState('Models'); // 'Models' | 'Add'
   const [editingModel, setEditingModel] = useState(null);
   
-  const [models, setModels] = useState([
-     { id: 1, name: 'iPhone 15 Pro', image: 'https://images.unsplash.com/photo-1696446701796-da61225697cc?q=80&w=200&auto=format&fit=crop' },
-     { id: 2, name: 'iPhone 15', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d256e?q=80&w=200&auto=format&fit=crop' },
-     { id: 3, name: 'iPhone 14 Pro', image: 'https://images.unsplash.com/photo-1663499482523-1c0c1bae4ce1?q=80&w=200&auto=format&fit=crop' },
-  ]);
+  const [models, setModels] = useState([]);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this model?')) {
@@ -1060,7 +1312,7 @@ function AddNewModelForm({ onCancel, initialBrand, initialCategory, editingModel
       name: formData.modelName,
       brand: formData.brand,
       category: formData.category,
-      image: imagePreview || 'https://via.placeholder.com/200'
+      image: imagePreview || ''
     });
   };
   
@@ -1503,85 +1755,96 @@ function ConditionPricingView() {
 // 5. ORDERS MANAGEMENT VIEW
 // ============================================================================ //
 function OrdersManagementView() {
-  const [orders, setOrders] = useState([
-    { id: 'ORD-8X9P', customer: 'Rahul Sharma', phone: 'iPhone 13 Pro', storage: '256GB', price: 42000, date: 'Oct 24, 2023', status: 'Order Placed' },
-    { id: 'ORD-2K4M', customer: 'Priya Patel', phone: 'Samsung S22 Ultra', storage: '512GB', price: 51500, date: 'Oct 23, 2023', status: 'Pickup Scheduled' },
-    { id: 'ORD-9F1Z', customer: 'Amit Singh', phone: 'OnePlus 11R', storage: '128GB', price: 28000, date: 'Oct 22, 2023', status: 'Device Verification' },
-    { id: 'ORD-7L3C', customer: 'Neha Gupta', phone: 'iPhone 12', storage: '64GB', price: 22000, date: 'Oct 20, 2023', status: 'Price Finalized' },
-    { id: 'ORD-5W8N', customer: 'Vikram Reddy', phone: 'Google Pixel 7', storage: '128GB', price: 34000, date: 'Oct 18, 2023', status: 'Payment Completed' },
-  ]);
+  const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [err, setErr] = useState('')
+  const [busyId, setBusyId] = useState(null)
 
   const PIPELINE = [
     'Order Placed',
     'Pickup Scheduled',
     'Device Verification',
     'Price Finalized',
-    'Payment Completed'
-  ];
+    'Payment Completed',
+  ]
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Order Placed': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Pickup Scheduled': return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'Device Verification': return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'Price Finalized': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-      case 'Payment Completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-      default: return 'bg-slate-100 text-slate-800 border-slate-200';
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res = await api.getOrderManagementList({ page: 1, limit: 50 })
+      const items = res.items || []
+      setOrders(
+        items.map((o) => ({
+          id: o._id,
+          customer: (typeof o.userId === 'object' && o.userId?.name) || o.userId?.phone || '—',
+          phone: `${o.brand || ''} ${o.modelName || ''}`.trim() || '—',
+          storage: o.storage || '—',
+          price: o.finalPrice ?? 0,
+          date: o.createdAt
+            ? new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            : '—',
+          status: apiStatusToAdminLabel(o.status),
+          apiStatus: o.status,
+        })),
+      )
+      setErr('')
+    } catch (e) {
+      setErr(e.message || 'Failed to load orders')
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
-  const getStatusDotColor = (status) => {
-    switch (status) {
-      case 'Order Placed': return 'bg-blue-500';
-      case 'Pickup Scheduled': return 'bg-purple-500';
-      case 'Device Verification': return 'bg-orange-500';
-      case 'Price Finalized': return 'bg-indigo-500';
-      case 'Payment Completed': return 'bg-emerald-500';
-      default: return 'bg-slate-500';
+  useEffect(() => {
+    load()
+  }, [])
+
+  const advanceOrder = async (row) => {
+    const i = ADMIN_PIPELINE.indexOf(row.apiStatus)
+    if (i < 0 || i >= ADMIN_PIPELINE.length - 1) return
+    const next = ADMIN_PIPELINE[i + 1]
+    setBusyId(row.id)
+    try {
+      await api.patchOrderManagementStatus(row.id, { status: next, notes: '' })
+      await load()
+    } catch (e) {
+      setErr(e.message || 'Update failed')
+    } finally {
+      setBusyId(null)
     }
-  };
+  }
 
-  const advanceOrder = (id) => {
-    setOrders(orders.map(o => {
-      if (o.id === id) {
-        const currIdx = PIPELINE.indexOf(o.status);
-        if (currIdx < PIPELINE.length - 1) {
-          return { ...o, status: PIPELINE[currIdx + 1] };
-        }
-      }
-      return o;
-    }));
-  };
-
-  const regressOrder = (id) => {
-    setOrders(orders.map(o => {
-      if (o.id === id) {
-        const currIdx = PIPELINE.indexOf(o.status);
-        if (currIdx > 0) {
-          return { ...o, status: PIPELINE[currIdx - 1] };
-        }
-      }
-      return o;
-    }));
-  };
+  const regressOrder = async (row) => {
+    const i = ADMIN_PIPELINE.indexOf(row.apiStatus)
+    if (i <= 0) return
+    const prev = ADMIN_PIPELINE[i - 1]
+    setBusyId(row.id)
+    try {
+      await api.patchOrderManagementStatus(row.id, { status: prev, notes: '' })
+      await load()
+    } catch (e) {
+      setErr(e.message || 'Update failed')
+    } finally {
+      setBusyId(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-900">Order Management</h2>
-          <p className="text-sm font-medium text-slate-500 mt-1">Track and advance active trade-in orders through the pipeline.</p>
+          <p className="text-sm font-medium text-slate-500 mt-1">Live data from <code className="text-xs">GET /api/order-management</code>. Next/Prev call PATCH status.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-            <input type="text" placeholder="Search orders..." className="pl-9 pr-4 py-2 border border-slate-200 bg-white rounded-xl text-sm font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition w-full sm:w-64" />
-          </div>
-          <button className="flex items-center justify-center gap-2 border border-slate-200 bg-white rounded-xl px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 shadow-sm transition">
-            <Filter size={16} /> Filter
+          <button type="button" onClick={() => load()} className="flex items-center justify-center gap-2 border border-slate-200 bg-white rounded-xl px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 shadow-sm transition">
+            Refresh
           </button>
         </div>
       </div>
+
+      {err && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{err}</div>}
+      {loading && <div className="text-sm font-semibold text-slate-500">Loading orders…</div>}
 
       <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -1617,7 +1880,7 @@ function OrdersManagementView() {
                   <td className="px-6 py-3 w-48 align-top">
                     <div className="flex flex-col py-1">
                        {PIPELINE.map((p, idx) => {
-                          const currentIdx = PIPELINE.indexOf(order.status);
+                          const currentIdx = Math.max(0, PIPELINE.indexOf(order.status));
                           const isComplete = idx <= currentIdx;
                           const isCurrent = idx === currentIdx;
                           const isLast = idx === PIPELINE.length - 1;
@@ -1659,18 +1922,22 @@ function OrdersManagementView() {
                     <div className="flex items-center justify-end h-8 min-w-[140px]">
                       {/* Action buttons on hover */}
                       <div className="hidden group-hover:flex items-center justify-end gap-1.5 w-full animate-in fade-in slide-in-from-right-2 duration-200">
-                          {order.status !== 'Order Placed' && (
+                          {order.status !== 'Order Placed' && order.apiStatus !== 'CANCELLED' && (
                              <button 
-                               onClick={() => regressOrder(order.id)}
+                               type="button"
+                               disabled={busyId === order.id}
+                               onClick={() => regressOrder(order)}
                                className="bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 border border-slate-200 px-3 h-8 rounded-lg text-xs font-black shadow-sm flex items-center justify-center transition-colors"
                                title="Undo Stage"
                              >
                                <ChevronLeft size={16} strokeWidth={2.5}/>
                              </button>
                           )}
-                          {order.status !== 'Payment Completed' && (
+                          {order.status !== 'Payment Completed' && order.apiStatus !== 'CANCELLED' && (
                              <button 
-                               onClick={() => advanceOrder(order.id)}
+                               type="button"
+                               disabled={busyId === order.id}
+                               onClick={() => advanceOrder(order)}
                                className="bg-slate-900 text-white hover:bg-black px-4 h-8 rounded-lg text-xs font-black shadow-sm flex items-center gap-1.5 transition-colors shrink-0"
                              >
                                Next <ChevronRight size={14} strokeWidth={3}/>
@@ -2352,23 +2619,53 @@ function CmsManagementView() {
 // 11. REPORTS & ANALYTICS VIEW
 // ============================================================================ //
 function AnalyticsManagementView() {
-  // Mock data for sales
-  const monthlyRevenueData = [
-    { name: 'Jan', revenue: 450000, units: 120 },
-    { name: 'Feb', revenue: 520000, units: 145 },
-    { name: 'Mar', revenue: 480000, units: 130 },
-    { name: 'Apr', revenue: 610000, units: 180 },
-    { name: 'May', revenue: 590000, units: 170 },
-    { name: 'Jun', revenue: 750000, units: 210 },
-    { name: 'Jul', revenue: 820000, units: 235 },
-  ];
+  const year = new Date().getFullYear()
+  const [monthlyRevenueData, setMonthlyRevenueData] = useState([])
+  const [brandData, setBrandData] = useState([])
+  const [stats, setStats] = useState(null)
+  const [topModelLabel, setTopModelLabel] = useState('—')
+  const [analyticsErr, setAnalyticsErr] = useState('')
 
-  const brandData = [
-    { name: 'Apple', value: 400, color: '#3b82f6' },
-    { name: 'Samsung', value: 300, color: '#8b5cf6' },
-    { name: 'OnePlus', value: 200, color: '#f59e0b' },
-    { name: 'Xiaomi', value: 100, color: '#10b981' },
-  ];
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const [monthly, devices, dash] = await Promise.all([
+          api.getReportMonthlyRevenue({ year }),
+          api.getReportMostSoldDevices(8),
+          api.dashboardStats(),
+        ])
+        if (cancelled) return
+        const m = Array.isArray(monthly) ? monthly : []
+        setMonthlyRevenueData(
+          m.map((x) => ({
+            name: x.month ? String(x.month).slice(5) : '',
+            revenue: x.revenue ?? 0,
+            units: x.orders ?? 0,
+          })),
+        )
+        const tb = devices?.topBrands ?? []
+        const palette = ['#3b82f6', '#8b5cf6', '#f59e0b', '#10b981', '#ef4444', '#6366f1', '#ec4899', '#14b8a6']
+        setBrandData(
+          tb.map((b, i) => ({
+            name: b.brandName || 'Unknown',
+            value: b.count ?? 0,
+            color: palette[i % palette.length],
+          })),
+        )
+        const tm = devices?.topModels?.[0]
+        setTopModelLabel(tm?.modelName ? `${tm.brand || ''} ${tm.modelName}`.trim() : '—')
+        setStats(dash)
+        setAnalyticsErr('')
+      } catch (e) {
+        if (!cancelled) setAnalyticsErr(e.message || 'Failed to load analytics')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const lastRev = monthlyRevenueData.length ? monthlyRevenueData[monthlyRevenueData.length - 1].revenue : 0
+  const totalUnitsPeriod = monthlyRevenueData.reduce((s, x) => s + (x.units || 0), 0)
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
@@ -2389,8 +2686,8 @@ function AnalyticsManagementView() {
       body: brandData.map(b => [b.name, b.value])
     });
     
-    doc.save("Baskaro_Analytics_Report.pdf");
-  };
+    doc.save('Baskaro_Analytics_Report.pdf')
+  }
 
   const handleExportExcel = () => {
     const wb = XLSX.utils.book_new();
@@ -2400,11 +2697,16 @@ function AnalyticsManagementView() {
     const brandSheet = XLSX.utils.json_to_sheet(brandData.map(b => ({ 'Brand Name': b.name, 'Units Sold': b.value })));
     XLSX.utils.book_append_sheet(wb, brandSheet, "Brand Share");
     
-    XLSX.writeFile(wb, "Baskaro_Analytics_Report.xlsx");
-  };
+    XLSX.writeFile(wb, 'Baskaro_Analytics_Report.xlsx')
+  }
 
   return (
     <div className="space-y-6">
+      {analyticsErr && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+          {analyticsErr}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-900">Reports & Analytics</h2>
@@ -2423,27 +2725,27 @@ function AnalyticsManagementView() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm hover:shadow-md transition">
           <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4"><DollarSign size={24} strokeWidth={2.5}/></div>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Monthly Revenue</p>
-          <h3 className="text-3xl font-black text-slate-900">₹8.2L</h3>
-          <p className="text-emerald-500 text-xs font-bold mt-2 flex items-center gap-1">+12.5% from last month</p>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Latest month revenue</p>
+          <h3 className="text-3xl font-black text-slate-900">₹{Number(lastRev || 0).toLocaleString('en-IN')}</h3>
+          <p className="text-slate-500 text-xs font-bold mt-2">From completed orders (report API)</p>
         </div>
         <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm hover:shadow-md transition">
           <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-4"><ShoppingCart size={24} strokeWidth={2.5}/></div>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Total Sales</p>
-          <h3 className="text-3xl font-black text-slate-900">235 Units</h3>
-          <p className="text-emerald-500 text-xs font-bold mt-2 flex items-center gap-1">+4.2% from last month</p>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Orders (dashboard)</p>
+          <h3 className="text-3xl font-black text-slate-900">{stats?.totalOrders ?? '—'}</h3>
+          <p className="text-slate-500 text-xs font-bold mt-2">Units in chart period: {totalUnitsPeriod}</p>
         </div>
         <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm hover:shadow-md transition">
           <div className="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mb-4"><Tag size={24} strokeWidth={2.5}/></div>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Most Sold Brand</p>
-          <h3 className="text-3xl font-black text-slate-900">Apple</h3>
-          <p className="text-slate-500 text-xs font-bold mt-2 flex items-center gap-1">40% of standard volume</p>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Top brand (units)</p>
+          <h3 className="text-3xl font-black text-slate-900 truncate">{brandData[0]?.name ?? '—'}</h3>
+          <p className="text-slate-500 text-xs font-bold mt-2 truncate">{brandData[0] ? `${brandData[0].value} orders` : 'No data'}</p>
         </div>
         <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm hover:shadow-md transition">
           <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4"><Smartphone size={24} strokeWidth={2.5}/></div>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Most Sold Model</p>
-          <h3 className="text-3xl font-black text-slate-900">iPhone 13</h3>
-          <p className="text-slate-500 text-xs font-bold mt-2 flex items-center gap-1">112 units moved this month</p>
+          <p className="text-slate-500 font-bold text-xs uppercase tracking-wider mb-1">Top model</p>
+          <h3 className="text-xl font-black text-slate-900 leading-tight">{topModelLabel}</h3>
+          <p className="text-slate-500 text-xs font-bold mt-2">From order aggregates</p>
         </div>
       </div>
 
@@ -2451,6 +2753,9 @@ function AnalyticsManagementView() {
         <div className="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col">
            <h3 className="text-lg font-black text-slate-900 mb-6 flex-shrink-0">Sales & Revenue Report</h3>
            <div className="flex-1 min-h-[300px]">
+             {monthlyRevenueData.length === 0 ? (
+               <div className="flex h-[300px] items-center justify-center text-sm font-semibold text-slate-400">No revenue data for {year}</div>
+             ) : (
              <ResponsiveContainer width="100%" height="100%">
                <ReBarChart data={monthlyRevenueData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0"/>
@@ -2461,6 +2766,7 @@ function AnalyticsManagementView() {
                  <Bar dataKey="revenue" name="Revenue (₹)" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
                </ReBarChart>
              </ResponsiveContainer>
+             )}
            </div>
         </div>
 
@@ -2468,6 +2774,9 @@ function AnalyticsManagementView() {
            <h3 className="text-lg font-black text-slate-900 mb-2 flex-shrink-0">Market Share</h3>
            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 flex-shrink-0">Top performing OEM brands</p>
            <div className="flex-1 min-h-[300px] flex items-center justify-center">
+             {brandData.length === 0 ? (
+               <p className="text-sm font-semibold text-slate-400">No brand sales yet</p>
+             ) : (
              <ResponsiveContainer width="100%" height="100%">
                <PieChart>
                   <Pie
@@ -2487,6 +2796,7 @@ function AnalyticsManagementView() {
                   <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontWeight: 700 }} />
                </PieChart>
              </ResponsiveContainer>
+             )}
            </div>
            
            <div className="grid grid-cols-2 gap-y-3 gap-x-2 mt-4 flex-shrink-0">
@@ -2508,11 +2818,7 @@ function AnalyticsManagementView() {
 // 12. ADMIN ROLES & PERMISSIONS VIEW
 // ============================================================================ //
 function RolesManagementView() {
-  const [admins, setAdmins] = useState([
-    { id: 'ADM-01', name: 'Althea Root', email: 'root@baskaro.com', role: 'Super Admin', status: 'Active' },
-    { id: 'ADM-02', name: 'Rahul Sharma', email: 'rahul@baskaro.com', role: 'Manager', status: 'Active' },
-    { id: 'ADM-03', name: 'Priya Patel', email: 'priya@baskaro.com', role: 'Support', status: 'Inactive' },
-  ]);
+  const [admins, setAdmins] = useState([]);
 
   const rolesList = ['Super Admin', 'Manager', 'Support'];
 
@@ -2534,7 +2840,6 @@ function RolesManagementView() {
   };
 
   const handleRoleChange = (id, newRole) => {
-    if (id === 'ADM-01') return; 
     setAdmins(admins.map(a => a.id === id ? { ...a, role: newRole } : a));
   };
 
@@ -2580,6 +2885,13 @@ function RolesManagementView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
+                {admins.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-4 py-8 text-center text-sm font-semibold text-slate-500">
+                      No personnel rows — add admins in the database or use Add Personnel when wired to the API.
+                    </td>
+                  </tr>
+                )}
                 {admins.map((admin) => (
                   <tr key={admin.id} className="hover:bg-slate-50/50 transition-colors group">
                     <td className="px-4 py-4 whitespace-nowrap">
@@ -2590,10 +2902,7 @@ function RolesManagementView() {
                        <select 
                          value={admin.role}
                          onChange={(e) => handleRoleChange(admin.id, e.target.value)}
-                         disabled={admin.id === 'ADM-01'}
-                         className={`text-xs font-black uppercase tracking-widest outline-none appearance-none px-3 py-1.5 rounded-lg shadow-sm transition-all focus:ring-2 focus:border-blue-500 w-32 cursor-pointer
-                            ${admin.id === 'ADM-01' ? 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200' : 'bg-white text-slate-700 border border-slate-300 hover:border-slate-400'}
-                         `}
+                         className="text-xs font-black uppercase tracking-widest outline-none appearance-none px-3 py-1.5 rounded-lg shadow-sm transition-all focus:ring-2 focus:border-blue-500 w-32 cursor-pointer bg-white text-slate-700 border border-slate-300 hover:border-slate-400"
                        >
                          {rolesList.map(r => <option key={r} value={r}>{r}</option>)}
                        </select>

@@ -14,6 +14,8 @@ export function ServicePageLayout({
   searchPlaceholder,
   searchButtonText,
   brands = [],
+  /** When true, show placeholder pills until `brands` are ready */
+  brandsLoading = false,
   brandPickerSubtitle = 'Or choose a brand',
   howItWorksTitle = 'How it works',
   howItWorks,
@@ -61,21 +63,29 @@ export function ServicePageLayout({
                 {searchButtonText}
               </Button>
             </div>
-            {brands.length > 0 && (
+            {(brands.length > 0 || brandsLoading) && (
               <>
                 <p className="mt-4 text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs">
                   {brandPickerSubtitle}
                 </p>
                 <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
-                  {brands.map((brand) => (
-                    <button
-                      key={brand}
-                      type="button"
-                      className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-400 hover:text-blue-700 hover:shadow-sm sm:px-3 sm:py-1.5 sm:text-sm"
-                    >
-                      {brand}
-                    </button>
-                  ))}
+                  {brandsLoading
+                    ? Array.from({ length: 8 }).map((_, i) => (
+                        <div
+                          key={`brand-skel-${i}`}
+                          className="h-7 min-w-[4.5rem] animate-pulse rounded-full bg-slate-200 sm:h-9 sm:min-w-[5.5rem]"
+                          aria-hidden
+                        />
+                      ))
+                    : brands.map((brand) => (
+                        <button
+                          key={brand}
+                          type="button"
+                          className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-400 hover:text-blue-700 hover:shadow-sm sm:px-3 sm:py-1.5 sm:text-sm"
+                        >
+                          {brand}
+                        </button>
+                      ))}
                 </div>
               </>
             )}

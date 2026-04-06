@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { LandingNavbar } from './LandingNavbar'
 import { CategoryRibbon } from './CategoryRibbon'
 import { WhatsAppWidget } from './WhatsAppWidget'
@@ -6,10 +8,32 @@ import { WhatsAppWidget } from './WhatsAppWidget'
  * Wraps page content; add header/footer/sidebar here as the app grows.
  */
 export function MainLayout({ children }) {
+  const { pathname } = useLocation()
+  const path = pathname.replace(/\/$/, '') || '/'
+  const slimLayout = path === '/login' || path === '/dashboard'
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (slimLayout) root.classList.add('scrollbar-hide')
+    else root.classList.remove('scrollbar-hide')
+    return () => root.classList.remove('scrollbar-hide')
+  }, [slimLayout])
+
+  /* Login + user dashboard: one screen tall — navbar + scrollable main — avoids min-h-screen stacking past 100vh */
+  if (slimLayout) {
+    return (
+      <div className="flex h-dvh max-h-dvh flex-col overflow-hidden">
+        <LandingNavbar />
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">{children}</div>
+        <WhatsAppWidget />
+      </div>
+    )
+  }
+
   return (
     <>
       <LandingNavbar />
-      <CategoryRibbon />
+      <CategoryRibbon variant="bar" />
       {children}
       <WhatsAppWidget />
       <footer className="border-t border-blue-800/90 bg-gradient-to-b from-blue-900 via-blue-950 to-slate-950 text-blue-100">
@@ -86,9 +110,9 @@ export function MainLayout({ children }) {
             <div>
               <h3 className="text-sm font-extrabold text-white">Portal</h3>
               <div className="mt-3 space-y-2 text-sm font-semibold text-blue-200/95">
-                <a className="block transition-colors hover:text-white" href="/admin/login">
+                <Link className="block transition-colors hover:text-white" to="/login" state={{ redirectTo: '/admin' }}>
                   Admin Login
-                </a>
+                </Link>
               </div>
             </div>
           </div>

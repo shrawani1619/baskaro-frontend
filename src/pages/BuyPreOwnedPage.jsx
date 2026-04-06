@@ -1,11 +1,13 @@
+import { useMemo } from 'react'
 import { ServicePageLayout } from '../components/ServicePageLayout'
+import { useCatalogBrands } from '../hooks/useCatalogBrands'
 import { gPhoto } from '../constants/googleImages'
 import { useCart } from '../context/CartContext'
 
 import s25Front from '../assets/products/s25_titanium.jpg'
 import iphone14Front from '../assets/products/iphone14_purple.jpg'
 
-const BRANDS = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'OPPO', 'Realme', 'Motorola']
+const BRANDS_FALLBACK = ['Apple', 'Samsung', 'OnePlus', 'Xiaomi', 'Vivo', 'OPPO', 'Realme', 'Motorola']
 
 const HOW_IT_WORKS = [
   {
@@ -58,6 +60,11 @@ const FAQS = [
 
 export default function BuyPreOwnedPage() {
   const { addToCart } = useCart()
+  const { brands: apiBrands, loading: brandsLoading } = useCatalogBrands()
+  const brands = useMemo(() => {
+    if (brandsLoading) return []
+    return apiBrands.length ? apiBrands : BRANDS_FALLBACK
+  }, [brandsLoading, apiBrands])
 
   return (
     <ServicePageLayout
@@ -67,7 +74,8 @@ export default function BuyPreOwnedPage() {
       searchLabel="Search pre-owned devices"
       searchPlaceholder="e.g. iPhone 14, Samsung S23..."
       searchButtonText="Search"
-      brands={BRANDS}
+      brands={brands}
+      brandsLoading={brandsLoading}
       brandPickerSubtitle="Browse by brand"
       howItWorksTitle="How buying pre-owned works"
       howItWorks={HOW_IT_WORKS}
