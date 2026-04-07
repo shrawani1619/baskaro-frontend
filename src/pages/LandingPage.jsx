@@ -5,8 +5,8 @@ import { gPhoto } from '../constants/googleImages'
 import { DownloadAppBanner } from '../components/DownloadAppBanner'
 import { FlashDealsSection } from '../components/FlashDealsSection'
 import { ProductCard } from '../components/ProductCard'
-import { EXCLUSIVE_STORES } from '../constants/exclusiveStores'
 import { ServiceCard } from '../components/ServiceCard'
+import { TopSellingBrands, PHONE_BRAND_PORTALS } from '../components/TopBrandPortals'
 
 // Import premium PNG assets for that "wow" effect
 import s25Front from '../assets/products/s25_titanium.jpg'
@@ -1193,8 +1193,8 @@ export default function LandingPage() {
   }, [navDropdownOpen])
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero carousel — full width (inset matches Our Services) */}
+    <div className="min-h-screen bg-white font-sans selection:bg-red-100 selection:text-red-900">
+      {/* Hero Section */}
       <section className="w-full pt-6 pb-2">
         <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
           <div
@@ -1326,6 +1326,13 @@ export default function LandingPage() {
       </section>
 
       <FlashDealsSection />
+
+      {/* Top Selling Brands Section */}
+      <section className="w-full py-10 bg-white">
+        <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-16">
+          <TopSellingBrands brands={PHONE_BRAND_PORTALS} />
+        </div>
+      </section>
 
       {/* Services — full-width band */}
       <section className="w-full border-y border-slate-100 bg-slate-50 pt-10 pb-10">

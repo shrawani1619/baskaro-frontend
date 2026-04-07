@@ -139,8 +139,8 @@ export function TopSellingBrands({
 
   return (
     <div className={className}>
-      <h2 className="text-xl font-extrabold text-slate-900 sm:text-2xl">{title}</h2>
-      <div className="mt-4 flex items-center gap-3">
+      <h2 className="text-xl font-bold text-slate-900 sm:text-2xl">{title}</h2>
+      <div className="mt-8 flex items-center gap-4 relative">
         <button
           type="button"
           onClick={scrollPrev}
@@ -165,15 +165,15 @@ export function TopSellingBrands({
               to={getHref(brand)}
               className="group flex min-w-[90px] shrink-0 flex-col items-center text-center"
             >
-              <div className="flex h-[64px] w-[64px] items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-md">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition group-hover:-translate-y-0.5 group-hover:shadow-md">
                 <img
                   src={brand.logoUrl}
                   alt={brand.name}
                   loading="lazy"
-                  className="h-8 w-10 object-contain"
+                  className="h-10 w-10 object-contain"
                 />
               </div>
-              <p className="mt-2 text-xs font-semibold text-slate-700">{brand.name}</p>
+              <p className="mt-3 text-[11px] font-bold text-slate-500 group-hover:text-slate-900">{brand.name}</p>
             </Link>
           ))}
         </div>
