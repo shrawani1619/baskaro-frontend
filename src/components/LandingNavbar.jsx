@@ -9,6 +9,7 @@ import {
   X,
   Bell,
   LogIn,
+  UserCircle,
   Heart,
   ShoppingCart,
 } from 'lucide-react'
@@ -33,6 +34,11 @@ export function LandingNavbar() {
   const loggedIn = Boolean(token && user)
   const accountHref = loggedIn ? (isAdminUser(user) ? '/admin' : '/dashboard') : '/login'
   const accountLabel = loggedIn ? (isAdminUser(user) ? 'Admin' : 'Account') : 'Login'
+  const accountAriaLabel = loggedIn
+    ? isAdminUser(user)
+      ? 'Open admin dashboard'
+      : 'Open my account'
+    : 'Log in or register'
 
   useEffect(() => {
     if (
@@ -148,12 +154,22 @@ export function LandingNavbar() {
             </div>
           </div>
 
-          <Link
-            to="/login"
-            className="rounded-xl bg-slate-900 px-3 py-2 text-[12px] font-black text-white shadow-lg shadow-slate-900/10 hover:bg-rose-600 hover:shadow-rose-600/20 transition-all active:scale-95 sm:px-5 sm:text-sm"
-          >
-            Login
-          </Link>
+          {loggedIn ? (
+            <Link
+              to={accountHref}
+              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-700 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 sm:p-2.5"
+              aria-label={accountAriaLabel}
+            >
+              <UserCircle size={22} strokeWidth={2} aria-hidden />
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="rounded-xl bg-slate-900 px-3 py-2 text-[12px] font-black text-white shadow-lg shadow-slate-900/10 hover:bg-rose-600 hover:shadow-rose-600/20 transition-all active:scale-95 sm:px-5 sm:text-sm"
+            >
+              Login
+            </Link>
+          )}
 
           <Link
             to="/wishlist"
@@ -349,8 +365,9 @@ export function LandingNavbar() {
                 to={accountHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 py-4 text-sm font-black text-white shadow-xl hover:bg-rose-600 transition-all active:scale-95"
+                aria-label={accountAriaLabel}
               >
-                <LogIn size={18} />
+                {loggedIn ? <UserCircle size={20} strokeWidth={2} aria-hidden /> : <LogIn size={18} aria-hidden />}
                 {loggedIn ? accountLabel : 'Login / Register'}
               </Link>
             </div>
