@@ -72,10 +72,14 @@ function RibbonCategoryLink({ cat }) {
   const Icon = ICON_MAP[cat.iconKey] ?? Smartphone
   const imageUrl = cat.imageUrl
   const showImg = Boolean(imageUrl) && !imgFailed
+  const to =
+    cat.path === '/marketplace'
+      ? { pathname: cat.path, search: `?categoryId=${encodeURIComponent(String(cat._id ?? ''))}` }
+      : cat.path
 
   return (
     <Link
-      to={cat.path}
+      to={to}
       className="group flex flex-col items-center gap-2 transition-all duration-300 hover:-translate-y-0.5 active:scale-95"
     >
       <div className="relative">

@@ -16,10 +16,13 @@ export function useCatalogBrands() {
     getCatalogBrands()
       .then((list) => {
         if (cancelled) return
-        const names = Array.isArray(list)
-          ? list.map((b) => b?.name).filter(Boolean)
+        const mapped = Array.isArray(list)
+          ? list.map((b) => ({
+              name: b.name || '',
+              logo: b.imageUrl || ''
+            })).filter(b => b.name)
           : []
-        setBrands(names)
+        setBrands(mapped)
       })
       .catch((e) => {
         if (!cancelled) setError(e)

@@ -68,7 +68,7 @@ export function ServicePageLayout({
                 <p className="mt-4 text-[10px] font-semibold uppercase tracking-wide text-slate-500 sm:text-xs">
                   {brandPickerSubtitle}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-1.5 sm:gap-2">
+                <div className="mt-6 flex overflow-x-auto pb-4 gap-8 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden items-start">
                   {brandsLoading
                     ? Array.from({ length: 8 }).map((_, i) => (
                         <div
@@ -77,15 +77,30 @@ export function ServicePageLayout({
                           aria-hidden
                         />
                       ))
-                    : brands.map((brand) => (
-                        <button
-                          key={brand}
-                          type="button"
-                          className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-blue-400 hover:text-blue-700 hover:shadow-sm sm:px-3 sm:py-1.5 sm:text-sm"
-                        >
-                          {brand}
-                        </button>
-                      ))}
+                    : brands.map((brand) => {
+                        const name = typeof brand === 'string' ? brand : brand.name
+                        const logo = typeof brand === 'object' ? brand.logo : null
+                        return (
+                          <button
+                            key={name}
+                            type="button"
+                            className="group flex flex-col items-center gap-3 transition-transform hover:-translate-y-1"
+                          >
+                            <div className="flex h-16 w-16 items-center justify-center rounded-full border border-slate-100 bg-white shadow-sm transition group-hover:shadow-md">
+                               {logo ? (
+                                 <img src={logo} alt={name} className="h-10 w-10 object-contain mix-blend-multiply" />
+                               ) : (
+                                 <div className="h-10 w-10 flex items-center justify-center text-[10px] font-black text-slate-300 uppercase tracking-tighter">
+                                   {name.slice(0, 2)}
+                                 </div>
+                               )}
+                            </div>
+                            <span className="text-[11px] font-bold text-slate-600 transition-colors group-hover:text-blue-700">
+                               {name}
+                            </span>
+                          </button>
+                        )
+                      })}
                 </div>
               </>
             )}

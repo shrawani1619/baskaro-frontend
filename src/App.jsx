@@ -5,6 +5,7 @@ import { Button } from './components/Button'
 import LandingPage from './pages/LandingPage'
 import HomePage from './pages/HomePage'
 import BrandPage from './pages/BrandPage'
+import MarketplacePage from './pages/MarketplacePage'
 import LoginPage from './pages/LoginPage'
 import UserDashboard from './pages/UserDashboard'
 import SellPhonePage from './pages/SellPhonePage'
@@ -61,7 +62,7 @@ export default function App() {
                     <Route path="/sell-phone" element={<SellPhonePage />} />
                     <Route path="/buy-accessories" element={<BuyAccessoriesPage />} />
                     <Route path="/buy-pre-owned" element={<BuyPreOwnedPage />} />
-                    <Route path="/marketplace" element={<BuyPreOwnedPage />} />
+                    <Route path="/marketplace" element={<MarketplacePage />} />
                     <Route path="/repair-phone" element={<RepairPhonePage />} />
                     <Route path="/find-new-phone" element={<FindNewPhonePage />} />
                     <Route path="/cart" element={<CartPage />} />

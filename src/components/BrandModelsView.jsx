@@ -1,0 +1,155 @@
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { 
+  ChevronLeft, Plus, Edit2, Trash2, CheckCircle 
+} from 'lucide-react'
+import AddNewModelForm from './AddNewModelForm.jsx'
+import * as api from '../lib/api/baskaroApi.js'
+
+export default function BrandModelsView({ category, brand, onBack }) {
+  const [activeTab, setActiveTab] = useState('Models'); // 'Models' | 'Add'
+  const [editingModel, setEditingModel] = useState(null);
+  
+  const [models, setModels] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadModels = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.getMobileModels({ brandId: brand.id, limit: 100 });
+      const mItems = res?.items || (Array.isArray(res) ? res : []); 
+      setModels(mItems);
+    } catch (err) {
+      console.error('Failed to load models:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [brand.id]);
+
+  React.useEffect(() => {
+    loadModels();
+  }, [loadModels]);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this model?')) {
+       try {
+         await api.deleteMobileModel(id);
+         loadModels();
+       } catch (err) {
+         alert(err.message || 'Delete failed');
+       }
+    }
+  };
+
+  const handleEdit = (model) => {
+     setEditingModel(model);
+     setActiveTab('Add');
+  };
+
+  const handleSave = async (data) => {
+    try {
+      if (editingModel) {
+        await api.patchMobileModel(editingModel.id, data);
+      } else {
+        await api.postMobileModel({ ...data, brandId: brand.id });
+      }
+      loadModels();
+      setActiveTab('Models');
+      setEditingModel(null);
+    } catch (err) {
+      alert(err.message || 'Save failed');
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+       <div className="flex items-center gap-4">
+          <button onClick={onBack} className="h-10 w-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+             <ChevronLeft size={20} />
+          </button>
+          <div className="flex items-baseline gap-2">
+             <h2 className="text-2xl font-black text-slate-900">{brand.name}</h2>
+             <span className="text-sm font-bold text-slate-400">/ {category.name} Models</span>
+          </div>
+       </div>
+
+       {activeTab === 'Add' ? (
+          <AddNewModelForm 
+            onCancel={() => { setActiveTab('Models'); setEditingModel(null); }} 
+            initialBrand={brand.name} 
+            initialCategory={category.name} 
+            editingModel={editingModel}
+            onSave={handleSave}
+          />
+       ) : (
+          <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
+             <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <div>
+                   <h3 className="text-lg font-black text-slate-900">Registered Models</h3>
+                   <p className="text-sm font-bold text-slate-400">Manage pricing and variants for {brand.name}</p>
+                </div>
+                <button onClick={() => setActiveTab('Add')} className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-black shadow-lg hover:bg-black transition">
+                   <Plus size={16} /> Add New {category.name === 'Smartphones' ? 'Mobile' : 'Product'}
+                </button>
+             </div>
+
+             <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                   <thead>
+                      <tr className="border-b border-slate-200/60 bg-slate-50/50">
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Model Name & Preview</th>
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Status</th>
+                         <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Actions</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                       {loading && (
+                        <tr>
+                           <td colSpan={3} className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs animate-pulse">Loading catalog…</td>
+                        </tr>
+                      )}
+                      {!loading && models.map(model => (
+                         <tr key={model.id || model._id} className="group border-b border-slate-100 hover:bg-slate-50/40 transition-all">
+                            <td className="px-8 py-5">
+                               <div className="flex items-center gap-5">
+                                  <div className="h-14 w-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex-shrink-0 p-2 overflow-hidden group-hover:border-blue-200 group-hover:scale-105 transition-all">
+                                     <img src={model.image || '/placeholder-phone.png'} alt={model.name} className="h-full w-full object-contain" />
+                                  </div>
+                                  <div>
+                                     <span className="block text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{model.name}</span>
+                                     <span className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-widest">Product ID: BSK-MDL-{String(model.id || model._id).slice(-6).toUpperCase()}</span>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="px-8 py-5 text-center">
+                               <div className="flex justify-center">
+                                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest border border-green-100 shadow-sm shadow-green-100">
+                                     <CheckCircle size={10} /> Active
+                                  </span>
+                                </div>
+                            </td>
+                            <td className="px-8 py-5">
+                               <div className="flex justify-end gap-3 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button onClick={() => handleEdit(model)} className="h-10 px-4 rounded-xl border border-slate-200 bg-white text-xs font-black text-slate-600 flex items-center gap-2 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50/20 transition-all shadow-sm">
+                                     <Edit2 size={14} /> Edit Details
+                                  </button>
+                                  <button onClick={() => handleDelete(model.id || model._id)} className="h-10 w-10 rounded-xl border border-slate-200 bg-white text-slate-500 flex items-center justify-center hover:text-red-600 hover:border-red-100 hover:bg-red-50/20 transition-all shadow-sm">
+                                     <Trash2 size={16} />
+                                  </button>
+                               </div>
+                            </td>
+                         </tr>
+                      ))}
+                      {!loading && models.length === 0 && (
+                        <tr>
+                           <td colSpan={3} className="py-20 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">No models found for this brand</td>
+                        </tr>
+                      )}
+                   </tbody>
+                </table>
+             </div>
+          </div>
+       )}
+    </motion.div>
+  );
+}
